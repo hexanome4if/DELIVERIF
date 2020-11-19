@@ -1,0 +1,5 @@
+/app/*/target/*
+*.jar
+*.java
+*.properties
+*.jar
