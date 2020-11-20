@@ -5,16 +5,18 @@
  */
 package deliverif.app.model.graph;
 
+import deliverif.app.model.graph.Vertex;
+
 /**
  *
  * @author zakaria
  */
 public class Edge {
-     // Source vertex of edge is implicit
-    public int dest;  // Index of destination vertex of this edge
-    public int cost;  // Cost (weight) of this edge 
+    // Source vertex of edge is implicit
+    public Vertex dest;  // Index of destination vertex of this edge
+    public float cost;  // Cost (weight) of this edge 
  
-    public Edge( int d, int c )    {
+    public Edge( Vertex d, float c )    {
         dest = d;
         cost = c;
     }

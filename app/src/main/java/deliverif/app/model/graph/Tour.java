@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package deliverif.app.model.graph;
-
 /**
  *
  * @author zakaria

@@ -5,6 +5,11 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.model.graph.Graph;
+import deliverif.app.model.request.PlanningRequest;
+
+
+
 /**
  *
  * @author zakaria
@@ -13,9 +18,11 @@ public class GraphProcessor {
 
     public GraphProcessor() {
     }
-    public void shortestPath() {
+    
+    public void shortestPath(Graph g, PlanningRequest pr) {
         
     }
+    
     public void tsp() {
         
     }
