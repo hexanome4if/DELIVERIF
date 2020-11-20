@@ -1,4 +1,4 @@
-package deliverif.app;
+package deliverif.app.view;
 
 import java.io.IOException;
 import javafx.fxml.FXML;

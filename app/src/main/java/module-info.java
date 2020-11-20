@@ -3,5 +3,5 @@ module deliverif.app {
     requires javafx.fxml;
 
     opens deliverif.app to javafx.fxml;
-    exports deliverif.app;
+    exports deliverif.app.view;
 }

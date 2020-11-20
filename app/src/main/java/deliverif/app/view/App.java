@@ -1,4 +1,4 @@
-package deliverif.app;
+package deliverif.app.view;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
