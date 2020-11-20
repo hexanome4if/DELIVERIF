@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.controller;
+package deliverif.app.controller;
 
+import deliverif.app.model.request.PlanningRequest;
 import deliverif.model.graph.Graph;
-import deliverif.model.request.PlanningRequest;
+
 
 /**
  *
