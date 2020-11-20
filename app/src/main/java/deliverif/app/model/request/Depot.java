@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.model.request;
+package deliverif.app.model.request;
 
 import java.util.Date;
 

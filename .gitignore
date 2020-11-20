@@ -18,3 +18,4 @@ nb-configuration.xml
 /app/*/target/*
 *.properties
 *.class
+/app/target/

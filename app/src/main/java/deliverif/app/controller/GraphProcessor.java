@@ -3,12 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.model.graph;
+package deliverif.app.controller;
 
 /**
  *
  * @author zakaria
  */
-public class Tour {
-    
+public class GraphProcessor {
+
+    public GraphProcessor() {
+    }
+    public void shortestPath() {
+        
+    }
+    public void tsp() {
+        
+    }
 }
