@@ -5,8 +5,9 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.model.graph.Graph;
 import deliverif.app.model.request.PlanningRequest;
-import deliverif.model.graph.Graph;
+
 
 
 /**

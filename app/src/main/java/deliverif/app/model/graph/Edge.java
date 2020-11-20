@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.model.graph;
+package deliverif.app.model.graph;
+
+import deliverif.app.model.graph.Vertex;
 
 /**
  *
