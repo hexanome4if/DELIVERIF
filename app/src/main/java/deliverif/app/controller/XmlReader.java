@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.controller;
+package deliverif.controller;
 
-import deliverif.app.model.map.Map;
-import deliverif.app.model.request.Request;
+import deliverif.model.map.Map;
+import deliverif.model.request.Request;
 import java.io.File;
 
 /**

@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.controller;
+package deliverif.controller;
+
+import deliverif.model.graph.Graph;
+import deliverif.model.request.PlanningRequest;
 
 /**
  *
@@ -13,9 +16,11 @@ public class GraphProcessor {
 
     public GraphProcessor() {
     }
-    public void shortestPath() {
+    
+    public void shortestPath(Graph g, PlanningRequest pr) {
         
     }
+    
     public void tsp() {
         
     }
