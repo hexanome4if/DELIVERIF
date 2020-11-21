@@ -6,24 +6,25 @@
 package deliverif.app.model.map;
 
 import java.util.List;
+import java.util.HashMap;
 
 /**
  *
  * @author zakaria
  */
 public class Map {
-    private List<Intersection> intersections;
+    private HashMap<Long, Intersection> intersections;
     private List<Segment> segments;
 
     public Map() {
     }
 
-    public Map(List<Intersection> intersections, List<Segment> segments) {
+    public Map(HashMap<Long, Intersection> intersections, List<Segment> segments) {
         this.intersections = intersections;
         this.segments = segments;
     }
 
-    public List<Intersection> getIntersections() {
+    public HashMap<Long, Intersection> getIntersections() {
         return intersections;
     }
 
@@ -31,7 +32,7 @@ public class Map {
         return segments;
     }
 
-    public void setIntersections(List<Intersection> intersections) {
+    public void setIntersections(HashMap<Long, Intersection> intersections) {
         this.intersections = intersections;
     }
 
@@ -41,7 +42,7 @@ public class Map {
 
     @Override
     public String toString() {
-        return "Map{" + "intersections=" + intersections + ", segments=" + segments + '}';
+        return "Map{intersections=" + intersections + ", segments=" + segments + '}';
     }
     
     
