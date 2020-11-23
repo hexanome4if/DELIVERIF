@@ -26,7 +26,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        scene = new Scene(loadFXML("baseTemplate"));
         stage.setScene(scene);
         stage.show();
     }
@@ -84,7 +84,7 @@ public class App extends Application {
             (new FileWriter(fichier.getPath(), true));
             filename = fichier.getPath();
             sortie.close();
-        }
+        }*/
         
         PlanningRequest pr = reader.readRequest(filename);
         return pr;
