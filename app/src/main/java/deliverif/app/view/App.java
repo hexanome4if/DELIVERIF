@@ -47,7 +47,6 @@ public class App extends Application {
         
         PrintWriter sortie;
         
-
         String filename = "";
         File fichier;
         
@@ -89,10 +88,13 @@ public class App extends Application {
         return pr;
     }
 
-    
+    public static void readTest() throws IOException {
+        XmlReader reader = new XmlReader();
+        Map map = choseMapFile(reader);
+    }
 
     public static void main(String[] args) throws IOException{
-        
+        /*
         XmlReader reader = new XmlReader();
         Map map = choseMapFile(reader);
         
@@ -101,6 +103,7 @@ public class App extends Application {
         }
         
         System.out.println(map);
+        */
         launch();
     }
 
