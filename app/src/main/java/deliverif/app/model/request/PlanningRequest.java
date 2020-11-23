@@ -41,7 +41,7 @@ public class PlanningRequest {
 
     @Override
     public String toString() {
-        return "PlanningRequest{" + "depot=" + depot + ", requests=" + requests + '}';
+        return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';
     }
     
 }
