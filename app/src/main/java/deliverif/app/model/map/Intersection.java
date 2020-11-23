@@ -10,21 +10,16 @@ package deliverif.app.model.map;
  * @author zakaria
  */
 public class Intersection {
-    private Integer id;
+    
     private float latitude;
     private float longitude;
 
     public Intersection() {
     }
 
-    public Intersection(Integer id, float latitude, float longitude) {
-        this.id = id;
+    public Intersection(float latitude, float longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    public Integer getId() {
-        return id;
     }
 
     public float getLatitude() {
@@ -33,10 +28,6 @@ public class Intersection {
 
     public float getLongitude() {
         return longitude;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public void setLatitude(float latitude) {
@@ -49,7 +40,7 @@ public class Intersection {
 
     @Override
     public String toString() {
-        return "Intersection{" + "id=" + id + ", latitude=" + latitude + ", longitude=" + longitude + '}';
+        return "Intersection{latitude=" + latitude + ", longitude=" + longitude + '}';
     }
     
     
