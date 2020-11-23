@@ -40,7 +40,7 @@ public class Intersection {
 
     @Override
     public String toString() {
-        return "Intersection{latitude=" + latitude + ", longitude=" + longitude + '}';
+        return "Intersection{latitude=" + latitude + ", longitude=" + longitude + "}\n";
     }
     
     
