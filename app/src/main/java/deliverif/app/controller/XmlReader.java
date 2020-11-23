@@ -15,7 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;  
 import org.w3c.dom.NodeList;  
 import org.w3c.dom.Node;  
-import org.w3c.dom.Element;  
+import org.w3c.dom.Element;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class XmlReader {
 
         List<Segment> segments = new ArrayList<Segment>(); 
         HashMap<Long, Intersection> intersections = new HashMap<Long, Intersection>();
-
+       
         try {  
             //creating a constructor of file class and parsing an XML file  
             File file = new File(filename);
@@ -97,7 +97,7 @@ public class XmlReader {
         }catch (Exception e){  
                 e.printStackTrace();  
         }
-
+        
         map = new Map(intersections, segments);
         return map;
    }
