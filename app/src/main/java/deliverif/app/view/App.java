@@ -99,9 +99,8 @@ public class App extends Application {
         
         if(map != null){
             PlanningRequest pr = choseRequestFile(reader);
+            System.out.println(pr);
         }
-        
-        System.out.println(map);
         launch();
     }
 
