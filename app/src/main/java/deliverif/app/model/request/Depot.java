@@ -5,6 +5,8 @@
  */
 package deliverif.app.model.request;
 
+import deliverif.app.model.map.Intersection;
+
 import java.util.Date;
 
 /**
@@ -12,18 +14,18 @@ import java.util.Date;
  * @author zakaria
  */
 public class Depot {
-    private Integer address;
+    private Intersection address;
     private Date departureTime;
 
     public Depot() {
     }
 
-    public Depot(Integer address, Date departureTime) {
+    public Depot(Intersection address, Date departureTime) {
         this.address = address;
         this.departureTime = departureTime;
     }
 
-    public Integer getAddress() {
+    public Intersection getAddress() {
         return address;
     }
 
@@ -31,7 +33,7 @@ public class Depot {
         return departureTime;
     }
 
-    public void setAddress(Integer address) {
+    public void setAddress(Intersection address) {
         this.address = address;
     }
 

@@ -59,7 +59,7 @@ public class Segment {
 
     @Override
     public String toString() {
-        return "Segment{" + "origin=" + origin + ", destination=" + destination + ", length=" + length + ", name=" + name + '}';
+        return "Segment{" + "origin=" + origin + ", destination=" + destination + ", length=" + length + ", name=" + name + "}\n";
     }
     
 }
