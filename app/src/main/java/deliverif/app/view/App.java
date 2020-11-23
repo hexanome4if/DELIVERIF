@@ -84,7 +84,7 @@ public class App extends Application {
             (new FileWriter(fichier.getPath(), true));
             filename = fichier.getPath();
             sortie.close();
-        }*/
+        }
         
         PlanningRequest pr = reader.readRequest(filename);
         return pr;
