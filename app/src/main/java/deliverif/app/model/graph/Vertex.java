@@ -20,7 +20,7 @@ public class Vertex {
     int prev;      // variable for use by algorithms
     int scratch;   // variable for use by algorithms
  
-    Vertex( Long id )    {
+    public Vertex( Long id )    {
         this.id = id;                      // name of this Vertex
         adj  = new LinkedList<Edge>( ); // Start an empty adj list
     }
@@ -33,6 +33,32 @@ public class Vertex {
         return id;
     }
     
+    public boolean isEdge(Vertex v){
+        for (Edge e : adj){
+            if (e.dest == v){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean equals(Object o){
+        Vertex v = (Vertex) o;
+        if(v.getId()==id){
+            return true;
+        }
+        return false;
+    }
+    
+    public float getCost(Vertex v){
+        for (Edge e : adj){
+            if (e.dest == v){
+                return e.cost;
+            }
+        }
+        return -1;
+    }
     
     
 }

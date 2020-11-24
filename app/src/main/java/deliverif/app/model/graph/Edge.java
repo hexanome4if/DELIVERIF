@@ -20,4 +20,6 @@ public class Edge {
         dest = d;
         cost = c;
     }
+    
+    
 }
