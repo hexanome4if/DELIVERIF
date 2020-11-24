@@ -7,6 +7,6 @@ module deliverif.app {
     requires gs.core;
     requires gs.ui.javafx;
     
-    opens deliverif.app to javafx.fxml;
+    opens deliverif.app to javafx.graphics;
     exports deliverif.app.view;
 }
