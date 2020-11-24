@@ -24,4 +24,10 @@ public class Vertex {
         this.id = id;                      // name of this Vertex
         adj  = new LinkedList<Edge>( ); // Start an empty adj list
     }
+
+    public List<Edge> getAdj() {
+        return adj;
+    }
+    
+    
 }
