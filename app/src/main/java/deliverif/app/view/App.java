@@ -85,7 +85,6 @@ public class App extends Application {
             filename = fichier.getPath();
             sortie.close();
         }
-
         PlanningRequest pr = reader.readRequest(filename);
         return pr;
     }
@@ -102,10 +101,12 @@ public class App extends Application {
         
         if(map != null){
             PlanningRequest pr = choseRequestFile(reader);
+            System.out.println(pr);
         }
         
         System.out.println(map);
         */
+
         launch();
     }
 

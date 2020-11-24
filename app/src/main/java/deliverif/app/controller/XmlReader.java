@@ -19,6 +19,9 @@ import org.w3c.dom.Element;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.text.SimpleDateFormat;  
+import java.util.Date;  
+
 /**
  *
  * @author zakaria
@@ -131,25 +134,25 @@ public class XmlReader {
             Document doc = db.parse(file);  
             doc.getDocumentElement().normalize();  
 
-            System.out.println("Root element: " + doc.getDocumentElement().getNodeName());  
             NodeList nodeList = doc.getElementsByTagName("depot");  
-
-           
+            SimpleDateFormat hourFormat =new SimpleDateFormat("HH:mm:ss"); 
+            
             // nodeList is not iterable, so we are using for loop  
             for (int itr = 0; itr < nodeList.getLength(); itr++) { 
 
                     Node node = nodeList.item(itr);  
-                    System.out.println("\nNode Name :" + node.getNodeName());
 
                     if (node.getNodeType() == Node.ELEMENT_NODE){  
                         Element eElement = (Element) node;  
-                        System.out.println("address : " + eElement.getAttribute("address"));
-                        System.out.println("departureTime : " + eElement.getAttribute("departureTime"));
- 
-                        //depot = new Depot (eElement.getAttribute("address"), eElement.getAttribute("departureTime"));
-
-                        //return xmlDocument.getElementsByTagName("category").item(0).getAttributes().getNamedItem("name").getNodeValue();
-                        //System.out.println("Student id: "+ eElement.getElementsByTagName("id").item(0).getTextContent());  
+                        //System.out.println("address : " + eElement.getAttribute("address"));
+                        //System.out.println("departureTime : " + eElement.getAttribute("departureTime"));
+                        
+                        Long adrId = Long.parseLong(eElement.getAttribute("address"));
+                        Intersection adr = map.getIntersections().get(adrId);
+                        
+                        Date departure = hourFormat.parse(eElement.getAttribute("departureTime"));
+                        
+                        depot = new Depot (adr, departure); 
                     }  
             } 
             
@@ -159,35 +162,41 @@ public class XmlReader {
             for (int itr = 0; itr < nodeList.getLength(); itr++) { 
 
                 Node node = nodeList.item(itr);  
-                System.out.println("\nNode Name :" + node.getNodeName());
 
                 if (node.getNodeType() == Node.ELEMENT_NODE){  
                     Element eElement = (Element) node;  
-                    System.out.println("pickupAddress :" + eElement.getAttribute("pickupAddress")); 
+                    /*System.out.println("pickupAddress :" + eElement.getAttribute("pickupAddress")); 
                     System.out.println("deliveryAddress :" + eElement.getAttribute("deliveryAddress"));
                     System.out.println("pickupDuration :" + eElement.getAttribute("pickupDuration")); 
-                    System.out.println("deliveryDuration :" + eElement.getAttribute("deliveryDuration"));
+                    System.out.println("deliveryDuration :" + eElement.getAttribute("deliveryDuration"));*/
                     
-                    Long origin = Long.parseLong(eElement.getAttribute("pickupAddress"));
-                    Intersection inter = map.getIntersections().get(origin);
-                    System.out.println("//"+inter+"//");
-                    //Request request = new Request(eElement.getAttribute("pickupAddress"), eElement.getAttribute("deliveryAddress"), eElement.getAttribute("pickupDuration")), eElement.getAttribute("deliveryDuration"));
-                    //requests.add(request);
-
-                    //return xmlDocument.getElementsByTagName("category").item(0).getAttributes().getNamedItem("name").getNodeValue();
-                    //System.out.println("Student id: "+ eElement.getElementsByTagName("id").item(0).getTextContent());  
-                }  
+                    Long pkId = Long.parseLong(eElement.getAttribute("pickupAddress"));
+                    
+                    
+                    Long dlId;
+                    
+                    if(!"".equals(eElement.getAttribute("deliveryAddress")))
+                        dlId= Long.parseLong(eElement.getAttribute("deliveryAddress"));
+                    else
+                        dlId= Long.parseLong(eElement.getAttribute("adresseLivraison"));
+                    
+                    Integer pkD = Integer.parseInt(eElement.getAttribute("pickupDuration"));
+                    Integer dlD = Integer.parseInt(eElement.getAttribute("deliveryDuration"));
+                    
+                    Intersection pkAdr = map.getIntersections().get(pkId);
+                    Intersection dlAdr = map.getIntersections().get(dlId);
+                            
+                    Request request = new Request(pkAdr, dlAdr, pkD, dlD);
+                    requests.add(request); 
+                
+                }
             }
 
         }catch (Exception e){  
             e.printStackTrace();  
         }  
-
-
-        pr = new PlanningRequest (depot, requests);
- 
         
+        pr = new PlanningRequest (depot, requests);
         return pr;
-
     }
 }
