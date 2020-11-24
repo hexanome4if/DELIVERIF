@@ -7,21 +7,21 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="800.0" maxWidth="1000.0" minHeight="800.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1000.0" snapToPixel="true" style="-fx-background-color:#1DBCEB;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.BaseTemplateController">
+<AnchorPane id="AnchorPane" prefHeight="664.0" prefWidth="1210.0" snapToPixel="true" style="-fx-background-color:#1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="deliverif.app.controller.BaseTemplateController">
   <children>
-    <Text disable="false" focusTraversable="false" fontSmoothingType="GRAY" layoutX="474.0" layoutY="109.0" scaleX="7.505029184033976" scaleY="6.7640723227712005" smooth="true" strikethrough="false" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DELIVERIF" textAlignment="LEFT" underline="false" visible="true">
+    <Text disable="false" focusTraversable="false" fontSmoothingType="GRAY" layoutX="455.0" layoutY="65.0" scaleX="7.505029184033976" scaleY="6.7640723227712005" smooth="true" strikethrough="false" stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DELIVERIF" textAlignment="LEFT" underline="false" visible="true">
       <font>
         <Font name="Arial Bold" size="10.0" />
       </font>
     </Text>
-    <Button fx:id="loadCityMapButton" cancelButton="false" defaultButton="false" disable="false" layoutX="733.0" layoutY="264.0" mnemonicParsing="false" onAction="#loadCityMapAction" prefHeight="71.0" prefWidth="229.0" text="Load City Map" textOverrun="ELLIPSIS" underline="false">
+    <Button fx:id="loadCityMapButton" cancelButton="false" defaultButton="false" disable="false" layoutX="956.0" layoutY="226.0" mnemonicParsing="false" onAction="#loadCityMapAction" prefHeight="71.0" prefWidth="229.0" text="Load City Map" textOverrun="ELLIPSIS" underline="false">
       <font>
         <Font size="15.0" fx:id="x1" />
       </font>
     </Button>
-    <Button fx:id="loadRequestButton" cancelButton="false" defaultButton="false" disable="false" font="$x1" layoutX="733.0" layoutY="362.0" mnemonicParsing="false" onAction="#loadRequestAction" prefHeight="71.0" prefWidth="229.0" text="Load Request" textOverrun="ELLIPSIS" underline="false" />
-    <Button id="loadComputeTourButton" fx:id="computeTourButton" cancelButton="false" defaultButton="false" disable="false" font="$x1" layoutX="733.0" layoutY="465.0" mnemonicParsing="false" onAction="#computeTourAction" prefHeight="71.0" prefWidth="229.0" text="Compute Tour" textOverrun="ELLIPSIS" underline="false" />
-    <Button fx:id="editTourButton" cancelButton="false" defaultButton="false" disable="false" font="$x1" layoutX="733.0" layoutY="564.0" mnemonicParsing="false" onAction="#editTourAction" prefHeight="71.0" prefWidth="229.0" text="Edit Tour" textOverrun="ELLIPSIS" underline="false" />
-    <AnchorPane cache="false" layoutX="50.0" layoutY="164.0" prefHeight="601.0" prefWidth="646.09423828125" scaleX="1.0" style="-fx-background-color:lightgray;&#10;-fx-background-radius:50px;" />
+    <Button fx:id="loadRequestButton" cancelButton="false" defaultButton="false" disable="false" font="$x1" layoutX="956.0" layoutY="324.0" mnemonicParsing="false" onAction="#loadRequestAction" prefHeight="71.0" prefWidth="229.0" text="Load Request" textOverrun="ELLIPSIS" underline="false" />
+    <Button id="loadComputeTourButton" fx:id="computeTourButton" cancelButton="false" defaultButton="false" disable="false" font="$x1" layoutX="956.0" layoutY="427.0" mnemonicParsing="false" onAction="#computeTourAction" prefHeight="71.0" prefWidth="229.0" text="Compute Tour" textOverrun="ELLIPSIS" underline="false" />
+    <Button fx:id="editTourButton" cancelButton="false" defaultButton="false" disable="false" font="$x1" layoutX="956.0" layoutY="526.0" mnemonicParsing="false" onAction="#editTourAction" prefHeight="71.0" prefWidth="229.0" text="Edit Tour" textOverrun="ELLIPSIS" underline="false" />
+    <AnchorPane cache="false" layoutX="26.0" layoutY="116.0" prefHeight="523.0" prefWidth="903.0" scaleX="1.0" style="-fx-background-color:lightgray;&#10;-fx-background-radius:50px;" />
   </children>
 </AnchorPane>
