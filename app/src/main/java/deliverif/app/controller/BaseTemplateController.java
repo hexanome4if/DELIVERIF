@@ -5,6 +5,7 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.view.App;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -30,6 +31,7 @@ public class BaseTemplateController {
     @FXML
     private void loadCityMapAction() throws IOException {
         System.out.println("loadCityMapAction");
+        App.readTest();
     }
     
     @FXML
