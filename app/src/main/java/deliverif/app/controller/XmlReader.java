@@ -75,7 +75,7 @@ public class XmlReader {
 
                     //System.out.println("Request id : " + eElement.getAttribute("id")); 
 
-                    Intersection inter = new Intersection(lat, lon);
+                    Intersection inter = new Intersection(id, lat, lon);
                     intersections.put(id, inter);
 
                 }
