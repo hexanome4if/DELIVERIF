@@ -10,6 +10,7 @@ import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.request.PlanningRequest;
+import deliverif.app.model.request.Request;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +31,12 @@ public class GraphProcessor {
         map = m;
     }
     
-    public HashMap<Integer,Float> dijkstra(Integer sourceId, List<Integer> goals){
+    public void dijkstra(Graph g, Vertex source, List<Vertex> goals){
         // Strutures
-        HashMap<Integer, Float> dis = new HashMap<>();  //distance : <idNoeud, distance>
+        HashMap<Long, Float> dis = new HashMap<>();  //distance : <idNoeud, distance>
         List<Vertex> gris = new ArrayList<>();          //liste des noeuds grisés (mais cet algo est sobre;)
-        List<Integer> noir = new ArrayList<>();         //liste des noeuds noircis
-        Vertex source = graph.getVertexMap().get(sourceId);
+        List<Long> noir = new ArrayList<>();         //liste des noeuds noircis
+
         System.out.println("source: "+source);
         System.out.println("adjacences: "+source.getAdj());
         
@@ -44,7 +45,7 @@ public class GraphProcessor {
             dis.put(edg.dest.getId(),edg.cost);
             gris.add(edg.dest);
         }
-        noir.add(sourceId);
+        noir.add(source.getId());
         System.out.println("distance: "+dis);
         System.out.println("nb gris: "+gris.size());
         System.out.println("nb noir: "+noir.size());
@@ -52,14 +53,13 @@ public class GraphProcessor {
         
         while(!gris.isEmpty() && !noir.containsAll(goals)){  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal
             float dis_MIN = Float.POSITIVE_INFINITY;
-            int noeudId = 0;
+            Vertex vertex = null;
             for(Vertex v : gris){ //parcours de liste gris pour trouver le noeud dont la valeur "distance" est minimal
                 if(dis.get(v.getId()) < dis_MIN){
                     dis_MIN = dis.get(v.getId());
-                    noeudId = v.getId();
+                    vertex = v;
                 }
             }
-            Vertex vertex = graph.getVertexMap().get(noeudId); 
             
             for(Edge edg : vertex.getAdj()){
                 if(dis.containsKey(edg.dest.getId())){
@@ -79,15 +79,30 @@ public class GraphProcessor {
             System.out.println("nb gris: "+gris.size());
             System.out.println("nb noir: "+noir.size());
         }
-        HashMap<Integer,Float> result = new HashMap<>();
-        for(Integer i : goals){
-            result.put(i,dis.get(i));
+        
+        for(Vertex v : goals){
+            g.addEdge(source.getId(), v.getId(), dis.get(v.getId()));
         }
-        return result;
+        
     }
     
     public Graph completeGraph(PlanningRequest pr) {
         Graph g = new Graph();
+        HashMap<Long, Vertex> vertexMap = graph.getVertexMap();
+        List<Vertex> vertices = new ArrayList<>();
+        vertices.add(vertexMap.get(pr.getDepot().getAddress().getId()));
+        for (Request r : pr.getRequests()){
+            vertices.add(vertexMap.get(r.getPickupAddress().getId()));
+            vertices.add(vertexMap.get(r.getDeliveryAddress().getId()));
+        }
+        for (Vertex v : vertices){
+            g.addVertex(v);
+        }
+        
+        for (Vertex v : vertices){
+            dijkstra(g,v,vertices);
+        }
+        return g;
     }
     
     public void shortestPath(Graph g, PlanningRequest pr) {

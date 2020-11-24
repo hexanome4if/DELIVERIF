@@ -16,16 +16,16 @@ import java.util.List;
  */
 public class Graph {
     // Maps vertex name to number
-    private HashMap<Integer, Vertex> vertexMap;
+    private HashMap<Long, Vertex> vertexMap;
      
  
     private static final int NULL_VERTEX = -1;
  
     public Graph()    {
-        vertexMap   = new HashMap<Integer, Vertex>();
+        vertexMap   = new HashMap<Long, Vertex>();
     }
 
-    public HashMap<Integer, Vertex> getVertexMap() {
+    public HashMap<Long, Vertex> getVertexMap() {
         return vertexMap;
     }
     
@@ -36,7 +36,7 @@ public class Graph {
      * @param source
      * @param dest
     */
-    public void addEdge( Integer source, Integer dest, float cost ) {
+    public void addEdge( Long source, Long dest, float cost ) {
         Vertex srcVex = vertexMap.get(source);
         Vertex dstVex = vertexMap.get(dest);
         if(srcVex != null && dstVex != null){
@@ -51,10 +51,8 @@ public class Graph {
     * This involves adding entries to the Hashtable and vertex Vector.
     * PRE: vertexName is not already in the Graph
     */
-    private Integer addVertex( Integer id ) {
-        Vertex v = new Vertex(id);
-        vertexMap.put(id,v);
-        return id;
+    public void addVertex( Vertex v ) {
+        vertexMap.put(v.getId(),v);
     }
     
 
