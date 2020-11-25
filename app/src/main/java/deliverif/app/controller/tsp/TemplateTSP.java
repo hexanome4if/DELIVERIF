@@ -78,11 +78,11 @@ public abstract class TemplateTSP implements TSP {
 			Collection<Vertex> visited, float currentCost, Vertex start){
 		if (System.currentTimeMillis() - startTime > timeLimit) return;
 	    if (unvisited.size() == 0){ 
-                System.out.println("Unvisited empty.");
+                //System.out.println("Unvisited empty.");
                 if(currentVertex.isEdge(start)) {
                     if (currentCost+currentVertex.getCost(start) < bestSolCost){ 
                         bestSol=visited.toArray(bestSol);
-                        System.out.println("Found a solution.");
+                        //System.out.println("Found a solution.");
                         //System.out.println("Before visited vertices.");
                         /*for (Vertex v : bestSol){
                             System.out.println("Visited vertex: " + v);

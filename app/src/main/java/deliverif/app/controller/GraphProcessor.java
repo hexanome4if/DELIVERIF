@@ -46,20 +46,14 @@ public class GraphProcessor {
         HashMap<Long, Float> dis = new HashMap<>();  //distance : <idNoeud, distance>
         List<Vertex> gris = new ArrayList<>();          //liste des noeuds grisés (mais cet algo est sobre;)
         List<Vertex> noir = new ArrayList<>();         //liste des noeuds noircis
-
-        //System.out.println("source: "+source);
-        //System.out.println("adjacences: "+source.getAdj());
         
         // Initialisation
+        source = graph.getVertexMap().get(source.getId());
         for(Edge edg : source.getAdj()){
             dis.put(edg.dest.getId(),edg.cost);
             gris.add(edg.dest);
         }
         noir.add(source);
-        //System.out.println("distance: "+dis);
-        //System.out.println("nb gris: "+gris.size());
-        //System.out.println("nb noir: "+noir.size());
-        
         
         while(!gris.isEmpty() && !noir.containsAll(goals)){  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal
             float dis_MIN = Float.POSITIVE_INFINITY;
@@ -70,6 +64,7 @@ public class GraphProcessor {
                     vertex = v;
                 }
             }
+            vertex = graph.getVertexMap().get(vertex.getId());
             
             for(Edge edg : vertex.getAdj()){
                 if(dis.containsKey(edg.dest.getId())){
@@ -84,15 +79,11 @@ public class GraphProcessor {
             
             gris.remove(vertex); //changement d'état gris->noir pour le noeud choisi
             noir.add(vertex);
-            
-            //System.out.println("distance: "+dis);
-            //System.out.println("nb gris: "+gris.size());
-            //System.out.println("nb noir: "+noir.size());
         }
         for(Vertex v : goals){
             if(Objects.equals(v.getId(), source.getId())) {
             } else {
-                g.addEdge(source.getId(), v.getId(), dis.get(v.getId()));
+                g.addEdgeOneSide(source.getId(), v.getId(), dis.get(v.getId()));
             }
         }
     }
@@ -101,10 +92,10 @@ public class GraphProcessor {
         Graph g = new Graph();
         HashMap<Long, Vertex> vertexMap = graph.getVertexMap();
         List<Vertex> vertices = new ArrayList<>();
-        vertices.add(vertexMap.get(pr.getDepot().getAddress().getId()));
+        vertices.add( new Vertex(pr.getDepot().getAddress().getId()) );
         for (Request r : pr.getRequests()){
-            vertices.add(vertexMap.get(r.getPickupAddress().getId()));
-            vertices.add(vertexMap.get(r.getDeliveryAddress().getId()));
+            vertices.add( new Vertex(r.getPickupAddress().getId()));
+            vertices.add( new Vertex(r.getDeliveryAddress().getId()));
         }
         for (Vertex v : vertices){
             g.addVertex(v);
@@ -117,25 +108,31 @@ public class GraphProcessor {
         return g;
     }
     
-    public Vertex[] shortestPath(PlanningRequest pr) {
+    public TSP1 shortestPath(PlanningRequest pr) {
         Graph g = completeGraph(pr);
         System.out.println("Nb of vertices shortest path: "+ g.getNbVertices());
         TSP1 tsp = new TSP1();
+        System.out.println("start at: " + pr.getDepot().getAddress().getId());
+        for(Edge e : g.getVertexById(pr.getDepot().getAddress().getId()).getAdj()){
+            System.out.println("to " + e.dest.getId() + " cost: "+ e.cost);
+        }
         tsp.searchSolution(5000, g, g.getVertexById(pr.getDepot().getAddress().getId()));
-        return tsp.getSolution();
+        return tsp;
     }
     
-    public void tsp() {
+    /*public void tsp() {
         
-    }
+    }*/
     
     public static void main (String[] args) {
         XmlReader reader = new XmlReader();
-        reader.readMap("/users/zakaria/Downloads/fichiersXML2020/mediumMap.xml");
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml");
         GraphProcessor gp =  new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("/users/zakaria/Downloads/fichiersXML2020/requestsMedium5.xml");
-        Vertex[] sol = gp.shortestPath(pr);
-        System.out.println(sol);
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsMedium5.xml");
+        TSP1 tsp = gp.shortestPath(pr);
+        Vertex[] sol = tsp.getSolution();
+        float cost = tsp.getSolutionCost();
+        System.out.println("Cost: " + cost);
         for (int i=0; i<sol.length; i++){
             if (sol[i]!=null)
                 System.out.println("Vertex " + i + ":" + sol[i].getId());

@@ -62,6 +62,17 @@ public class Graph {
             System.out.println("source is " + srcVex + ", destination is " + dstVex);
         }
     }
+    
+    public void addEdgeOneSide( Long source, Long dest, float cost ) {
+        Vertex srcVex = vertexMap.get(source);
+        Vertex dstVex = vertexMap.get(dest);
+        if(srcVex != null && dstVex != null){
+            srcVex.adj.add( new Edge (dstVex, cost) );
+            majVertex(srcVex);
+        } else {
+            System.out.println("source is " + srcVex + ", destination is " + dstVex);
+        }
+    }
     /**
     * Add a vertex with the given name to the Graph, and
     * return its internal number as an Integer.
@@ -69,15 +80,19 @@ public class Graph {
     * PRE: vertexName is not already in the Graph
     */
     public void addVertex( Vertex v ) {
-        vertexMap.put(v.getId(),v);
+        if(!vertexMap.containsKey(v.getId()))
+            vertexMap.put(v.getId(),v);
     }
     
+    public void majVertex( Vertex v ) {
+        vertexMap.put(v.getId(),v);
+    }
 
     private void internalAddEdge(Vertex source, Vertex dest, float cost){
         source.adj.add( new Edge (dest, cost) );
         dest.adj.add( new Edge (source, cost) );
-        vertexMap.put(source.id,source);
-        vertexMap.put(dest.id,dest);
+        majVertex(source);
+        majVertex(dest);
     }
 
 }
