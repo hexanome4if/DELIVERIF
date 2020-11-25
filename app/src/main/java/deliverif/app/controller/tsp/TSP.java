@@ -7,6 +7,7 @@ package deliverif.app.controller.tsp;
 
 import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;
+import java.util.List;
 
 /**
  *
@@ -20,7 +21,7 @@ public interface TSP {
      * @param limitTime
      * @param g
      */
-    public void searchSolution(int timeLimit, Graph g, Vertex start);
+    public void searchSolution(int timeLimit, Graph g, Vertex start, List<Long> ordre);
 
     /**
      * @param i

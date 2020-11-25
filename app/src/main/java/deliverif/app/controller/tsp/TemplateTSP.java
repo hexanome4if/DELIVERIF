@@ -15,6 +15,8 @@ import deliverif.app.model.graph.Vertex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class TemplateTSP implements TSP {
 	private Vertex[] bestSol;
@@ -24,7 +26,7 @@ public abstract class TemplateTSP implements TSP {
 	private long startTime;
 	
         
-	public void searchSolution(int timeLimit, Graph g, Vertex start){
+	public void searchSolution(int timeLimit, Graph g, Vertex start, List<Long> ordre){
             if (timeLimit <= 0) return;
             startTime = System.currentTimeMillis();	
             this.timeLimit = timeLimit;
@@ -36,7 +38,7 @@ public abstract class TemplateTSP implements TSP {
             Collection<Vertex> visited = new ArrayList<>(g.getNbVertices());
             visited.add(start); // The first visited vertex is 0
             bestSolCost = Integer.MAX_VALUE;
-            branchAndBound(start, unvisited, visited, 0, start);
+            branchAndBound(start, unvisited, visited, 0, start, ordre);
 	}
 	
 	public Vertex[] getSolution(){
@@ -75,9 +77,10 @@ public abstract class TemplateTSP implements TSP {
 	 * @param currentCost the cost of the path corresponding to <code>visited</code>
 	 */	
 	private void branchAndBound(Vertex currentVertex, Collection<Vertex> unvisited, 
-			Collection<Vertex> visited, float currentCost, Vertex start){
-		if (System.currentTimeMillis() - startTime > timeLimit) return;
-	    if (unvisited.size() == 0){ 
+			Collection<Vertex> visited, float currentCost, Vertex start, 
+                        List<Long> ordre){
+            if (System.currentTimeMillis() - startTime > timeLimit) return;
+	    if (unvisited.isEmpty()){ 
                 //System.out.println("Unvisited empty.");
                 if(currentVertex.isEdge(start)) {
                     if (currentCost+currentVertex.getCost(start) < bestSolCost){ 
@@ -92,13 +95,27 @@ public abstract class TemplateTSP implements TSP {
                 }            
 	    } else if (currentCost+bound(currentVertex,unvisited) < bestSolCost){
 	        Iterator<Vertex> it = iterator(currentVertex, unvisited, g);
+                
 	        while (it.hasNext()){
                     Vertex nextVertex = it.next();
                     visited.add(nextVertex);
 	            unvisited.remove(nextVertex);
+                    
+                    boolean allowed = true;
+                    if(ordre.indexOf(nextVertex.getId())%2 != 0){
+                        for(Vertex unv : unvisited){
+                            if(Objects.equals(unv.getId(), ordre.get(ordre.indexOf(nextVertex.getId())-1))){
+                                allowed = false;
+                                break;
+                            }
+                        }
+                    }
+                    
                     //System.out.println("Removed "+ nextVertex + "from unvisited.");
-	            branchAndBound(nextVertex, unvisited, visited, 
-	            		currentCost+currentVertex.getCost(nextVertex), start);
+	            if(allowed){
+                        branchAndBound(nextVertex, unvisited, visited, 
+                                    currentCost+currentVertex.getCost(nextVertex), start, ordre);
+                    }
 	            visited.remove(nextVertex);
 	            unvisited.add(nextVertex);
                     //System.out.println("Added "+ nextVertex + "to unvisited.");

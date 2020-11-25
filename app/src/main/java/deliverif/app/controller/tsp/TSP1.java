@@ -9,6 +9,7 @@ import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -27,8 +28,9 @@ public class TSP1 extends TemplateTSP {
     }
     
     @Override
-    public void searchSolution(int timeLimit, Graph g, Vertex start){
+    public void searchSolution(int timeLimit, Graph g, Vertex start, List<Long> ordre){
         mindis = g.getMinDis();
-        super.searchSolution(timeLimit, g, start);
+        super.searchSolution(timeLimit, g, start, ordre);
     }
+
 }

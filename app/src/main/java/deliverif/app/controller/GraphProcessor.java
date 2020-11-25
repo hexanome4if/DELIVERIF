@@ -116,7 +116,12 @@ public class GraphProcessor {
         for(Edge e : g.getVertexById(pr.getDepot().getAddress().getId()).getAdj()){
             System.out.println("to " + e.dest.getId() + " cost: "+ e.cost);
         }
-        tsp.searchSolution(5000, g, g.getVertexById(pr.getDepot().getAddress().getId()));
+        List<Long> ordre = new ArrayList<>();
+        for (Request r : pr.getRequests()){
+            ordre.add( r.getPickupAddress().getId());
+            ordre.add( r.getDeliveryAddress().getId());
+        }
+        tsp.searchSolution(5000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
         return tsp;
     }
     
