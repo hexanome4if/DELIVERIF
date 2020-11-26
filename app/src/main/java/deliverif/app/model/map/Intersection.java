@@ -18,6 +18,11 @@ public class Intersection {
     public Intersection() {
     }
 
+    public Intersection(Long id) {
+        this.id = id;
+    }
+
+    
     public Intersection(Long id, float latitude, float longitude) {
         this.id = id;
         this.latitude = latitude;
