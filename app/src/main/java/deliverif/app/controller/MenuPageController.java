@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.EnumSet;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
@@ -31,7 +32,8 @@ import org.graphstream.ui.view.util.InteractiveElement;
  * @author fabien
  */
 public class MenuPageController {
-        @FXML
+    
+    @FXML
     private Button loadCityMapButton;
     
     @FXML
@@ -44,7 +46,7 @@ public class MenuPageController {
     private Button editTourButton;
     
     @FXML 
-    private Pane mapPane;
+    private AnchorPane mapPane;
     
     private XmlReader xmlReader = new XmlReader();
     
@@ -71,6 +73,10 @@ public class MenuPageController {
         panel.enableMouseOptions();
         panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.NODE, InteractiveElement.SPRITE)));
         mapPane.getChildren().add(panel);
+        AnchorPane.setTopAnchor(panel, 1.0);
+        AnchorPane.setLeftAnchor(panel, 1.0);
+        AnchorPane.setRightAnchor(panel, 1.0);
+        AnchorPane.setBottomAnchor(panel, 1.0);
     }
     
     @FXML

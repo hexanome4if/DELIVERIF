@@ -6,6 +6,7 @@
 package deliverif.app.controller;
 
 import java.util.EnumSet;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import org.graphstream.ui.fx_viewer.util.FxMouseManager;
 import org.graphstream.ui.graphicGraph.GraphicElement;
@@ -59,15 +60,33 @@ public class MouseOverMouseManager extends FxMouseManager {
     }
 
     @Override
+    protected void mouseButtonPressOnElement(GraphicElement element,
+            MouseEvent event) {
+        view.freezeElement(element, true);
+        if (event.getButton() == MouseButton.SECONDARY) {
+            element.setAttribute("ui.selected");
+        } else {
+            element.setAttribute("ui.clicked");
+        }
+        System.out.println("Press on " + element.getSelectorType() + " id=" + element.getId());
+    }
+
+    @Override
     protected void mouseButtonPress(MouseEvent event) {
         view.requireFocus();
         float value = 0;
         float val = (float) 0.5;
         // Unselect all.
         if (!event.isShiftDown()) {
-            graph.nodes().filter(n -> n.hasAttribute("ui.selected")).forEach(n -> {n.removeAttribute("ui.selected"); n.setAttribute("ui.color", value);});
+            graph.nodes().filter(n -> n.hasAttribute("ui.selected")).forEach(n -> {
+                n.removeAttribute("ui.selected");
+                n.setAttribute("ui.color", value);
+            });
             graph.sprites().filter(s -> s.hasAttribute("ui.selected")).forEach(s -> s.removeAttribute("ui.selected"));
-            graph.edges().filter(e -> e.hasAttribute("ui.selected")).forEach(e -> {e.removeAttribute("ui.selected"); e.setAttribute("ui.color", val);});
+            graph.edges().filter(e -> e.hasAttribute("ui.selected")).forEach(e -> {
+                e.removeAttribute("ui.selected");
+                e.setAttribute("ui.color", val);
+            });
         }
     }
 }
