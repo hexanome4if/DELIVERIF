@@ -21,14 +21,8 @@ public class Path {
     private float length;
     private Date depatureTime;
     private Date arrivalTime;
-    private Type type;
     private Request request;
     
-    public enum Type {
-        PICKUP,
-        DELIVERY,
-        RETURN
-    }
     
     public Path () {
         
@@ -41,7 +35,6 @@ public class Path {
         this.length = p.getLength();
         this.depatureTime = p.getDepatureTime();
         this.arrivalTime = p.getArrivalTime();
-        this.type = p.getType();
         this.request = p.getRequest();
     }
 
@@ -69,13 +62,42 @@ public class Path {
         return arrivalTime;
     }
 
-    public Type getType() {
-        return type;
-    }
-
     public Request getRequest() {
         return request;
     }
+
+    public void setSegments(ArrayList<Segment> segments) {
+        this.segments = segments;
+    }
+
+    public void setDeparture(Intersection departure) {
+        this.departure = departure;
+    }
+
+    public void setArrival(Intersection arrival) {
+        this.arrival = arrival;
+    }
+
+    public void setLength(float length) {
+        this.length = length;
+    }
+
+    public void setDepatureTime(Date depatureTime) {
+        this.depatureTime = depatureTime;
+    }
+
+    public void setArrivalTime(Date arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public void setRequest(Request request) {
+        this.request = request;
+    }
     
+    public void addSegment (Segment s) {
+        this.segments.add(s);
+        this.arrival = s.getDestination();
+        this.length += s.getLength();
+    }
     
 }

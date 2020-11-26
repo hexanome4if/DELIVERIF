@@ -22,22 +22,6 @@ public class Tour {
         this.pr = pr;
         this.paths = new ArrayList<Path>();
     }
-
-    public ArrayList<Path> getPaths() {
-        return paths;
-    }
-
-    public PlanningRequest getPr() {
-        return pr;
-    }
-
-    public void setPaths(ArrayList<Path> paths) {
-        this.paths = paths;
-    }
-
-    public void setPr(PlanningRequest pr) {
-        this.pr = pr;
-    }
     
     public float getTotalDistance() {
         float total = 0;
@@ -65,7 +49,23 @@ public class Tour {
     public void addPath (Path p) {
         paths.add(p);
     }
+    
+    public ArrayList<Path> getPaths() {
+        return paths;
+    }
 
+    public PlanningRequest getPr() {
+        return pr;
+    }
+
+    public void setPaths(ArrayList<Path> paths) {
+        this.paths = paths;
+    }
+
+    public void setPr(PlanningRequest pr) {
+        this.pr = pr;
+    }
+    
     @Override
     public String toString() {
         return "Tour{" + "paths=" + paths + ", pr=" + pr + '}';

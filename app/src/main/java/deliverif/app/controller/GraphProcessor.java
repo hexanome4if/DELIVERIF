@@ -8,13 +8,16 @@ package deliverif.app.controller;
 import deliverif.app.controller.tsp.TSP1;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
+import deliverif.app.model.graph.Tour;
 import deliverif.app.model.graph.Vertex;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.map.Segment;
+import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -123,6 +126,46 @@ public class GraphProcessor {
         }
         tsp.searchSolution(5000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
         return tsp;
+    }
+    
+    public Path shortestPathBetweenTwoIntersections (Intersection v1, Intersection v2) {
+        Path path = new Path();
+        return path;
+    }
+    
+    public Tour optimalTour (Map map, PlanningRequest pr) {
+        Tour tour = new Tour (pr);
+        GraphProcessor gp =  new GraphProcessor(map);
+        TSP1 tsp = gp.hamiltonianCircuit(pr);
+        Vertex[] sol = tsp.getSolution();
+        double velocity = 15 * 1000 / 60;
+        Calendar cal =  Calendar.getInstance();
+        cal.setTime(pr.getDepot().getDepartureTime());
+        if (sol == null || sol[0] == null) return null;
+        Long arrivalId = null;
+        // Adding paths excluding warehouse
+        for (int i=0; i<sol.length-1; i++){
+            Intersection curr = new Intersection(sol[i].getId());
+            Intersection next = new Intersection(sol[i+1].getId());
+            Path path = shortestPathBetweenTwoIntersections(curr,next);
+            path.setDepatureTime(cal.getTime());
+            double cycling = path.getLength()/velocity;
+            cal.add(Calendar.MINUTE, (int) cycling);
+            path.setArrivalTime(cal.getTime());
+            tour.addPath(path);
+            // Need to take into account path type to add pickup/delivery time
+        }
+        // Adding path back to warehouse
+        Intersection last =  new Intersection(sol[sol.length-2].getId());
+        Intersection warehouse = new Intersection(sol[sol.length-1].getId());
+        Path path = shortestPathBetweenTwoIntersections(last, warehouse);
+        path.setDepatureTime(cal.getTime());
+        double cycling = path.getLength()/velocity;
+        cal.add(Calendar.MINUTE, (int) cycling);
+        path.setArrivalTime(cal.getTime());
+        tour.addPath(path);
+        
+        return tour;
     }
     
     /*public void tsp() {
