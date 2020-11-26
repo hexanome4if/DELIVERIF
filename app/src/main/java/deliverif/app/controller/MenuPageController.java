@@ -8,7 +8,6 @@ package deliverif.app.controller;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.request.PlanningRequest;
-import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -22,17 +21,17 @@ import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
+import org.graphstream.ui.spriteManager.Sprite;
+import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
-import org.graphstream.ui.spriteManager.*;
 
 /**
  *
  * @author fabien
  */
-public class BaseTemplateController {
-    
-    @FXML
+public class MenuPageController {
+        @FXML
     private Button loadCityMapButton;
     
     @FXML
@@ -81,24 +80,7 @@ public class BaseTemplateController {
             System.out.println("Il faut charger une map avant");
             return;
         }
-        sman = new SpriteManager(this.graph);
-        this.planningRequest = App.choseRequestFile(this.xmlReader);
-        Intersection depot = planningRequest.getDepot().getAddress();
-        Sprite depotSprite = sman.addSprite(depot.getId().toString());
-        depotSprite.setAttribute("ui.class", "depotSprite");
-        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);
-        planningRequest.getRequests().stream().map((r) -> {
-            Intersection pickupAddress = r.getPickupAddress();
-            Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
-            pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
-            pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-            return r;
-        }).forEachOrdered((r) -> {
-            Intersection deliveryAdress = r.getDeliveryAddress();
-            Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
-            deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
-            deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
-        });
+        this.chargerPlanningRequests();
         System.out.println(this.planningRequest);
     }
     
@@ -133,4 +115,24 @@ public class BaseTemplateController {
         });
     }
     
+    private void chargerPlanningRequests() throws IOException {
+        sman = new SpriteManager(this.graph);
+        this.planningRequest = App.choseRequestFile(this.xmlReader);
+        Intersection depot = planningRequest.getDepot().getAddress();
+        Sprite depotSprite = sman.addSprite(depot.getId().toString());
+        depotSprite.setAttribute("ui.class", "depotSprite");
+        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);
+        planningRequest.getRequests().stream().map((r) -> {
+            Intersection pickupAddress = r.getPickupAddress();
+            Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
+            pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+            pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+            return r;
+        }).forEachOrdered((r) -> {
+            Intersection deliveryAdress = r.getDeliveryAddress();
+            Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
+            deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+            deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
+        });
+    }
 }

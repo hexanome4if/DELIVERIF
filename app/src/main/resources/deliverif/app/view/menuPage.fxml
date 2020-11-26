@@ -1,56 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <top>
-      <Text stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DELIVERIF" BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets bottom="20.0" top="10.0" />
-         </BorderPane.margin>
-         <font>
-            <Font name="Arial Bold Italic" size="24.0" />
-         </font>
-      </Text>
-   </top>
-   <right>
-      <VBox prefHeight="383.0" prefWidth="104.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Load City Map" />
-            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Load Request">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Button>
-            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Compute Tour">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Button>
-            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Button>
-         </children>
-         <BorderPane.margin>
-            <Insets right="10.0" />
-         </BorderPane.margin>
-         <padding>
-            <Insets top="40.0" />
-         </padding>
-      </VBox>
-   </right>
-   <center>
-      <AnchorPane prefHeight="383.0" prefWidth="469.0" style="-fx-background-color: lightgrey; -fx-background-radius: 50px;" BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" />
-         </BorderPane.margin>
-      </AnchorPane>
-   </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #1DBCEB;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.MenuPageController">
+  <center>
+    <AnchorPane fx:id="mapPane" prefHeight="383.0" prefWidth="469.0" style="-fx-background-color:transparent;;" BorderPane.alignment="CENTER">
+      <BorderPane.margin>
+        <Insets bottom="10.0" left="10.0" right="10.0" />
+      </BorderPane.margin>
+    </AnchorPane>
+  </center>
+  <right>
+    <VBox prefHeight="383.0" prefWidth="104.0" BorderPane.alignment="CENTER">
+      <children>
+        <Button fx:id="loadCityMapButton" mnemonicParsing="false" onAction="#loadCityMapAction" prefHeight="50.0" prefWidth="200.0" text="Load City Map" />
+        <Button fx:id="loadRequestButton" mnemonicParsing="false" onAction="#loadRequestAction" prefHeight="50.0" prefWidth="200.0" text="Load Request">
+          <VBox.margin>
+            <Insets top="20.0" />
+          </VBox.margin>
+        </Button>
+        <Button fx:id="computeTourButton" mnemonicParsing="false" onAction="#computeTourAction" prefHeight="50.0" prefWidth="200.0" text="Compute Tour">
+          <VBox.margin>
+            <Insets top="20.0" />
+          </VBox.margin>
+        </Button>
+        <Button fx:id="editTourButton" mnemonicParsing="false" onAction="#editTourAction" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
+          <VBox.margin>
+            <Insets top="20.0" />
+          </VBox.margin>
+        </Button>
+      </children>
+      <padding>
+        <Insets top="40.0" />
+      </padding>
+      <BorderPane.margin>
+        <Insets right="10.0" />
+      </BorderPane.margin>
+    </VBox>
+  </right>
+  <top>
+    <Text stroke="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DELIVERIF" BorderPane.alignment="CENTER">
+      <font>
+        <Font name="Arial Bold Italic" size="24.0" />
+      </font>
+      <BorderPane.margin>
+        <Insets bottom="20.0" top="10.0" />
+      </BorderPane.margin>
+    </Text>
+  </top>
 </BorderPane>

@@ -23,9 +23,10 @@ public class App extends Application {
     
     private static Stage stageGraph;
     
-    public static final String styleSheet = "node {\n"
+    public static final String styleSheet = 
+          "node {\n"
         + "	size: 3px;\n"
-        + " fill-mode: dyn-plain;"
+        + "     fill-mode: dyn-plain;"
         + "	fill-color: #222, #555, green, yellow;\n"
         + "	text-mode: hidden;\n"
         + "	z-index: 0;\n"
@@ -33,15 +34,42 @@ public class App extends Application {
         + "\n"
         + "edge {\n"
         + "	shape: line;\n"
-        + " fill-mode: dyn-plain;"
+        + "     fill-mode: dyn-plain;"
         + "	fill-color: #222, #555, green, yellow;\n"
-        + "	arrow-size: 3px, 2px;}";
+        + "	arrow-size: 3px, 2px;"
+        + "}\n"
+        + "\n"
+        + "sprite.depotSprite {\n"
+        + "	shape: diamond;\n"
+        + "     size: 12px;\n"
+        + "     fill-mode: dyn-plain;"
+        + "     fill-color: green;\n"
+        + "     text-mode: hidden;\n"
+        + "     z-index: 99;\n"
+        + "}\n"
+        + "\n"
+        + "sprite.pickupSprite {\n"
+        + "     size: 12px;\n"
+        + "     fill-mode: dyn-plain;"
+        + "     fill-color: red;\n"
+        + "     text-mode: hidden;\n"
+        + "     z-index: 99;\n"
+        + "}\n"
+        + "\n"
+        + "sprite.deliverySprite {\n"
+        + "	shape: triangle;\n"
+        + "     size: 12px;\n"
+        + "     fill-mode: dyn-plain;"
+        + "     fill-color: blue;\n"
+        + "     text-mode: hidden;\n"
+        + "     z-index: 99;\n"
+        + "}\n";
 
     
     @Override
     public void start(Stage stage) throws IOException {
         App.stageGraph = stage ;
-        scene = new Scene(loadFXML("baseTemplate"));
+        scene = new Scene(loadFXML("menuPage"));
         App.stageGraph.setScene(scene); 
         App.stageGraph.show();
     }
