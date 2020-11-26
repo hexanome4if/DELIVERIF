@@ -117,7 +117,7 @@ public class App extends Application {
             String nodeId = mapentry.getKey().toString();
             Intersection intersection = (Intersection) mapentry.getValue();
             graph.addNode(nodeId);
-            graph.getNode(nodeId).setAttribute("xy", intersection.getLatitude(), intersection.getLongitude());
+            graph.getNode(nodeId).setAttribute("xy", intersection.getLongitude(), intersection.getLatitude());
         }
 
         for (Segment s : map.getSegments()) {

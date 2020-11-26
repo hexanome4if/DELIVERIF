@@ -29,10 +29,10 @@
                     <groupId>org.graphstream</groupId>
                     <artifactId>mbox2</artifactId>
                 </exclusion>
-                <exclusion>
+                <!--<exclusion>
                     <groupId>org.graphstream</groupId>
                     <artifactId>pherd</artifactId>
-                </exclusion>
+                </exclusion>-->
             </exclusions>
         </dependency>
         <dependency>
