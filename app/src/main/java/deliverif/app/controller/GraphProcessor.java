@@ -108,7 +108,7 @@ public class GraphProcessor {
         return g;
     }
     
-    public TSP1 shortestPath(PlanningRequest pr) {
+    public TSP1 hamiltonianCircuit (PlanningRequest pr) {
         Graph g = completeGraph(pr);
         System.out.println("Nb of vertices shortest path: "+ g.getNbVertices());
         TSP1 tsp = new TSP1();
@@ -134,10 +134,10 @@ public class GraphProcessor {
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml");
         GraphProcessor gp =  new GraphProcessor(reader.getMap());
         PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsMedium5.xml");
-        TSP1 tsp = gp.shortestPath(pr);
+        TSP1 tsp = gp.hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         float cost = tsp.getSolutionCost();
-        System.out.println("Cost: " + cost);
+        System.out.println("Total cost: " + cost);
         for (int i=0; i<sol.length; i++){
             if (sol[i]!=null)
                 System.out.println("Vertex " + i + ":" + sol[i].getId());
