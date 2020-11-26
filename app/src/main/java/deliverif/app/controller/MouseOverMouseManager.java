@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.view;
+package deliverif.app.controller;
 
 import java.util.EnumSet;
 import javafx.scene.input.MouseEvent;
@@ -58,6 +58,7 @@ public class MouseOverMouseManager extends FxMouseManager {
         }
     }
 
+    @Override
     protected void mouseButtonPress(MouseEvent event) {
         view.requireFocus();
         float value = 0;

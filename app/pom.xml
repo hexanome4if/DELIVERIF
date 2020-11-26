@@ -29,10 +29,6 @@
                     <groupId>org.graphstream</groupId>
                     <artifactId>mbox2</artifactId>
                 </exclusion>
-                <!--<exclusion>
-                    <groupId>org.graphstream</groupId>
-                    <artifactId>pherd</artifactId>
-                </exclusion>-->
             </exclusions>
         </dependency>
         <dependency>
