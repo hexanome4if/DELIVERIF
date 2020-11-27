@@ -19,9 +19,12 @@ import org.graphstream.ui.view.util.InteractiveElement;
  * @author faouz
  */
 public class MouseOverMouseManager extends FxMouseManager {
+    
+    private final MenuPageController menuPageController;
 
-    public MouseOverMouseManager(EnumSet<InteractiveElement> of) {
+    public MouseOverMouseManager(EnumSet<InteractiveElement> of, MenuPageController mpc) {
         super(of);
+        this.menuPageController = mpc;
     }
 
     @Override
@@ -69,6 +72,7 @@ public class MouseOverMouseManager extends FxMouseManager {
             element.setAttribute("ui.clicked");
         }
         System.out.println("Press on " + element.getSelectorType() + " id=" + element.getId());
+        this.menuPageController.updateSelection(element);
     }
 
     @Override
