@@ -5,24 +5,19 @@
  */
 package deliverif.app.controller;
 
-import java.awt.Component;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
-import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.util.FxMouseManager;
-import org.graphstream.ui.geom.Point2;
 import org.graphstream.ui.geom.Point3;
 import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.graphicGraph.GraphicNode;
 import org.graphstream.ui.view.View;
-import org.graphstream.ui.view.camera.Camera;
 import org.graphstream.ui.view.util.InteractiveElement;
 
 /**
@@ -30,10 +25,10 @@ import org.graphstream.ui.view.util.InteractiveElement;
  * @author faouz
  */
 public class MouseOverMouseManager extends FxMouseManager {
-    
+
     private final MenuPageController menuPageController;
 
-      /*
+    /*
         Construction
      */
     public MouseOverMouseManager(EnumSet<InteractiveElement> of, MenuPageController mpc) {
@@ -128,8 +123,7 @@ public class MouseOverMouseManager extends FxMouseManager {
                     y2 = t;
                 }
                 view.endSelectionAt(x2, y2);
-                //view.getCamera().setViewCenter((x1+x2)/2, (y1+y2)/2, 0);
-                view.getCamera().setViewPercent(0.50);
+                //view.getCamera().setViewPercent(0.50);
             }
         }
     };
@@ -143,18 +137,18 @@ public class MouseOverMouseManager extends FxMouseManager {
             } else {
                 /*
                     Reconnaissance des segments
-                
+                 */
                 Edge edge = selectEdge(e.getX(), e.getY());
                 if (edge != null) {
                     curElement = (GraphicElement) edge;
                     mouseButtonPressOnElement(curElement, e);
-                } else { */
-                x1 = e.getX();
-                y1 = e.getY();
-                mouseButtonPress(e);
-                view.beginSelectionAt(x1, y1);
+                } else {
+                    x1 = e.getX();
+                    y1 = e.getY();
+                    mouseButtonPress(e);
+                    view.beginSelectionAt(x1, y1);
+                }
 
-                
             }
         }
     };
@@ -174,8 +168,8 @@ public class MouseOverMouseManager extends FxMouseManager {
         double ld = 5; // Max distance mouse click can be from line to be a click
         Edge se = null; // Current closest edge to mouse click that is withing max distance
         GraphicGraph gg = graph;
-        for (int i = 0; i < gg.getEdgeCount(); i++) {
-            Edge ge = gg.getEdge(i);
+        List<Edge> list = graph.edges().collect(Collectors.toList());
+        for (Edge ge : list) {
             // Nodes of current edge
             GraphicNode gn0 = (GraphicNode) ge.getNode0();
             GraphicNode gn1 = (GraphicNode) ge.getNode1();
@@ -188,7 +182,7 @@ public class MouseOverMouseManager extends FxMouseManager {
             // Distance of mouse click from the line
             double d = Math.abs(m * px - py + b) / Math.sqrt(Math.pow(m, 2) + 1);
 
-            System.out.println("Mouse Point: " + px + "," + py + ", GN0Point: " + gn0p.toString() + ", GN1Point: " + gn1p.toString() + ". Distance: " + d);
+            //System.out.println("Mouse Point: " + px + "," + py + ", GN0Point: " + gn0p.toString() + ", GN1Point: " + gn1p.toString() + ". Distance: " + d);
 
             // Determine lowest x (lnx), hishest x (hnx), lowest y (lny), highest y (hny)
             double lnx = gn0p.x;
@@ -210,7 +204,6 @@ public class MouseOverMouseManager extends FxMouseManager {
             }
         }
         if (se != null) {
-            System.out.println("Selected edge: " + se.getId());
             return graph.getEdge(se.getId());
         }
         return null;
