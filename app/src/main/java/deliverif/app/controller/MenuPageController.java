@@ -14,6 +14,7 @@ import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.EnumSet;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -94,7 +95,9 @@ public class MenuPageController {
         if (depot.getId().toString().equals(idElement)) {
             this.longitudeText.setText(longitude + String.valueOf(depot.getLongitude()));
             this.latitudeText.setText(latitude + String.valueOf(depot.getLatitude()));
-            this.infosText.setText("Departure time = " + String.valueOf(this.planningRequest.getDepot().getDepartureTime()));
+            SimpleDateFormat hourFormat =new SimpleDateFormat("HH:mm:ss"); 
+            String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
+            this.infosText.setText("Departure time = " + strDate);
         } else {
             for (Request r : this.planningRequest.getRequests()) {
                 String idPickupAddress = r.getPickupAddress().getId().toString();
@@ -143,8 +146,12 @@ public class MenuPageController {
         }
         this.chargerPlanningRequests();
         System.out.println(this.planningRequest);
-        /*tour = graphProcessor.optimalTour(this.planningRequest);
+    }
 
+    @FXML
+    private void computeTourAction() throws IOException {
+        System.out.println("computeTourAction");
+        tour = graphProcessor.optimalTour(this.planningRequest);
         for (Path p : tour.getPaths()) {
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -163,12 +170,7 @@ public class MenuPageController {
                     }
                 }
             }
-        }*/
-    }
-
-    @FXML
-    private void computeTourAction() throws IOException {
-        System.out.println("computeTourAction");
+        }
     }
 
     @FXML
