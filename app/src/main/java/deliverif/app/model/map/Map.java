@@ -35,6 +35,17 @@ public class Map {
     public List<Segment> getSegments() {
         return segments;
     }
+    
+    public Segment getSegmentParExtremites(Intersection origine, Intersection destination){
+        for(Segment s : segments){
+            if(s.getOrigin()==origine && s.getDestination()==destination){
+                return s;
+            }else if(s.getOrigin()==destination && s.getDestination()==origine){
+                return s;
+            }
+        }
+        return null;
+    }
 
     public void setIntersections(HashMap<Long, Intersection> intersections) {
         this.intersections = intersections;

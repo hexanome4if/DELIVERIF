@@ -25,7 +25,7 @@ public class Path {
     
     
     public Path () {
-        
+        this.segments = new ArrayList<>();
     }
     
     public Path (Path p) {
@@ -95,9 +95,23 @@ public class Path {
     }
     
     public void addSegment (Segment s) {
+        if (segments.isEmpty()) {
+            departure = s.getOrigin();
+            arrival = s.getDestination();
+        }
         this.segments.add(s);
         this.arrival = s.getDestination();
         this.length += s.getLength();
     }
+
+    @Override
+    public String toString() {
+        String seg =  "";
+        for (Segment s : segments) {
+            seg += s.toString();
+        }
+        return "Path{" + "segments=" + segments + ", \n departure=" + departure + ", arrival=" + arrival + ", length=" + length + ", depatureTime=" + depatureTime + ", arrivalTime=" + arrivalTime + ", request=" + request + '}';
+    }
+    
     
 }

@@ -68,7 +68,11 @@ public class Tour {
     
     @Override
     public String toString() {
-        return "Tour{" + "paths=" + paths + ", pr=" + pr + '}';
+        String pathDetails = "";
+        for (Path p : paths) {
+            pathDetails += p.toString();
+        }
+        return "Tour{" + "paths=" + pathDetails + ", pr=" + pr + '}';
     }
     
     

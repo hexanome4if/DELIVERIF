@@ -128,12 +128,87 @@ public class GraphProcessor {
         return tsp;
     }
     
-    public Path shortestPathBetweenTwoIntersections (Intersection v1, Intersection v2) {
-        Path path = new Path();
-        return path;
+    public Path dijkstraPath(Graph g, Vertex source, Vertex goal){
+        // Structures
+        HashMap<Long, Float> dis = new HashMap<>();  //distance : <idNoeud, distance>
+        HashMap<Long, List<Long>> parcours =  new HashMap<>();
+        List<Vertex> gris = new ArrayList<>();          //liste des noeuds grisés (mais cet algo est sobre;)
+        List<Vertex> noir = new ArrayList<>();         //liste des noeuds noircis
+        HashMap<Long, Path> paths = new HashMap<>();
+        
+        // Initialisation
+        source = graph.getVertexMap().get(source.getId());
+        
+        //List<Long> initParcours = new ArrayList<>();
+        //initParcours.add(source.getId()); //p
+        
+        
+        Intersection sourceItsc = map.getIntersectionParId(source.getId());
+        for(Edge edg : source.getAdj()){
+            dis.put(edg.dest.getId(),edg.cost);
+            //parcours.put(edg.dest.getId(),initParcours);//p
+            Intersection itsc2 = map.getIntersectionParId(edg.dest.getId());
+            Path initPath = new Path();
+            initPath.addSegment(map.getSegmentParExtremites(sourceItsc, itsc2));
+            paths.put(edg.dest.getId(),initPath);
+            gris.add(edg.dest);
+        }
+        noir.add(source);
+        
+        // Itérations
+        while(!gris.isEmpty() && !noir.contains(goal)){  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal
+            float dis_MIN = Float.POSITIVE_INFINITY;
+            Vertex vertex = null;
+            for(Vertex v : gris){ //parcours de liste gris pour trouver le noeud dont la valeur "distance" est minimal
+                if(dis.get(v.getId()) < dis_MIN){
+                    dis_MIN = dis.get(v.getId());
+                    vertex = v;
+                }
+            }
+            vertex = graph.getVertexMap().get(vertex.getId());
+            
+            for(Edge edg : vertex.getAdj()){
+                if(dis.containsKey(edg.dest.getId())){
+                    if(edg.cost + dis.get(vertex.getId()) < dis.get(edg.dest.getId())){ //MAJ si ce chemin est plus court
+                        dis.put(edg.dest.getId(), edg.cost + dis.get(vertex.getId()));
+                        
+                        /*List<Long> intermediareParcours = parcours.get(vertex.getId());
+                        intermediareParcours.add(vertex.getId());
+                        parcours.put(edg.dest.getId(), intermediareParcours);*/
+                        
+                        Path pathIntermediaire = paths.get(vertex.getId());
+                        pathIntermediaire.addSegment(map.getSegmentParExtremites
+                        (map.getIntersectionParId(vertex.getId()), map.getIntersectionParId(edg.dest.getId())));
+                        paths.put(edg.dest.getId(), pathIntermediaire);
+                    } 
+                } else {
+                    dis.put(edg.dest.getId(), edg.cost + dis.get(vertex.getId())); //ajouter la valeur "distance" d'un noeud blanc et le griser
+                    
+                    /*List<Long> intermediareParcours = parcours.get(vertex.getId());//p
+                    intermediareParcours.add(vertex.getId());
+                    parcours.put(edg.dest.getId(), intermediareParcours);*/
+                    
+                    Path pathIntermediaire = paths.get(vertex.getId());
+                    pathIntermediaire.addSegment(map.getSegmentParExtremites
+                    (map.getIntersectionParId(vertex.getId()), map.getIntersectionParId(edg.dest.getId())));
+                    paths.put(edg.dest.getId(), pathIntermediaire);
+                    gris.add(edg.dest);
+                }
+            }
+            
+            gris.remove(vertex); //changement d'état gris->noir pour le noeud choisi
+            noir.add(vertex);
+        }
+        
+        return paths.get(goal.getId());
+        
     }
     
-    public Tour optimalTour (Map map, PlanningRequest pr) {
+    public Path shortestPathBetweenTwoIntersections (Intersection v1, Intersection v2) {
+        return dijkstraPath(graph, graph.getVertexById(v1.getId()), graph.getVertexById(v2.getId()));
+    }
+    
+    public Tour optimalTour (PlanningRequest pr) {
         Tour tour = new Tour (pr);
         GraphProcessor gp =  new GraphProcessor(map);
         TSP1 tsp = gp.hamiltonianCircuit(pr);
@@ -177,14 +252,17 @@ public class GraphProcessor {
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml");
         GraphProcessor gp =  new GraphProcessor(reader.getMap());
         PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsMedium5.xml");
-        TSP1 tsp = gp.hamiltonianCircuit(pr);
+        
+        Tour tour = gp.optimalTour(pr);
+        System.out.println(tour);
+        /*TSP1 tsp = gp.hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         float cost = tsp.getSolutionCost();
         System.out.println("Total cost: " + cost);
         for (int i=0; i<sol.length; i++){
             if (sol[i]!=null)
                 System.out.println("Vertex " + i + ":" + sol[i].getId());
-        }
+        }*/
         /*Graph g = new Graph();
         for(int i = 1; i<= 3000; i++){
             g.addVertex(new Vertex(new Long(i)));
