@@ -27,9 +27,24 @@ public class Map {
     public HashMap<Long, Intersection> getIntersections() {
         return intersections;
     }
-
+    
+    public Intersection getIntersectionParId(Long id) {
+        return intersections.get(id);
+    }
+    
     public List<Segment> getSegments() {
         return segments;
+    }
+    
+    public Segment getSegmentParExtremites(Intersection origine, Intersection destination){
+        for(Segment s : segments){
+            if(s.getOrigin()==origine && s.getDestination()==destination){
+                return s;
+            }else if(s.getOrigin()==destination && s.getDestination()==origine){
+                return s;
+            }
+        }
+        return null;
     }
 
     public void setIntersections(HashMap<Long, Intersection> intersections) {
