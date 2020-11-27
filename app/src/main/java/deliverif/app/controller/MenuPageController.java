@@ -8,6 +8,7 @@ package deliverif.app.controller;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.request.PlanningRequest;
+import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -26,7 +27,7 @@ import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
-
+import java.util.Random;
 /**
  *
  * @author fabien
@@ -121,24 +122,51 @@ public class MenuPageController {
         });
     }
     
+    public String randomColorSprite(){
+        
+        String color;
+        Random rand = new Random();
+        
+        int min, max;
+        min = 55;
+        max = 200;
+        
+        int r = rand.nextInt((max - min) + 1) + min;
+        int g = rand.nextInt((max - min) + 1) + min;
+        int b = rand.nextInt((max - min) + 1) + min;
+                
+        color = "fill-color: rgb("+r+","+g+","+b+");";
+        return color;
+    }
     private void chargerPlanningRequests() throws IOException {
+        //node.setAttribute("ui.style", "fill-color: rgb(0,100,255);");
         sman = new SpriteManager(this.graph);
         this.planningRequest = App.choseRequestFile(this.xmlReader);
+        
         Intersection depot = planningRequest.getDepot().getAddress();
+        
         Sprite depotSprite = sman.addSprite(depot.getId().toString());
         depotSprite.setAttribute("ui.class", "depotSprite");
         depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);
-        planningRequest.getRequests().stream().map((r) -> {
+        
+        
+        
+        for(Request r : planningRequest.getRequests()) {
+     
+            String color = randomColorSprite();
+            
             Intersection pickupAddress = r.getPickupAddress();
             Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
             pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+            pickupAddressSprite.setAttribute("ui.style", color);
             pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-            return r;
-        }).forEachOrdered((r) -> {
+     
+            
             Intersection deliveryAdress = r.getDeliveryAddress();
             Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
             deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+            deliveryAdressSprite.setAttribute("ui.style", color);
             deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
-        });
+        }
     }
 }
