@@ -143,7 +143,7 @@ public class MenuPageController {
         }
         this.chargerPlanningRequests();
         System.out.println(this.planningRequest);
-        tour = graphProcessor.optimalTour(this.planningRequest);
+        /*tour = graphProcessor.optimalTour(this.planningRequest);
 
         for (Path p : tour.getPaths()) {
             for (Segment s : p.getSegments()) {
@@ -163,7 +163,7 @@ public class MenuPageController {
                     }
                 }
             }
-        }
+        }*/
     }
 
     @FXML
