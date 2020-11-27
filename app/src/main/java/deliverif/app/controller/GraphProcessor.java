@@ -145,8 +145,8 @@ public class GraphProcessor {
         Long arrivalId = null;
         // Adding paths excluding warehouse
         for (int i=0; i<sol.length-1; i++){
-            Intersection curr = new Intersection(sol[i].getId());
-            Intersection next = new Intersection(sol[i+1].getId());
+            Intersection curr = map.getIntersectionParId(sol[i].getId());
+            Intersection next = map.getIntersectionParId(sol[i+1].getId());
             Path path = shortestPathBetweenTwoIntersections(curr,next);
             path.setDepatureTime(cal.getTime());
             double cycling = path.getLength()/velocity;
@@ -156,8 +156,8 @@ public class GraphProcessor {
             // Need to take into account path type to add pickup/delivery time
         }
         // Adding path back to warehouse
-        Intersection last =  new Intersection(sol[sol.length-2].getId());
-        Intersection warehouse = new Intersection(sol[sol.length-1].getId());
+        Intersection last =  map.getIntersectionParId(sol[sol.length-2].getId());
+        Intersection warehouse = map.getIntersectionParId(sol[sol.length-1].getId());
         Path path = shortestPathBetweenTwoIntersections(last, warehouse);
         path.setDepatureTime(cal.getTime());
         double cycling = path.getLength()/velocity;

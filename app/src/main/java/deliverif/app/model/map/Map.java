@@ -27,7 +27,11 @@ public class Map {
     public HashMap<Long, Intersection> getIntersections() {
         return intersections;
     }
-
+    
+    public Intersection getIntersectionParId(Long id) {
+        return intersections.get(id);
+    }
+    
     public List<Segment> getSegments() {
         return segments;
     }
