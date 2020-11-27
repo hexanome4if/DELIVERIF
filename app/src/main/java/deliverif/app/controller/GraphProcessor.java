@@ -135,6 +135,7 @@ public class GraphProcessor {
         List<Vertex> gris = new ArrayList<>();          //liste des noeuds grisés (mais cet algo est sobre;)
         List<Vertex> noir = new ArrayList<>();         //liste des noeuds noircis
         HashMap<Long, Path> paths = new HashMap<>();
+        HashMap<Long,Long> precedents = new HashMap<>();
         
         // Initialisation
         source = graph.getVertexMap().get(source.getId());
@@ -147,10 +148,7 @@ public class GraphProcessor {
         for(Edge edg : source.getAdj()){
             dis.put(edg.dest.getId(),edg.cost);
             //parcours.put(edg.dest.getId(),initParcours);//p
-            Intersection itsc2 = map.getIntersectionParId(edg.dest.getId());
-            Path initPath = new Path();
-            initPath.addSegment(map.getSegmentParExtremites(sourceItsc, itsc2));
-            paths.put(edg.dest.getId(),initPath);
+            precedents.put(edg.dest.getId(), sourceItsc.getId()); 
             gris.add(edg.dest);
         }
         noir.add(source);
@@ -175,32 +173,33 @@ public class GraphProcessor {
                         /*List<Long> intermediareParcours = parcours.get(vertex.getId());
                         intermediareParcours.add(vertex.getId());
                         parcours.put(edg.dest.getId(), intermediareParcours);*/
-                        
-                        Path pathIntermediaire = paths.get(vertex.getId());
-                        pathIntermediaire.addSegment(map.getSegmentParExtremites
-                        (map.getIntersectionParId(vertex.getId()), map.getIntersectionParId(edg.dest.getId())));
-                        paths.put(edg.dest.getId(), pathIntermediaire);
+                        precedents.put(edg.dest.getId(), vertex.getId());                     
                     } 
                 } else {
                     dis.put(edg.dest.getId(), edg.cost + dis.get(vertex.getId())); //ajouter la valeur "distance" d'un noeud blanc et le griser
-                    
+                    precedents.put(edg.dest.getId(), vertex.getId());
                     /*List<Long> intermediareParcours = parcours.get(vertex.getId());//p
                     intermediareParcours.add(vertex.getId());
                     parcours.put(edg.dest.getId(), intermediareParcours);*/
                     
-                    Path pathIntermediaire = paths.get(vertex.getId());
-                    pathIntermediaire.addSegment(map.getSegmentParExtremites
-                    (map.getIntersectionParId(vertex.getId()), map.getIntersectionParId(edg.dest.getId())));
-                    paths.put(edg.dest.getId(), pathIntermediaire);
-                    gris.add(edg.dest);
+                    
                 }
             }
             
             gris.remove(vertex); //changement d'état gris->noir pour le noeud choisi
             noir.add(vertex);
         }
-        
-        return paths.get(goal.getId());
+        System.out.println("Source: " + source.getId());
+        System.out.println("Goal: " + goal.getId());
+        System.out.println(precedents);
+        Path path = new Path();
+        Long next = goal.getId();
+        do {
+            path.addSegment(map.getSegmentParExtremites(map.getIntersectionParId(next), 
+                    map.getIntersectionParId(precedents.get(next))));
+            next = precedents.get(next);
+        } while(precedents.containsKey(next));
+        return path;
         
     }
     
@@ -218,6 +217,9 @@ public class GraphProcessor {
         cal.setTime(pr.getDepot().getDepartureTime());
         if (sol == null || sol[0] == null) return null;
         Long arrivalId = null;
+        for (int i=0; i<sol.length; i++){
+            System.out.println("Vertex " + i + ":" + sol[i].getId());
+        }
         // Adding paths excluding warehouse
         for (int i=0; i<sol.length-1; i++){
             Intersection curr = map.getIntersectionParId(sol[i].getId());
@@ -227,6 +229,7 @@ public class GraphProcessor {
             double cycling = path.getLength()/velocity;
             cal.add(Calendar.MINUTE, (int) cycling);
             path.setArrivalTime(cal.getTime());
+            System.out.println("Path" + i + ":" + path + "\n");
             tour.addPath(path);
             // Need to take into account path type to add pickup/delivery time
         }
@@ -249,12 +252,12 @@ public class GraphProcessor {
     
     public static void main (String[] args) {
         XmlReader reader = new XmlReader();
-        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml");
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp =  new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsMedium5.xml");
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
         
         Tour tour = gp.optimalTour(pr);
-        System.out.println(tour);
+        //System.out.println(tour);
         /*TSP1 tsp = gp.hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         float cost = tsp.getSolutionCost();
