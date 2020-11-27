@@ -219,7 +219,7 @@ public class MenuPageController {
         sman = new SpriteManager(this.graph);
         this.planningRequest = App.choseRequestFile(this.xmlReader);
         
-        Intersection depot = planningRequest.getDepot().getAddress()
+        Intersection depot = planningRequest.getDepot().getAddress();
         Sprite depotSprite = sman.addSprite(depot.getId().toString());
         depotSprite.setAttribute("ui.class", "depotSprite");
         depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);  
