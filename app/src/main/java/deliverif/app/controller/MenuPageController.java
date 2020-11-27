@@ -5,8 +5,11 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
+import deliverif.app.model.map.Segment;
+import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.view.App;
 import java.io.IOException;
@@ -15,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
@@ -32,36 +36,38 @@ import org.graphstream.ui.view.util.InteractiveElement;
  * @author fabien
  */
 public class MenuPageController {
-    
+
     @FXML
     private Button loadCityMapButton;
-    
+
     @FXML
     private Button loadRequestButton;
-    
+
     @FXML
     private Button computeTourButton;
-    
+
     @FXML
     private Button editTourButton;
-    
-    @FXML 
+
+    @FXML
     private AnchorPane mapPane;
-    
+
     private XmlReader xmlReader = new XmlReader();
-    
+
     private Map map;
-    
+
     private PlanningRequest planningRequest;
-    
+
     private Graph graph;
-    
+
     private FxViewPanel panel;
-    
+
     private SpriteManager sman;
-    
-    
-    
+
+    private GraphProcessor graphProcessor;
+
+    private Tour tour;
+
     @FXML
     private void loadCityMapAction() throws IOException {
         System.out.println("loadCityMapAction");
@@ -69,7 +75,7 @@ public class MenuPageController {
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-        panel = (FxViewPanel)viewer.addDefaultView(false); 
+        panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
         panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.NODE, InteractiveElement.SPRITE)));
         mapPane.getChildren().add(panel);
@@ -77,32 +83,54 @@ public class MenuPageController {
         AnchorPane.setLeftAnchor(panel, 1.0);
         AnchorPane.setRightAnchor(panel, 1.0);
         AnchorPane.setBottomAnchor(panel, 1.0);
+        graphProcessor = new GraphProcessor(map);
     }
-    
+
     @FXML
     private void loadRequestAction() throws IOException {
         System.out.println("loadRequestAction");
-        if(this.xmlReader.getMap() == null) {
+        if (this.xmlReader.getMap() == null) {
             System.out.println("Il faut charger une map avant");
             return;
         }
         this.chargerPlanningRequests();
         System.out.println(this.planningRequest);
+        tour = graphProcessor.optimalTour(this.planningRequest);
+
+        for (Path p : tour.getPaths()) {
+            for (Segment s : p.getSegments()) {
+                String originId = s.getOrigin().getId().toString();
+                String destId = s.getDestination().getId().toString();
+                Edge edge = graph.getEdge(originId + "|" + destId);
+                if (edge != null) {
+                    edge.setAttribute("ui.style", "fill-color: red;");
+                    edge.setAttribute("ui.style", "size: 4px;");
+                } else {
+                    edge = graph.getEdge(destId + "|" + originId);
+                    if (edge != null) {
+                        edge.setAttribute("ui.style", "fill-color: red;");
+                        edge.setAttribute("ui.style", "size: 4px;");
+                    } else {
+                        System.out.println("Edge not found");
+                    }
+                }
+            }
+        }
     }
-    
+
     @FXML
     private void computeTourAction() throws IOException {
         System.out.println("computeTourAction");
     }
-    
+
     @FXML
     private void editTourAction() throws IOException {
         System.out.println("editTourAction");
     }
-    
+
     private void chargerGraph(Map map) {
         this.graph = new SingleGraph("Graph test 1");
-        
+
         map.getIntersections().entrySet().forEach((mapentry) -> {
             String nodeId = mapentry.getKey().toString();
             Intersection intersection = (Intersection) mapentry.getValue();
@@ -114,13 +142,13 @@ public class MenuPageController {
             String origin = s.getOrigin().getId().toString();
             String destination = s.getDestination().getId().toString();
             try {
-                graph.addEdge(origin + destination, origin, destination);
+                graph.addEdge(origin + "|" + destination, origin, destination);
             } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
                 //System.out.println("Error edge " + origin + " -> " + destination);
             }
         });
     }
-    
+
     private void chargerPlanningRequests() throws IOException {
         sman = new SpriteManager(this.graph);
         this.planningRequest = App.choseRequestFile(this.xmlReader);
@@ -141,4 +169,5 @@ public class MenuPageController {
             deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
         });
     }
+
 }
