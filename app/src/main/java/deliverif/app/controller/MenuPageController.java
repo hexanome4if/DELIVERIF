@@ -35,6 +35,8 @@ import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
 import java.util.Random;
+import org.graphstream.graph.Node;
+import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 /**
  *
  * @author fabien
@@ -67,6 +69,9 @@ public class MenuPageController {
     @FXML 
     private Text infosText;
     
+    @FXML
+    private Text segmentNameText;
+    
     private final XmlReader xmlReader = new XmlReader();
     
     private Map map;
@@ -85,6 +90,27 @@ public class MenuPageController {
     
     public void updateSelection(GraphicElement element) {
         System.out.println("UPDATE SELECTION");
+        if(element.getSelectorType() == Selector.Type.EDGE) {
+            Edge edge = graph.getEdge(element.getId());
+            String name = (String) edge.getAttribute("segment.name");
+            System.out.println(name);
+            if(name != null) {
+                segmentNameText.setText(name);
+                sman.removeSprite("segmentSprite");
+                
+                Sprite segmentSprite = sman.addSprite("segmentSprite");
+                double x,y,z;
+                
+                segmentSprite.setAttribute("ui.class", "segmentSprite");
+                segmentSprite.setAttribute("ui.style", "fill-color: green;");
+                Node origin = edge.getNode0();
+                Node dest = edge.getNode1();
+                Float longitude = ( ((Float) origin.getAttribute("x")) + ((Float) dest.getAttribute("x")) )/2 ;
+                Float latitude = ( ((Float) origin.getAttribute("y")) + ((Float) dest.getAttribute("y")) )/2 ;
+                segmentSprite.setPosition(longitude, latitude, 0);
+            }
+            return;
+        }
         if (this.planningRequest == null) {
             return;
         }
@@ -135,6 +161,7 @@ public class MenuPageController {
         AnchorPane.setRightAnchor(panel, 1.0);
         AnchorPane.setBottomAnchor(panel, 1.0);
         graphProcessor = new GraphProcessor(map);
+        sman = new SpriteManager(this.graph);
     }
 
     @FXML
@@ -185,7 +212,9 @@ public class MenuPageController {
             String nodeId = mapentry.getKey().toString();
             Intersection intersection = (Intersection) mapentry.getValue();
             graph.addNode(nodeId);
-            graph.getNode(nodeId).setAttribute("xy", intersection.getLongitude(), intersection.getLatitude());
+            graph.getNode(nodeId).setAttribute("x", intersection.getLongitude());
+            graph.getNode(nodeId).setAttribute("y", intersection.getLatitude());
+            
         });
 
         map.getSegments().forEach((s) -> {
@@ -193,8 +222,13 @@ public class MenuPageController {
             String destination = s.getDestination().getId().toString();
             try {
                 graph.addEdge(origin + "|" + destination, origin, destination);
+                graph.getEdge(origin+"|"+destination).setAttribute("segment.name",s.getName());
             } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
                 //System.out.println("Error edge " + origin + " -> " + destination);
+                Edge ed = graph.getEdge(destination + "|" + origin) ;
+                if(ed != null) {
+                    ed.setAttribute("ui.style", "size: 2px;");
+                }
             }
         });
     }
@@ -217,7 +251,6 @@ public class MenuPageController {
     }
 
     private void chargerPlanningRequests() throws IOException {
-
         sman = new SpriteManager(this.graph);
         this.planningRequest = App.choseRequestFile(this.xmlReader);
         

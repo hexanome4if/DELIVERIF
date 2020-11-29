@@ -33,6 +33,7 @@ public class App extends Application {
         + "}\n"
         + "\n"
         + "edge {\n"
+        + "     size: 1px;\n"
         + "	shape: line;\n"
         + "     fill-mode: dyn-plain;"
         + "	fill-color: #222, #555, green, yellow;\n"
@@ -61,6 +62,11 @@ public class App extends Application {
         + "     fill-mode: dyn-plain;"
         + "     text-mode: hidden;\n"
         + "     z-index: 99;\n"
+        + "}\n"
+        + "\n"    
+        + "sprite.segmentSprite {\n"
+        + " shape: cross; size: 7px; z-index: 99;"
+        + " fill-color: blue;"   
         + "}\n";
 
     
