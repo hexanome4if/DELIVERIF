@@ -6,7 +6,6 @@
 package deliverif.app.controller;
 
 import deliverif.app.model.map.Intersection;
-import deliverif.app.model.map.Map;
 import deliverif.app.model.request.Depot;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;

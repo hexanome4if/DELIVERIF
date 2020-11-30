@@ -233,7 +233,6 @@ public class GraphProcessor {
             tour.addPath(path);
             // Need to take into account path type to add pickup/delivery time
         }
-        // Adding path back to warehouse
         Intersection secondlast =  map.getIntersectionParId(sol[sol.length-2].getId());
         Intersection last = map.getIntersectionParId(sol[sol.length-1].getId());
         Path path = shortestPathBetweenTwoIntersections(secondlast, last);
@@ -242,7 +241,7 @@ public class GraphProcessor {
         cal.add(Calendar.MINUTE, (int) cycling);
         path.setArrivalTime(cal.getTime());
         tour.addPath(path);
-        
+        // Adding path back to warehouse
         Intersection warehouse =  pr.getDepot().getAddress();
         Path back = shortestPathBetweenTwoIntersections(last, warehouse);
         back.setDepatureTime(cal.getTime());
