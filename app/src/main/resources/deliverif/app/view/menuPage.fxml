@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="783.0" style="-fx-background-color: #1DBCEB;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.MenuPageController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="783.0" style="-fx-background-color: #1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="deliverif.app.controller.MenuPageController">
   <bottom>
     <Text fx:id="segmentNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="" textAlignment="CENTER" BorderPane.alignment="CENTER">
       <font>
@@ -52,7 +52,7 @@
             <Insets top="20.0" />
           </VBox.margin>
         </Button>
-        <Button fx:id="editTourButton" mnemonicParsing="false" onAction="#editTourAction" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
+        <Button fx:id="editTourButton" mnemonicParsing="false" onAction="#computePathAction" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
           <VBox.margin>
             <Insets top="20.0" />
           </VBox.margin>

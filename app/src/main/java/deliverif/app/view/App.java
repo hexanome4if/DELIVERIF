@@ -67,9 +67,13 @@ public class App extends Application {
         + "sprite.segmentSprite {\n"
         + " shape: cross; size: 7px; z-index: 99;"
         + " fill-color: blue;"   
+        + "}\n"
+        + "\n"    
+        + "edge.marked {\n"
+        + "size: 4px;"
+        + " fill-color: blue;"   
         + "}\n";
-
-    
+            
     @Override
     public void start(Stage stage) throws IOException {
         App.stageGraph = stage ;
