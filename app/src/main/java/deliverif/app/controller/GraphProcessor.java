@@ -216,7 +216,6 @@ public class GraphProcessor {
         Calendar cal =  Calendar.getInstance();
         cal.setTime(pr.getDepot().getDepartureTime());
         if (sol == null || sol[0] == null) return null;
-        Long arrivalId = null;
         for (int i=0; i<sol.length; i++){
             System.out.println("Vertex " + i + ":" + sol[i].getId());
         }
@@ -226,10 +225,12 @@ public class GraphProcessor {
             pickups.put(r.getPickupAddress().getId(),r.getPickupDuration());
             deliveries.put(r.getDeliveryAddress().getId(),r.getDeliveryDuration());
         }
+        System.out.println("---------Tour Deets---------");
         // Adding paths excluding warehouse
         for (int i=0; i<sol.length-1; i++){
             Intersection curr = map.getIntersectionParId(sol[i].getId());
             Intersection next = map.getIntersectionParId(sol[i+1].getId());
+            System.out.println("Going from: " + curr + "to: " + next);
             Path path = shortestPathBetweenTwoIntersections(curr,next);
             path.setDepatureTime(cal.getTime());
             double commute = path.getLength()/velocity;
@@ -243,31 +244,18 @@ public class GraphProcessor {
             path.setArrivalTime(cal.getTime());
             //System.out.println("Path" + i + ":" + path + "\n");
             tour.addPath(path);
-            // Need to take into account path type to add pickup/delivery time
         }
-        Intersection secondlast =  map.getIntersectionParId(sol[sol.length-2].getId());
-        Intersection last = map.getIntersectionParId(sol[sol.length-1].getId());
-        Path path = shortestPathBetweenTwoIntersections(secondlast, last);
-        path.setDepatureTime(cal.getTime());
-        double commute = path.getLength()/velocity;
-        if(pickups.containsKey(last.getId())){
-        commute += pickups.get(last.getId());
-        }
-        else if(deliveries.containsKey(last.getId())){
-            commute += deliveries.get(last.getId());
-        }
-        cal.add(Calendar.MINUTE, (int) commute);
-        path.setArrivalTime(cal.getTime());
-        tour.addPath(path);
         // Adding path back to warehouse
+        Intersection last = map.getIntersectionParId(sol[sol.length-1].getId());
         Intersection warehouse =  pr.getDepot().getAddress();
+        System.out.println("Going from: " + last + "to: " + warehouse.getId());
         Path back = shortestPathBetweenTwoIntersections(last, warehouse);
         back.setDepatureTime(cal.getTime());
-        commute = back.getLength()/velocity;
+        double commute = back.getLength()/velocity;
         cal.add(Calendar.MINUTE, (int) commute);
-        path.setArrivalTime(cal.getTime());
+        back.setArrivalTime(cal.getTime());
         tour.addPath(back);
-        
+        System.out.println("-----------End of Tour---------");
         return tour;
     }
     
@@ -276,9 +264,11 @@ public class GraphProcessor {
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp =  new GraphProcessor(reader.getMap());
         PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
-        
+        System.out.println("Entrepôt: " + pr.getDepot().getAddress().getId());
         Tour tour = gp.optimalTour(pr);
-        System.out.println("Tour: "+tour);
+        /*for (Path p : tour.getPaths()){
+            System.out.println("Path: "+p);
+        }*/
         TSP1 tsp = gp.hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         float cost = tsp.getSolutionCost();
@@ -287,7 +277,7 @@ public class GraphProcessor {
         for (i=0; i<sol.length; i++){
                 System.out.println("Vertex " + i + ":" + sol[i].getId());
         }
-        System.out.println("Vertex " + i + ":" + pr.getDepot().getAddress().getId());
+        //System.out.println("Vertex " + i + ":" + pr.getDepot().getAddress().getId());
         /*TSP1 tsp = gp.hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         float cost = tsp.getSolutionCost();
