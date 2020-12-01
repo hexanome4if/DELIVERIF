@@ -220,14 +220,26 @@ public class GraphProcessor {
         for (int i=0; i<sol.length; i++){
             System.out.println("Vertex " + i + ":" + sol[i].getId());
         }
+        HashMap<Long, Integer> pickups = new HashMap<>();
+        HashMap<Long, Integer> deliveries = new HashMap<>();
+        for (Request r : pr.getRequests()){
+            pickups.put(r.getPickupAddress().getId(),r.getPickupDuration());
+            deliveries.put(r.getDeliveryAddress().getId(),r.getDeliveryDuration());
+        }
         // Adding paths excluding warehouse
         for (int i=0; i<sol.length-1; i++){
             Intersection curr = map.getIntersectionParId(sol[i].getId());
             Intersection next = map.getIntersectionParId(sol[i+1].getId());
             Path path = shortestPathBetweenTwoIntersections(curr,next);
             path.setDepatureTime(cal.getTime());
-            double cycling = path.getLength()/velocity;
-            cal.add(Calendar.MINUTE, (int) cycling);
+            double commute = path.getLength()/velocity;
+            if(pickups.containsKey(next.getId())){
+            commute += pickups.get(next.getId());
+            }
+            else if(deliveries.containsKey(next.getId())){
+                commute += deliveries.get(next.getId());
+            }
+            cal.add(Calendar.MINUTE, (int) commute);
             path.setArrivalTime(cal.getTime());
             //System.out.println("Path" + i + ":" + path + "\n");
             tour.addPath(path);
@@ -237,16 +249,22 @@ public class GraphProcessor {
         Intersection last = map.getIntersectionParId(sol[sol.length-1].getId());
         Path path = shortestPathBetweenTwoIntersections(secondlast, last);
         path.setDepatureTime(cal.getTime());
-        double cycling = path.getLength()/velocity;
-        cal.add(Calendar.MINUTE, (int) cycling);
+        double commute = path.getLength()/velocity;
+        if(pickups.containsKey(last.getId())){
+        commute += pickups.get(last.getId());
+        }
+        else if(deliveries.containsKey(last.getId())){
+            commute += deliveries.get(last.getId());
+        }
+        cal.add(Calendar.MINUTE, (int) commute);
         path.setArrivalTime(cal.getTime());
         tour.addPath(path);
         // Adding path back to warehouse
         Intersection warehouse =  pr.getDepot().getAddress();
         Path back = shortestPathBetweenTwoIntersections(last, warehouse);
         back.setDepatureTime(cal.getTime());
-        double cyclingback = back.getLength()/velocity;
-        cal.add(Calendar.MINUTE, (int) cyclingback);
+        commute = back.getLength()/velocity;
+        cal.add(Calendar.MINUTE, (int) commute);
         path.setArrivalTime(cal.getTime());
         tour.addPath(back);
         
