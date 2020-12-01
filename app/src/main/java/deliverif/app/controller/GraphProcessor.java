@@ -150,13 +150,10 @@ public class GraphProcessor {
 
     public Tour optimalTour(PlanningRequest pr) {
         Tour tour = new Tour(pr);
-
+        GraphProcessor gp = new GraphProcessor(map);
         HashMap<String, VertexPath> fullPath = new HashMap<>();
-
-        TSP1 tsp = hamiltonianCircuit(pr, fullPath);
-
+        TSP1 tsp = gp.hamiltonianCircuit(pr, fullPath);
         Vertex[] sol = tsp.getSolution();
-
         double velocity = 15 * 1000 / 60;
         Calendar cal = Calendar.getInstance();
         cal.setTime(pr.getDepot().getDepartureTime());
@@ -164,6 +161,7 @@ public class GraphProcessor {
             return null;
         }
         for (int i = 0; i < sol.length; i++) {
+            System.out.println("Vertex " + i + ":" + sol[i].getId());
         }
         HashMap<Long, Integer> pickups = new HashMap<>();
         HashMap<Long, Integer> deliveries = new HashMap<>();
@@ -171,10 +169,12 @@ public class GraphProcessor {
             pickups.put(r.getPickupAddress().getId(), r.getPickupDuration());
             deliveries.put(r.getDeliveryAddress().getId(), r.getDeliveryDuration());
         }
+        System.out.println("---------Tour Deets---------");
         // Adding paths excluding warehouse
         for (int i = 0; i < sol.length - 1; i++) {
             Intersection curr = map.getIntersectionParId(sol[i].getId());
             Intersection next = map.getIntersectionParId(sol[i + 1].getId());
+            System.out.println("Going from: " + curr + "to: " + next);
             Path path = shortestPathBetweenTwoIntersections(curr, next, fullPath);
             path.setDepatureTime(cal.getTime());
             double commute = path.getLength() / velocity;
@@ -187,88 +187,18 @@ public class GraphProcessor {
             path.setArrivalTime(cal.getTime());
             //System.out.println("Path" + i + ":" + path + "\n");
             tour.addPath(path);
-            // Need to take into account path type to add pickup/delivery time
         }
-        Intersection secondlast = map.getIntersectionParId(sol[sol.length - 2].getId());
-        Intersection last = map.getIntersectionParId(sol[sol.length - 1].getId());
-        Path path = shortestPathBetweenTwoIntersections(secondlast, last, fullPath);
-        path.setDepatureTime(cal.getTime());
-        double commute = path.getLength() / velocity;
-        if (pickups.containsKey(last.getId())) {
-            commute += pickups.get(last.getId());
-        } else if (deliveries.containsKey(last.getId())) {
-            commute += deliveries.get(last.getId());
-        }
-        cal.add(Calendar.MINUTE, (int) commute);
-        path.setArrivalTime(cal.getTime());
-        tour.addPath(path);
         // Adding path back to warehouse
+        Intersection last = map.getIntersectionParId(sol[sol.length - 1].getId());
         Intersection warehouse = pr.getDepot().getAddress();
+        System.out.println("Going from: " + last + "to: " + warehouse.getId());
         Path back = shortestPathBetweenTwoIntersections(last, warehouse, fullPath);
         back.setDepatureTime(cal.getTime());
-
-        commute = back.getLength() / velocity;
+        double commute = back.getLength() / velocity;
         cal.add(Calendar.MINUTE, (int) commute);
-        path.setArrivalTime(cal.getTime());
+        back.setArrivalTime(cal.getTime());
         tour.addPath(back);
-
+        System.out.println("-----------End of Tour---------");
         return tour;
-    }
-
-    public static void main(String[] args) {
-        XmlReader reader = new XmlReader();
-        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
-        GraphProcessor gp = new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
-
-        Tour tour = gp.optimalTour(pr);
-        System.out.println("Tour: " + tour);
-        /*TSP1 tsp = gp.hamiltonianCircuit(pr);
-        Vertex[] sol = tsp.getSolution();
-        float cost = tsp.getSolutionCost();
-        System.out.println("Total cost: " + cost);
-        int i;
-        for (i = 0; i < sol.length; i++) {
-            System.out.println("Vertex " + i + ":" + sol[i].getId());
-        }
-        System.out.println("Vertex " + i + ":" + pr.getDepot().getAddress().getId());*/
- /*TSP1 tsp = gp.hamiltonianCircuit(pr);
-        Vertex[] sol = tsp.getSolution();
-        float cost = tsp.getSolutionCost();
-        System.out.println("Total cost: " + cost);
-        for (int i=0; i<sol.length; i++){
-            if (sol[i]!=null)
-                System.out.println("Vertex " + i + ":" + sol[i].getId());
-        }*/
- /*Graph g = new Graph();
-        for(int i = 1; i<= 3000; i++){
-            g.addVertex(new Vertex(new Long(i)));
-        }
-        System.out.println(g.getVertexMap());
-
-        g.addEdge(1L,2L,7);
-        g.addEdge(1L,3L,9);
-        g.addEdge(1L,6L,14);
-        g.addEdge(2L,3L,10);
-        g.addEdge(3L,6L,2);
-        g.addEdge(3L,4L,11);
-        g.addEdge(2L,4L,15);
-        g.addEdge(6L,5L,9);
-        g.addEdge(4L,5L,6);
-
-        for(int i = 7; i<=3000; i++){
-            for(int j = 0; j<=Math.random()*6+1; j++){
-                g.addEdge(new Long(i),(long)(Math.random()*3000+1),(float)(Math.random()*200+5));
-            }
-        }
-
-        gp.graph = g;
-        List<Integer> goal = new ArrayList<>();
-        goal.add(2);
-        goal.add(3);
-        goal.add(4);
-        goal.add(5);
-        goal.add(6);
-        gp.shortestPath(pr);*/
     }
 }

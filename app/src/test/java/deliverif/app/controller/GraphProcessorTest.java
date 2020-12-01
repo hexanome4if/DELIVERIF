@@ -9,15 +9,10 @@ import deliverif.app.controller.tsp.TSP1;
 import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.graph.Vertex;
-import deliverif.app.model.map.Intersection;
-import deliverif.app.model.request.Path;
+import deliverif.app.model.graph.VertexPath;
 import deliverif.app.model.request.PlanningRequest;
+import java.util.HashMap;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -25,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author zakaria
  */
 public class GraphProcessorTest {
-    
+
     public GraphProcessorTest() {
     }
 
@@ -44,8 +39,6 @@ public class GraphProcessorTest {
     @org.junit.jupiter.api.AfterEach
     public void tearDown() throws Exception {
     }
-    
-    
 
     /**
      * Test of dijkstra method, of class GraphProcessor.
@@ -57,7 +50,8 @@ public class GraphProcessorTest {
         Vertex source = null;
         List<Vertex> goals = null;
         GraphProcessor instance = null;
-        instance.dijkstra(g, source, goals);
+        HashMap<String, VertexPath> fullPath = new HashMap<>();
+        instance.dijkstra(g, source, goals, fullPath);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
@@ -71,7 +65,8 @@ public class GraphProcessorTest {
         PlanningRequest pr = null;
         GraphProcessor instance = null;
         Graph expResult = null;
-        Graph result = instance.completeGraph(pr);
+        HashMap<String, VertexPath> fullPath = new HashMap<>();
+        Graph result = instance.completeGraph(pr, fullPath);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -86,40 +81,8 @@ public class GraphProcessorTest {
         PlanningRequest pr = null;
         GraphProcessor instance = null;
         TSP1 expResult = null;
-        TSP1 result = instance.hamiltonianCircuit(pr);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of dijkstraPath method, of class GraphProcessor.
-     */
-    @org.junit.jupiter.api.Test
-    public void testDijkstraPath() {
-        System.out.println("dijkstraPath");
-        Graph g = null;
-        Vertex source = null;
-        Vertex goal = null;
-        GraphProcessor instance = null;
-        Path expResult = null;
-        Path result = instance.dijkstraPath(g, source, goal);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of shortestPathBetweenTwoIntersections method, of class GraphProcessor.
-     */
-    @org.junit.jupiter.api.Test
-    public void testShortestPathBetweenTwoIntersections() {
-        System.out.println("shortestPathBetweenTwoIntersections");
-        Intersection v1 = null;
-        Intersection v2 = null;
-        GraphProcessor instance = null;
-        Path expResult = null;
-        Path result = instance.shortestPathBetweenTwoIntersections(v1, v2);
+        HashMap<String, VertexPath> fullPath = new HashMap<>();
+        TSP1 result = instance.hamiltonianCircuit(pr, fullPath);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -140,16 +103,4 @@ public class GraphProcessorTest {
         fail("The test case is a prototype.");
     }
 
-    /**
-     * Test of main method, of class GraphProcessor.
-     */
-    @org.junit.jupiter.api.Test
-    public void testMain() {
-        System.out.println("main");
-        String[] args = null;
-        GraphProcessor.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
 }
