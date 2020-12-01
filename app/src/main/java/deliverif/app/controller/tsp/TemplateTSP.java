@@ -35,6 +35,7 @@ public abstract class TemplateTSP implements TSP {
             Collection<Vertex> unvisited = new ArrayList<>(g.getNbVertices()-1);
             for (Edge e : start.getAdj()) 
                 unvisited.add(e.dest);
+            //unvisited.add(start);
             Collection<Vertex> visited = new ArrayList<>(g.getNbVertices());
             visited.add(start); // The first visited vertex is 0
             bestSolCost = Integer.MAX_VALUE;

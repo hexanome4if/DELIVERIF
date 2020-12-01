@@ -22,7 +22,13 @@ public class Path {
     private Date depatureTime;
     private Date arrivalTime;
     private Request request;
+    private Type type;
     
+    public enum Type {
+        PICKUP,
+        DELIVERY,
+        WAREHOUSE;
+    }
     
     public Path () {
         this.segments = new ArrayList<>();
@@ -36,6 +42,7 @@ public class Path {
         this.depatureTime = p.getDepatureTime();
         this.arrivalTime = p.getArrivalTime();
         this.request = p.getRequest();
+        this.type = p.getType();
     }
 
     public ArrayList<Segment> getSegments() {
@@ -64,6 +71,10 @@ public class Path {
 
     public Request getRequest() {
         return request;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public void setSegments(ArrayList<Segment> segments) {
