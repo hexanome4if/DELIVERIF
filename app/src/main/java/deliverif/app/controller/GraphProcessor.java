@@ -250,6 +250,7 @@ public class GraphProcessor {
         cal.add(Calendar.MINUTE, (int) commute);
         pickupPath.setArrivalTime(cal.getTime());
         t.getPaths().add(pickupIndex, pickupPath);
+        
         Path deliveryPath = shortestPathBetweenTwoIntersections(beforeDelivery.getDeparture(), afterDelivery.getArrival());
         deliveryPath.setDepatureTime(beforeDelivery.getDepatureTime());
         cal.setTime(beforeDelivery.getDepatureTime());
@@ -257,6 +258,7 @@ public class GraphProcessor {
         cal.add(Calendar.MINUTE, (int) commute);
         deliveryPath.setArrivalTime(cal.getTime());
         t.getPaths().add(deliveryIndex, deliveryPath);
+        
         return t;
     }
 }
