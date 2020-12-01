@@ -178,6 +178,9 @@ public class MenuPageController {
     @FXML
     private void computeTourAction() throws IOException {
         System.out.println("computeTourAction");
+        if (this.planningRequest == null) {
+            return;
+        }
         tour = graphProcessor.optimalTour(this.planningRequest);
         for (Path p : tour.getPaths()) {
             for (Segment s : p.getSegments()) {
