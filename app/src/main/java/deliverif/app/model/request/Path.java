@@ -27,7 +27,7 @@ public class Path {
     public enum Type {
         PICKUP,
         DELIVERY,
-        COMEBACKHOME;
+        WAREHOUSE;
     }
     
     public Path () {
