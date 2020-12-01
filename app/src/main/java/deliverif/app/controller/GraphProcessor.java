@@ -253,10 +253,6 @@ public class GraphProcessor {
         return tour;
     }
     
-    /*public void tsp() {
-        
-    }*/
-    
     public static void main (String[] args) {
         XmlReader reader = new XmlReader();
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
