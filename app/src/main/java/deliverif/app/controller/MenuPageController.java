@@ -137,37 +137,8 @@ public class MenuPageController {
                 spriteText = t;
             }
         }
-        requestList.getSelectionModel().select(spriteText);
-        
-        String longitude = "Longitude = ";
-        String latitude = "Latitude = ";
-        Intersection depot = this.planningRequest.getDepot().getAddress();
-        if (depot.getId().toString().equals(idElement)) {
-            this.longitudeText.setText(longitude + String.valueOf(depot.getLongitude()));
-            this.latitudeText.setText(latitude + String.valueOf(depot.getLatitude()));
-            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
-            String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
-            this.infosText.setText("Departure time = " + strDate);
-        } else {
-            for (Request r : this.planningRequest.getRequests()) {
-                String idPickupAddress = r.getPickupAddress().getId().toString();
-                String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
-                if (idPickupAddress.equals(idElement)) {
-                    this.longitudeText.setText(longitude + String.valueOf(r.getPickupAddress().getLongitude()));
-                    this.latitudeText.setText(latitude + String.valueOf(r.getPickupAddress().getLatitude()));
-                    this.infosText.setText("Pickup duration = " + String.valueOf(r.getPickupDuration()));
-                    return;
-                }
-                if (idDeliveryAdress.equals(idElement)) {
-                    this.longitudeText.setText(longitude + String.valueOf(r.getDeliveryAddress().getLongitude()));
-                    this.latitudeText.setText(latitude + String.valueOf(r.getDeliveryAddress().getLatitude()));
-                    this.infosText.setText("Delivery duration = " + String.valueOf(r.getDeliveryDuration()));
-                    return;
-                }
-            }
-        }
-        
-        
+        this.requestList.getSelectionModel().select(spriteText);
+               
     }
 
     @FXML
@@ -278,12 +249,31 @@ public class MenuPageController {
         bigSprite.setAttribute("ui.class",bigSpriteType);        
         bigSprite.setAttribute("ui.style",sprite.getAttribute("ui.style"));
         
+        String longitude = "Longitude = ";
+        String latitude = "Latitude = ";
         if(spriteType.equals("depotSprite")) {
-            
-        } else if(spriteType.equals("pickupSprite")) {
-            
+            this.longitudeText.setText(longitude + String.valueOf(sprite.getX()));
+            this.latitudeText.setText(latitude + String.valueOf(sprite.getY()));
+            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
+            String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
+            this.infosText.setText("Departure time = " + strDate);
         } else {
-            
+            for (Request r : this.planningRequest.getRequests()) {
+                String idPickupAddress = r.getPickupAddress().getId().toString();
+                String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
+                if (idPickupAddress.equals(spriteId)) {
+                    this.longitudeText.setText(longitude + String.valueOf(r.getPickupAddress().getLongitude()));
+                    this.latitudeText.setText(latitude + String.valueOf(r.getPickupAddress().getLatitude()));
+                    this.infosText.setText("Pickup duration = " + String.valueOf(r.getPickupDuration()));
+                    return;
+                }
+                if (idDeliveryAdress.equals(spriteId)) {
+                    this.longitudeText.setText(longitude + String.valueOf(r.getDeliveryAddress().getLongitude()));
+                    this.latitudeText.setText(latitude + String.valueOf(r.getDeliveryAddress().getLatitude()));
+                    this.infosText.setText("Delivery duration = " + String.valueOf(r.getDeliveryDuration()));
+                    return;
+                }
+            }
         }
     }
 
