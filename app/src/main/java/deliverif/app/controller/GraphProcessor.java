@@ -31,6 +31,7 @@ public class GraphProcessor {
 
     private Graph graph;
     private Map map;
+    private HashMap<String,VertexPath> fullPath;
 
     public GraphProcessor(Map m) {
         graph = new Graph();
@@ -41,9 +42,10 @@ public class GraphProcessor {
         for (Segment s : m.getSegments()) {
             graph.addEdge(s.getOrigin().getId(), s.getDestination().getId(), s.getLength());
         }
+        fullPath = new HashMap<>();
     }
 
-    public void dijkstra(Graph completeGraph, Vertex source, List<Vertex> goals, HashMap<String, VertexPath> fullPath) {
+    public void dijkstra(Graph completeGraph, Vertex source, List<Vertex> goals) {
         // Strutures
         HashMap<Long, Float> dis = new HashMap<>();  //distance : <idNoeud, distance>
         HashMap<Long, Long> precedents = new HashMap<>();
@@ -108,7 +110,7 @@ public class GraphProcessor {
         }
     }
 
-    public Graph completeGraph(PlanningRequest pr, HashMap<String, VertexPath> fullPath) {
+    public Graph completeGraph(PlanningRequest pr) {
         Graph g = new Graph();
         List<Vertex> vertices = new ArrayList<>();
         vertices.add(new Vertex(pr.getDepot().getAddress().getId()));
@@ -121,13 +123,13 @@ public class GraphProcessor {
         }
 
         for (Vertex v : vertices) {
-            dijkstra(g, v, vertices, fullPath);
+            dijkstra(g, v, vertices);
         }
         return g;
     }
 
-    public TSP1 hamiltonianCircuit(PlanningRequest pr, HashMap<String, VertexPath> fullPath) {
-        Graph g = completeGraph(pr, fullPath);
+    public TSP1 hamiltonianCircuit(PlanningRequest pr) {
+        Graph g = completeGraph(pr);
         TSP1 tsp = new TSP1();
 
         List<Long> ordre = new ArrayList<>();
@@ -139,7 +141,7 @@ public class GraphProcessor {
         return tsp;
     }
 
-    public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2, HashMap<String, VertexPath> fullPath) {
+    public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2) {
         Vertex source = graph.getVertexById(v1.getId());
         Vertex destination = graph.getVertexById(v2.getId());
 
@@ -151,8 +153,8 @@ public class GraphProcessor {
     public Tour optimalTour(PlanningRequest pr) {
         Tour tour = new Tour(pr);
         GraphProcessor gp = new GraphProcessor(map);
-        HashMap<String, VertexPath> fullPath = new HashMap<>();
-        TSP1 tsp = gp.hamiltonianCircuit(pr, fullPath);
+        fullPath.clear();
+        TSP1 tsp = gp.hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         double velocity = 15 * 1000 / 60;
         Calendar cal = Calendar.getInstance();
@@ -175,7 +177,7 @@ public class GraphProcessor {
             Intersection curr = map.getIntersectionParId(sol[i].getId());
             Intersection next = map.getIntersectionParId(sol[i + 1].getId());
             System.out.println("Going from: " + curr + "to: " + next);
-            Path path = shortestPathBetweenTwoIntersections(curr, next, fullPath);
+            Path path = shortestPathBetweenTwoIntersections(curr, next);
             path.setDepatureTime(cal.getTime());
             double commute = path.getLength() / velocity;
             if (pickups.containsKey(next.getId())) {
@@ -192,7 +194,7 @@ public class GraphProcessor {
         Intersection last = map.getIntersectionParId(sol[sol.length - 1].getId());
         Intersection warehouse = pr.getDepot().getAddress();
         System.out.println("Going from: " + last + "to: " + warehouse.getId());
-        Path back = shortestPathBetweenTwoIntersections(last, warehouse, fullPath);
+        Path back = shortestPathBetweenTwoIntersections(last, warehouse);
         back.setDepatureTime(cal.getTime());
         double commute = back.getLength() / velocity;
         cal.add(Calendar.MINUTE, (int) commute);
@@ -200,5 +202,61 @@ public class GraphProcessor {
         tour.addPath(back);
         System.out.println("-----------End of Tour---------");
         return tour;
+    }
+    
+    public Tour removeRequestFromTour(Tour t, Request r) {
+        Intersection pickup = r.getPickupAddress();
+        Intersection delivery = r.getDeliveryAddress();
+        double velocity = 15 * 1000 / 60;
+        Path beforePickup = null;
+        Path afterPickup =null;
+        Path beforeDelivery = null;
+        Path afterDelivery = null;
+        int i=0;
+        int deliveryIndex =0;
+        int pickupIndex =0;
+        for (Path p : t.getPaths()) {
+            if (p.getDeparture().getId() == pickup.getId()) {
+                afterPickup = p;
+                t.removePath(p);
+                pickupIndex = i;
+                i--;
+            }
+            if(p.getArrival().getId() == pickup.getId()) {
+                beforePickup = p;
+                t.removePath(p);
+                i--;
+            }
+            if (p.getDeparture().getId() == delivery.getId()) {
+                afterDelivery = p;
+                t.removePath(p);
+                deliveryIndex =i;
+                i--;
+            } 
+            if (p.getArrival().getId() == delivery.getId()) {
+                beforeDelivery = p;
+                t.removePath(p);
+                i--;
+            }
+            i++;
+        }
+        if (beforePickup == null || afterPickup == null || beforeDelivery == null || afterDelivery == null ) return t;
+        
+        Path pickupPath = shortestPathBetweenTwoIntersections(beforePickup.getDeparture(), afterPickup.getArrival());
+        pickupPath.setDepatureTime(beforePickup.getDepatureTime());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beforePickup.getDepatureTime());
+        double commute = pickupPath.getLength() / velocity;
+        cal.add(Calendar.MINUTE, (int) commute);
+        pickupPath.setArrivalTime(cal.getTime());
+        t.getPaths().add(pickupIndex, pickupPath);
+        Path deliveryPath = shortestPathBetweenTwoIntersections(beforeDelivery.getDeparture(), afterDelivery.getArrival());
+        deliveryPath.setDepatureTime(beforeDelivery.getDepatureTime());
+        cal.setTime(beforeDelivery.getDepatureTime());
+        commute = deliveryPath.getLength() / velocity;
+        cal.add(Calendar.MINUTE, (int) commute);
+        deliveryPath.setArrivalTime(cal.getTime());
+        t.getPaths().add(deliveryIndex, deliveryPath);
+        return t;
     }
 }

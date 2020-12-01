@@ -50,6 +50,10 @@ public class Tour {
         paths.add(p);
     }
     
+    public void removePath(Path p){
+        paths.remove(p);
+    }
+    
     public ArrayList<Path> getPaths() {
         return paths;
     }
