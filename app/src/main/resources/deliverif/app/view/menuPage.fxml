@@ -35,6 +35,7 @@
         <Text fx:id="longitudeText" layoutX="14.0" layoutY="34.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude =" />
         <Text fx:id="latitudeText" layoutX="14.0" layoutY="53.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude =" />
         <Text id="infos" fx:id="infosText" layoutX="14.0" layoutY="72.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Infos =" />
+        <ListView fx:id="requestList" prefHeight="226.00009155273438" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0" />
       </children>
     </AnchorPane>
   </left>

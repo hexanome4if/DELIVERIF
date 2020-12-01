@@ -35,6 +35,12 @@ import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
 import java.util.Random;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 /**
@@ -71,6 +77,9 @@ public class MenuPageController {
     
     @FXML
     private Text segmentNameText;
+    
+    @FXML
+    private ListView<String> requestList;
     
     private final XmlReader xmlReader = new XmlReader();
     
@@ -258,7 +267,8 @@ public class MenuPageController {
         Sprite depotSprite = sman.addSprite(depot.getId().toString());
         depotSprite.setAttribute("ui.class", "depotSprite");
         depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);  
-        
+        this.requestList.getItems().add("Depot");
+        int cpt = 1;
         for(Request r : planningRequest.getRequests()) {
      
             String color = randomColorSprite();
@@ -268,6 +278,7 @@ public class MenuPageController {
             pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
             pickupAddressSprite.setAttribute("ui.style", color);
             pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+            this.requestList.getItems().add("Pickup " + cpt);
      
             
             Intersection deliveryAdress = r.getDeliveryAddress();
@@ -275,7 +286,43 @@ public class MenuPageController {
             deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
             deliveryAdressSprite.setAttribute("ui.style", color);
             deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
+            this.requestList.getItems().add("Delivery " + cpt);
+            cpt++;
         }
+        //this.requestList.setCellFactory((ListView<String> l) -> new ColorRectCell());
+        //this.chargerRequestList();
+    }
+    
+    /*static class ColorRectCell extends ListCell<String> {
+        @Override
+        public void updateItem(String item, boolean empty) {
+          super.updateItem(item, empty);
+          Rectangle rect = new Rectangle(100, 20);
+          if (item != null) {
+            rect.setFill(Color.RED);
+            setGraphic(rect);
+          }
+        }
+      }*/
+    
+    private void chargerRequestList() {
+        if (this.planningRequest == null) {
+            return;
+        }
+        Intersection depot = planningRequest.getDepot().getAddress();
+        this.requestList.getItems().add("Depot");
+        int cpt = 1;
+        for(Request r : planningRequest.getRequests()) {
+            Intersection pickupAddress = r.getPickupAddress();
+            this.requestList.getItems().add("Pickup " + cpt);
+            Intersection deliveryAdress = r.getDeliveryAddress();
+            this.requestList.getItems().add("Delivery " + cpt);
+            cpt++;
+        }
+        
+        /*ObservableList<String> items =FXCollections.observableArrayList (
+            "A", "B", "C", "D");
+        this.requestList.setItems(items);*/
     }
 
 }
