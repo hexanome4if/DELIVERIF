@@ -206,7 +206,9 @@ public class MenuPageController {
             }
         }
         System.out.println("compute tour done");
-        computePathAction();
+        //computePathAction();
+        PathThread pt = new PathThread(this);
+        pt.start();
     }
     
     protected void sleep() {
@@ -326,5 +328,15 @@ public class MenuPageController {
             deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
         }
     }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public Tour getTour() {
+        return tour;
+    }
+    
+    
 
 }
