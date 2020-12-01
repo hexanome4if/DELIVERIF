@@ -20,7 +20,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
-import javafx.scene.layout.Pane;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
@@ -35,12 +34,8 @@ import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
 import java.util.Random;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 /**
@@ -79,7 +74,7 @@ public class MenuPageController {
     private Text segmentNameText;
     
     @FXML
-    private ListView<String> requestList;
+    private ListView<Text> requestList;
     
     private final XmlReader xmlReader = new XmlReader();
     
@@ -242,9 +237,8 @@ public class MenuPageController {
         });
     }
     
-    public String randomColorSprite(){
+    public int[] randomColorSprite(){
         
-        String color;
         Random rand = new Random();
         
         int min, max;
@@ -253,32 +247,37 @@ public class MenuPageController {
         
         int r = rand.nextInt((max - min) + 1) + min;
         int g = rand.nextInt((max - min) + 1) + min;
-        int b = rand.nextInt((max - min) + 1) + min;
-                
-        color = "fill-color: rgb("+r+","+g+","+b+");";
-        return color;
+        int b = rand.nextInt((max - min) + 1) + min;          
+        
+        int[] rgb = {r,g,b};
+        return rgb;
     }
 
     private void chargerPlanningRequests() throws IOException {
         sman = new SpriteManager(this.graph);
         this.planningRequest = App.choseRequestFile(this.xmlReader);
         
+        Text txt;
         Intersection depot = planningRequest.getDepot().getAddress();
         Sprite depotSprite = sman.addSprite(depot.getId().toString());
         depotSprite.setAttribute("ui.class", "depotSprite");
-        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);  
-        this.requestList.getItems().add("Depot");
+        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);
+        txt = new Text("Depot");
+        txt.setFill(Color.RED);
+        this.requestList.getItems().add(txt);
         int cpt = 1;
         for(Request r : planningRequest.getRequests()) {
      
-            String color = randomColorSprite();
-          
+            int[] rgb = randomColorSprite();
+            String color = "fill-color: rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+");";
             Intersection pickupAddress = r.getPickupAddress();
             Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
             pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
             pickupAddressSprite.setAttribute("ui.style", color);
             pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-            this.requestList.getItems().add("Pickup " + cpt);
+            txt = new Text("Pickup " + cpt);
+            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+            this.requestList.getItems().add(txt);
      
             
             Intersection deliveryAdress = r.getDeliveryAddress();
@@ -286,43 +285,10 @@ public class MenuPageController {
             deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
             deliveryAdressSprite.setAttribute("ui.style", color);
             deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
-            this.requestList.getItems().add("Delivery " + cpt);
+            txt = new Text("Delivery " + cpt);
+            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+            this.requestList.getItems().add(txt);
             cpt++;
         }
-        //this.requestList.setCellFactory((ListView<String> l) -> new ColorRectCell());
-        //this.chargerRequestList();
     }
-    
-    /*static class ColorRectCell extends ListCell<String> {
-        @Override
-        public void updateItem(String item, boolean empty) {
-          super.updateItem(item, empty);
-          Rectangle rect = new Rectangle(100, 20);
-          if (item != null) {
-            rect.setFill(Color.RED);
-            setGraphic(rect);
-          }
-        }
-      }*/
-    
-    private void chargerRequestList() {
-        if (this.planningRequest == null) {
-            return;
-        }
-        Intersection depot = planningRequest.getDepot().getAddress();
-        this.requestList.getItems().add("Depot");
-        int cpt = 1;
-        for(Request r : planningRequest.getRequests()) {
-            Intersection pickupAddress = r.getPickupAddress();
-            this.requestList.getItems().add("Pickup " + cpt);
-            Intersection deliveryAdress = r.getDeliveryAddress();
-            this.requestList.getItems().add("Delivery " + cpt);
-            cpt++;
-        }
-        
-        /*ObservableList<String> items =FXCollections.observableArrayList (
-            "A", "B", "C", "D");
-        this.requestList.setItems(items);*/
-    }
-
 }
