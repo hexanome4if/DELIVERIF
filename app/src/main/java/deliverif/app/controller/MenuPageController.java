@@ -15,7 +15,9 @@ import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
@@ -35,7 +37,6 @@ import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
 import java.util.Random;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import org.graphstream.graph.Node;
@@ -79,6 +80,9 @@ public class MenuPageController {
 
     @FXML
     private ListView<Text> requestList;
+    
+    @FXML
+    private ListView<Text> pathList;
 
     private final XmlReader xmlReader = new XmlReader();
 
@@ -95,12 +99,32 @@ public class MenuPageController {
     private GraphProcessor graphProcessor;
 
     private Tour tour;
+    
+    private String[] selectedEdges = null;
+    
+    private List<String> graphEdges = new ArrayList<>();
 
+    
+    
     public void updateSelection(GraphicElement element) {
         
         System.out.println("UPDATE SELECTION");
         if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
+            for (String id : this.graphEdges) {
+                if (element.getId().equals(id)) {
+                    System.out.println(id + " is on the path");
+                    for (Text t : this.pathList.getItems()) {
+                        if (t.getId().contains(id)) {
+                            this.pathList.getSelectionModel().select(t);
+                            String[] ids = t.getId().split("#");
+                            this.setSelectedPath(ids);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
             String name = (String) edge.getAttribute("segment.name");
             System.out.println(name);
             if (name != null) {
@@ -176,7 +200,11 @@ public class MenuPageController {
     private void computeTourAction() throws IOException {
         System.out.println("computeTourAction");
         tour = graphProcessor.optimalTour(this.planningRequest);
+        Text txt = null;
+        int cpt = 1;
         for (Path p : tour.getPaths()) {
+            txt = new Text("Step " + cpt);
+            String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
                 String destId = s.getDestination().getId().toString();
@@ -184,16 +212,25 @@ public class MenuPageController {
                 if (edge != null) {
                     edge.setAttribute("ui.style", "fill-color: red;");
                     edge.setAttribute("ui.style", "size: 4px;");
+                    edge.setAttribute("ui.class","pathEdge");
+                    this.graphEdges.add(edge.getId());
+                    id = id + edge.getId() + "#";
                 } else {
                     edge = graph.getEdge(destId + "|" + originId);
                     if (edge != null) {
                         edge.setAttribute("ui.style", "fill-color: red;");
                         edge.setAttribute("ui.style", "size: 4px;");
+                        edge.setAttribute("ui.class","pathEdge");
+                        this.graphEdges.add(edge.getId());
+                        id = id + edge.getId() + "#";
                     } else {
                         System.out.println("Edge not found");
                     }
                 }
             }
+            txt.setId(id);
+            this.pathList.getItems().add(txt);
+            cpt++;
         }
     }
 
@@ -237,6 +274,30 @@ public class MenuPageController {
         String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
         this.setSelectedSprite(spriteId);
         
+    }
+    
+    @FXML
+    public void pathListClick(MouseEvent arg0) {
+        System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
+
+        String[] ids = this.pathList.getSelectionModel().getSelectedItem().getId().split("#");
+        this.setSelectedPath(ids);
+        
+    }
+    
+    private void setSelectedPath(String[] pathIds) {
+        if (this.selectedEdges != null) {
+            for (String edge : this.selectedEdges) {
+                Edge pathEdge = this.graph.getEdge(edge);
+                pathEdge.setAttribute("ui.style", "fill-color: red;");
+            }
+        }
+        
+        for(String id : pathIds) {
+            Edge pathEdge = this.graph.getEdge(id);
+            pathEdge.setAttribute("ui.style", "fill-color: blue;");
+        }
+        this.selectedEdges = pathIds;
     }
     
     private void setSelectedSprite(String spriteId) {
