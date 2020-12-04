@@ -38,7 +38,14 @@ public class PlanningRequest {
     public void setRequests(List<Request> requests) {
         this.requests = requests;
     }
-
+    
+    public void addRequest(Request r) {
+        this.requests.add(r);
+    }
+    
+    public void removeRequest(Request r){
+        this.requests.remove(r);
+    }
     @Override
     public String toString() {
         return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';

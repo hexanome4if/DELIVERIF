@@ -146,15 +146,14 @@ public class GraphProcessor {
         Vertex destination = graph.getVertexById(v2.getId());
 
         VertexPath vertexPath = fullPath.get(source.getId() + "-" + destination.getId());
-
+        System.out.println(vertexPath);
         return vertexPath.convertToPath(map);
     }
 
     public Tour optimalTour(PlanningRequest pr) {
         Tour tour = new Tour(pr);
-        GraphProcessor gp = new GraphProcessor(map);
         fullPath.clear();
-        TSP1 tsp = gp.hamiltonianCircuit(pr);
+        TSP1 tsp = hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         double velocity = 15 * 1000 / 60;
         Calendar cal = Calendar.getInstance();
@@ -205,6 +204,7 @@ public class GraphProcessor {
     }
     
     public Tour removeRequestFromTour(Tour t, Request r) {
+        t.getPr().removeRequest(r);
         Intersection pickup = r.getPickupAddress();
         Intersection delivery = r.getDeliveryAddress();
         double velocity = 15 * 1000 / 60;
@@ -218,30 +218,31 @@ public class GraphProcessor {
         for (Path p : t.getPaths()) {
             if (p.getDeparture().getId() == pickup.getId()) {
                 afterPickup = p;
-                t.removePath(p);
+                //t.removePath(p);
                 pickupIndex = i;
                 i--;
             }
             if(p.getArrival().getId() == pickup.getId()) {
                 beforePickup = p;
-                t.removePath(p);
+                //t.removePath(p);
                 i--;
             }
             if (p.getDeparture().getId() == delivery.getId()) {
                 afterDelivery = p;
-                t.removePath(p);
+                //t.removePath(p);
                 deliveryIndex =i;
                 i--;
             } 
             if (p.getArrival().getId() == delivery.getId()) {
                 beforeDelivery = p;
-                t.removePath(p);
+                //t.removePath(p);
                 i--;
             }
             i++;
         }
-        if (beforePickup == null || afterPickup == null || beforeDelivery == null || afterDelivery == null ) return t;
         
+        if (beforePickup == null || afterPickup == null || beforeDelivery == null || afterDelivery == null ) return t;
+        t.removePath(afterPickup); t.removePath(beforePickup); t.removePath(beforeDelivery); t.removePath(afterDelivery);
         Path pickupPath = shortestPathBetweenTwoIntersections(beforePickup.getDeparture(), afterPickup.getArrival());
         pickupPath.setDepatureTime(beforePickup.getDepatureTime());
         Calendar cal = Calendar.getInstance();
@@ -260,5 +261,20 @@ public class GraphProcessor {
         t.getPaths().add(deliveryIndex, deliveryPath);
         
         return t;
+    }
+    
+    public static void main(String[] args) {
+        XmlReader reader = new XmlReader();
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/largeMap.xml");
+        GraphProcessor gp = new GraphProcessor(reader.getMap());
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsLarge9.xml");
+        Tour tour = gp.optimalTour(pr);
+        //System.out.println("Tour before deletion: " + tour);
+        System.out.println("Duration before deletion: " + tour.getTotalDuration());
+        System.out.println("Distance before deletion: " + tour.getTotalDistance());
+        gp.removeRequestFromTour(tour, pr.getRequests().get(1));
+        System.out.println("Duration after deletion: " + tour.getTotalDuration());
+        System.out.println("Distance after deletion: " + tour.getTotalDistance());
+        //System.out.println("Tour after deletion: " + tour);
     }
 }
