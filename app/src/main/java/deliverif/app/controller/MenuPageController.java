@@ -9,6 +9,8 @@ import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.map.Segment;
+import deliverif.app.model.request.Observable;
+import deliverif.app.model.request.Observer;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -46,7 +48,7 @@ import org.graphstream.ui.graphicGraph.stylesheet.Selector;
  *
  * @author fabien
  */
-public class MenuPageController {
+public class MenuPageController implements Observer {
 
     @FXML
     private Button loadCityMapButton;
@@ -105,8 +107,16 @@ public class MenuPageController {
     private List<String> graphEdges = new ArrayList<>();
     
     private PathThread pathThread = null;
-
     
+    private String selectedNode = null;
+    
+    private ListOfCommands loc = null;
+
+    public MenuPageController() {
+        KeyboardEventManager kem = new KeyboardEventManager(this);
+        loc = new ListOfCommands();
+    }
+
     
     public void updateSelection(GraphicElement element) {
         
@@ -207,7 +217,12 @@ public class MenuPageController {
     private void computeTourAction() throws IOException {
         System.out.println("computeTourAction");
         tour = graphProcessor.optimalTour(this.planningRequest);
+        tour.addObserver(this);
 
+        renderTour();
+    }
+    
+    public void renderTour() {
         Text txt = null;
         int cpt = 1;
         for (Path p : tour.getPaths()) {
@@ -302,6 +317,7 @@ public class MenuPageController {
     }
     
     private void setSelectedSprite(String spriteId) {
+        selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
         sman.removeSprite("bigSprite");
         Sprite bigSprite = sman.addSprite("bigSprite");
@@ -404,4 +420,36 @@ public class MenuPageController {
         return tour;
     }
     
+    public String getSelectedNode() {
+        return selectedNode;
+    }
+    
+    public void removeRequest() {
+        if (selectedNode == null) return;
+        Request selectedRequest = null;
+        for (Request r : this.planningRequest.getRequests()) {
+            String idPickupAddress = r.getPickupAddress().getId().toString();
+            String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
+            if (idPickupAddress.equals(selectedNode)) {
+                selectedRequest = r;
+                break;
+            }
+            if (idDeliveryAdress.equals(selectedNode)) {
+                selectedRequest = r;
+                break;
+            }
+        }
+        if (selectedRequest == null) return;
+        RemoveRequest rr = new RemoveRequest(graphProcessor, tour, selectedRequest);
+        loc.addCommand(rr);
+        rr.doCommand();
+        
+    }
+
+    @Override
+    public void update(Observable observed, Object arg) {
+        Tour t = (Tour) observed;
+        if (t != tour) return;
+        renderTour();
+    }
 }

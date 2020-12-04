@@ -175,4 +175,8 @@ public class App extends Application {
         PlanningRequest pr = reader.readRequest(filename);
         return pr;
     }
+    
+    public static Scene getScene() {
+        return scene;
+    }
 }
