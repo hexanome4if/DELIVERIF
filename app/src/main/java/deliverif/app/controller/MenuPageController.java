@@ -20,29 +20,29 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Random;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.fx_viewer.FxViewPanel;
 import org.graphstream.ui.fx_viewer.FxViewer;
 import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 import org.graphstream.ui.spriteManager.Sprite;
 import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
-import java.util.Random;
-import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import org.graphstream.graph.Node;
-import org.graphstream.ui.graphicGraph.stylesheet.Selector;
 
 /**
  *
@@ -82,7 +82,7 @@ public class MenuPageController implements Observer {
 
     @FXML
     private ListView<Text> requestList;
-    
+
     @FXML
     private ListView<Text> pathList;
 
@@ -101,25 +101,24 @@ public class MenuPageController implements Observer {
     private GraphProcessor graphProcessor;
 
     private Tour tour;
-    
+
     private String[] selectedEdges = null;
-    
+
     private List<String> graphEdges = new ArrayList<>();
-    
+
     private PathThread pathThread = null;
-    
+
     private String selectedNode = null;
-    
+
     private ListOfCommands loc = null;
 
     public MenuPageController() {
-        KeyboardEventManager kem = new KeyboardEventManager(this);
         loc = new ListOfCommands();
+        instance = this;
     }
 
-    
     public void updateSelection(GraphicElement element) {
-        
+
         System.out.println("UPDATE SELECTION");
         if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
@@ -158,25 +157,25 @@ public class MenuPageController implements Observer {
             }
             return;
         }
-        
+
         if (this.planningRequest == null) {
             return;
         }
         if (element.getSelectorType() != Selector.Type.SPRITE) {
             return;
         }
-        
+
         String idElement = element.getId();
-        
+
         this.setSelectedSprite(element.getId());
         Text spriteText = null;
-        for(Text t : this.requestList.getItems()) {
-            if(t.getId().equals(idElement)) {
+        for (Text t : this.requestList.getItems()) {
+            if (t.getId().equals(idElement)) {
                 spriteText = t;
             }
         }
         this.requestList.getSelectionModel().select(spriteText);
-               
+
     }
 
     @FXML
@@ -187,7 +186,7 @@ public class MenuPageController implements Observer {
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
         //this.graph.setAutoCreate(true);
         //this.graph.setStrict(false);
-        
+
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
@@ -221,7 +220,7 @@ public class MenuPageController implements Observer {
 
         renderTour();
     }
-    
+
     public void renderTour() {
         Text txt = null;
         int cpt = 1;
@@ -235,7 +234,7 @@ public class MenuPageController implements Observer {
                 if (edge != null) {
                     edge.setAttribute("ui.style", "fill-color: red;");
                     edge.setAttribute("ui.style", "size: 4px;");
-                    edge.setAttribute("ui.class","pathEdge");
+                    edge.setAttribute("ui.class", "pathEdge");
                     this.graphEdges.add(edge.getId());
                     id = id + edge.getId() + "#";
                 } else {
@@ -243,7 +242,7 @@ public class MenuPageController implements Observer {
                     if (edge != null) {
                         edge.setAttribute("ui.style", "fill-color: red;");
                         edge.setAttribute("ui.style", "size: 4px;");
-                        edge.setAttribute("ui.class","pathEdge");
+                        edge.setAttribute("ui.class", "pathEdge");
                         this.graphEdges.add(edge.getId());
                         id = id + edge.getId() + "#";
                     } else {
@@ -294,42 +293,43 @@ public class MenuPageController implements Observer {
     @FXML
     public void requestListClick(MouseEvent arg0) {
         System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
-        
+
         String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
         this.setSelectedSprite(spriteId);
-        
+
     }
-    
+
     @FXML
     public void pathListClick(MouseEvent arg0) {
         System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
         int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(5));
-        this.setSelectedPath(num);    
+        this.setSelectedPath(num);
     }
-    
+
     private void setSelectedPath(int num) {
         if (this.pathThread != null) {
             this.pathThread.end();
-            while(this.pathThread.isIsFinished() == false) {}
+            while (this.pathThread.isIsFinished() == false) {
+            }
         }
         this.pathThread = new PathThread(this, num);
         this.pathThread.start();
     }
-    
+
     private void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
         sman.removeSprite("bigSprite");
         Sprite bigSprite = sman.addSprite("bigSprite");
-        bigSprite.setPosition(sprite.getX(),sprite.getY(),sprite.getZ());
+        bigSprite.setPosition(sprite.getX(), sprite.getY(), sprite.getZ());
         String spriteType = (String) sprite.getAttribute("ui.class");
         String bigSpriteType = spriteType + "Selected";
-        bigSprite.setAttribute("ui.class",bigSpriteType);        
-        bigSprite.setAttribute("ui.style",sprite.getAttribute("ui.style"));
-        
+        bigSprite.setAttribute("ui.class", bigSpriteType);
+        bigSprite.setAttribute("ui.style", sprite.getAttribute("ui.style"));
+
         String longitude = "Longitude = ";
         String latitude = "Latitude = ";
-        if(spriteType.equals("depotSprite")) {
+        if (spriteType.equals("depotSprite")) {
             this.longitudeText.setText(longitude + String.valueOf(sprite.getX()));
             this.latitudeText.setText(latitude + String.valueOf(sprite.getY()));
             SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
@@ -419,13 +419,15 @@ public class MenuPageController implements Observer {
     public Tour getTour() {
         return tour;
     }
-    
+
     public String getSelectedNode() {
         return selectedNode;
     }
-    
+
     public void removeRequest() {
-        if (selectedNode == null) return;
+        if (selectedNode == null) {
+            return;
+        }
         Request selectedRequest = null;
         for (Request r : this.planningRequest.getRequests()) {
             String idPickupAddress = r.getPickupAddress().getId().toString();
@@ -439,17 +441,28 @@ public class MenuPageController implements Observer {
                 break;
             }
         }
-        if (selectedRequest == null) return;
+        if (selectedRequest == null) {
+            return;
+        }
         RemoveRequest rr = new RemoveRequest(graphProcessor, tour, selectedRequest);
         loc.addCommand(rr);
         rr.doCommand();
-        
+
     }
 
     @Override
     public void update(Observable observed, Object arg) {
         Tour t = (Tour) observed;
-        if (t != tour) return;
+        if (t != tour) {
+            return;
+        }
         renderTour();
+    }
+
+    // Instance (Singleton)
+    private static MenuPageController instance = null;
+
+    public static MenuPageController getInstance() {
+        return instance;
     }
 }

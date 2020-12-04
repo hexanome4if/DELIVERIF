@@ -51,7 +51,7 @@ public class MouseOverMouseManager extends FxMouseManager {
      */
     @Override
     protected void elementMoving(GraphicElement element, MouseEvent event) {
-        //Empecher les noeuds de bouger 
+        //Empecher les noeuds de bouger
         //view.moveElementAtPx(element, event.getX(), event.getY());
         //System.out.println("elementMoving");
     }
@@ -183,7 +183,6 @@ public class MouseOverMouseManager extends FxMouseManager {
             double d = Math.abs(m * px - py + b) / Math.sqrt(Math.pow(m, 2) + 1);
 
             //System.out.println("Mouse Point: " + px + "," + py + ", GN0Point: " + gn0p.toString() + ", GN1Point: " + gn1p.toString() + ". Distance: " + d);
-
             // Determine lowest x (lnx), hishest x (hnx), lowest y (lny), highest y (hny)
             double lnx = gn0p.x;
             double lny = gn0p.y;
@@ -197,7 +196,7 @@ public class MouseOverMouseManager extends FxMouseManager {
                 lny = gn1p.y;
                 hny = gn0p.y;
             }
-            // Determine if click is close enough to line (d < ld), and click is within edge bounds (lnx <= px && lny <= py && hnx >= px && hny >= py) 
+            // Determine if click is close enough to line (d < ld), and click is within edge bounds (lnx <= px && lny <= py && hnx >= px && hny >= py)
             if (d < ld && lnx <= px && lny <= py && hnx >= px && hny >= py) {
                 se = ge; // store edge
                 ld = d; // update max distance to get the closest edge to the mouse click
