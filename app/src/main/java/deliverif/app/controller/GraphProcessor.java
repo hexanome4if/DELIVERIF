@@ -205,7 +205,7 @@ public class GraphProcessor {
         return tour;
     }
 
-    public Tour addRequest(Tour tour, Request rqst) {
+    public Tour addRequestToTour(Tour tour, Request rqst) {
         PlanningRequest pr = tour.getPr();
         pr.getRequests().add(rqst);
         ArrayList<Path> paths = tour.getPaths();
@@ -337,9 +337,16 @@ public class GraphProcessor {
         System.out.println("Duration before deletion: " + tour.getTotalDuration());
         System.out.println("Distance before deletion: " + tour.getTotalDistance());
         System.out.println("Nb paths: " + tour.getPaths().size());
-        gp.removeRequestFromTour(tour, pr.getRequests().get(1));
+        //gp.removeRequestFromTour(tour, pr.getRequests().get(1));
+        
+        RemoveRequest rr = new RemoveRequest(gp, tour, pr.getRequests().get(1));
+        rr.doCommand();
         System.out.println("Duration after deletion: " + tour.getTotalDuration());
         System.out.println("Distance after deletion: " + tour.getTotalDistance());
+        System.out.println("Nb paths: " + tour.getPaths().size());
+        rr.undoCommand();
+        System.out.println("Duration after undo: " + tour.getTotalDuration());
+        System.out.println("Distance after undo: " + tour.getTotalDistance());
         System.out.println("Nb paths: " + tour.getPaths().size());
         //System.out.println("Tour after deletion: " + tour);
     }

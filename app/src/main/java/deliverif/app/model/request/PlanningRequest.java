@@ -5,6 +5,7 @@
  */
 package deliverif.app.model.request;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ public class PlanningRequest {
     List<Request> requests;
 
     public PlanningRequest() {
+        this.requests = new ArrayList<Request>();
     }
 
     public PlanningRequest(Depot depot, List<Request> requests) {

@@ -39,7 +39,7 @@ public class Tour extends Observable {
         for (Request r : t.getPr().getRequests()) {
             pr.addRequest(r);
         }
-        paths = new ArrayList<Path>();
+        paths.clear();
         for (Path p : t.getPaths()) {
             paths.add(p);
         }
