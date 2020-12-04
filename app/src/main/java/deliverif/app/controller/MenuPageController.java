@@ -119,10 +119,17 @@ public class MenuPageController implements Observer {
     private String selectedNode = null;
 
     private ListOfCommands loc = null;
+    
+    private State currentState;
 
     public MenuPageController() {
         loc = new ListOfCommands();
         instance = this;
+        currentState = new InitialState(this);
+    }
+    
+    public void setCurrentState(State s){
+        currentState = s;
     }
 
     public void updateSelection(GraphicElement element) {
@@ -175,7 +182,7 @@ public class MenuPageController implements Observer {
 
         String idElement = element.getId();
 
-        this.setSelectedSprite(element.getId());
+        this.currentState.selectNode(element.getId());
         Text spriteText = null;
         for (Text t : this.requestList.getItems()) {
             if (t.getId().equals(idElement)) {
@@ -188,6 +195,10 @@ public class MenuPageController implements Observer {
 
     @FXML
     private void loadCityMapAction() throws IOException {
+        currentState.loadMap();
+    }
+
+    public void loadMap () throws IOException {
         System.out.println("loadCityMapAction");
         this.map = App.choseMapFile(this.xmlReader);
         this.chargerGraph(this.map);
@@ -208,9 +219,13 @@ public class MenuPageController implements Observer {
         graphProcessor = new GraphProcessor(map);
         sman = new SpriteManager(this.graph);
     }
-
+    
     @FXML
     private void loadRequestAction() throws IOException {
+        currentState.loadRequest();
+    }
+
+    public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
         if (this.xmlReader.getMap() == null) {
             System.out.println("Il faut charger une map avant");
@@ -219,16 +234,19 @@ public class MenuPageController implements Observer {
         this.chargerPlanningRequests();
         //System.out.println(this.planningRequest);
     }
-
+    
     @FXML
     private void computeTourAction() throws IOException {
+        currentState.computeTour();
+    }
+
+    public void computeTour() {
         System.out.println("computeTourAction");
         tour = graphProcessor.optimalTour(this.planningRequest);
         tour.addObserver(this);
 
         renderTour();
     }
-
     public void renderTour() {
         for (String edgeId : graphEdges) {
             resetEdge(edgeId);
@@ -331,7 +349,7 @@ public class MenuPageController implements Observer {
         System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
 
         String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
-        this.setSelectedSprite(spriteId);
+        this.currentState.selectNode(spriteId);
 
     }
 
@@ -353,7 +371,7 @@ public class MenuPageController implements Observer {
 
     }
 
-    private void setSelectedSprite(String spriteId) {
+    public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
         sman.removeSprite("bigSprite");
@@ -474,6 +492,10 @@ public class MenuPageController implements Observer {
         }
     }
 
+    public State getCurrentState() {
+        return currentState;
+    }
+    
     public Graph getGraph() {
         return graph;
     }
@@ -514,6 +536,16 @@ public class MenuPageController implements Observer {
         rr.doCommand();
 
     }
+    
+    public void addRequest(String pickupId, String deliveryId){
+        Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
+        Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
+        Request r = new Request (pickup,delivery, 120, 67);
+        AddRequest ar = new AddRequest(graphProcessor,tour,r);
+        loc.addCommand(ar);
+        ar.doCommand();
+    }
+    
 
     @Override
     public void update(Observable observed, Object arg) {
