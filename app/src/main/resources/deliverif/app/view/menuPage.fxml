@@ -36,9 +36,9 @@
         <Text fx:id="latitudeText" layoutX="30.0" layoutY="53.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude =" />
         <Text id="infos" fx:id="infosText" layoutX="30.0" layoutY="71.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Infos =" />
             <Text fx:id="infosTextTour1" layoutX="10.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tour Infos = " wrappingWidth="263.47003746032715" />
-            <Text fx:id="infosTextTour2" layoutX="9.0" layoutY="109.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="278.9466247558594" />
-        <ListView fx:id="requestList" layoutX="7.0" layoutY="136.0" onMouseClicked="#requestListClick" prefHeight="179.0" prefWidth="89.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="177.0" AnchorPane.topAnchor="136.0" />
-        <ListView id="requestList" fx:id="pathList" layoutX="116.0" layoutY="136.0" onMouseClicked="#pathListClick" prefHeight="179.0" prefWidth="167.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="116.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="136.0" />
+            <Text fx:id="infosTextTour2" layoutX="81.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="211.94662475585938" />
+        <ListView fx:id="requestList" layoutX="7.0" layoutY="136.0" onMouseClicked="#requestListClick" prefHeight="179.0" prefWidth="200.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="81.0" AnchorPane.topAnchor="136.0" />
+        <ListView id="requestList" fx:id="pathList" layoutX="222.0" layoutY="136.0" onMouseClicked="#pathListClick" prefHeight="179.0" prefWidth="53.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="222.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="136.0" />
         <Text layoutX="8.0" layoutY="129.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Request points :" AnchorPane.leftAnchor="8.0" />
         <Text layoutX="138.0" layoutY="129.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path step by step :" />
       </children>

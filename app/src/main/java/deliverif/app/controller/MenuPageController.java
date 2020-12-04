@@ -14,8 +14,8 @@ import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -248,14 +248,25 @@ public class MenuPageController {
             this.pathList.getItems().add(txt);
             cpt++;
         }
+        
         float distance = this.tour.getTotalDistance();
-        int duration = this.tour.getTotalDuration();
+        int time = this.tour.getTotalDuration();
+        
+        System.out.println("getDuration/"+time);
+        distance = distance / 100;
+        float duration = time/ 60;
+        System.out.println("Duration/"+duration);
+        int hours = (int)duration;
+        float min = duration - hours;
+        int mins = (int)(60*min);
+        System.out.println("hours/"+duration+"/ min/"+min+"/ mins/"+mins);
+
         Date departure = this.tour.getDepartureTime();
         Date arrival = this.tour.getArrivalTime();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss"); 
-   SysteSystem.out.println(dtf.format(now));  
-        this.infosTextTour1.setText("TOUR = dist. : " + distance + " m, duration :  " + duration + " min");
-        this.infosTextTour2.setText("from " + departure + " to " + arrival);
+        
+        SimpleDateFormat dtf = new SimpleDateFormat("HH:mm:ss");   
+        this.infosTextTour1.setText("TOUR = " + distance + " km / " + hours +"h"+ mins + "min");
+        this.infosTextTour2.setText("from " + dtf.format(departure) + " to " + dtf.format(arrival));
         System.out.println("compute tour done");
     }
 
