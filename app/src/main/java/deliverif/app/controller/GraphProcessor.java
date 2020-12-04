@@ -152,9 +152,8 @@ public class GraphProcessor {
 
     public Tour optimalTour(PlanningRequest pr) {
         Tour tour = new Tour(pr);
-        GraphProcessor gp = new GraphProcessor(map);
         fullPath.clear();
-        TSP1 tsp = gp.hamiltonianCircuit(pr);
+        TSP1 tsp = hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
         double velocity = 15 * 1000 / 60;
         Calendar cal = Calendar.getInstance();
