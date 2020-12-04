@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -80,7 +81,7 @@ public class MenuPageController {
 
     @FXML
     private ListView<Text> requestList;
-    
+
     @FXML
     private ListView<Text> pathList;
 
@@ -90,7 +91,7 @@ public class MenuPageController {
 
     private PlanningRequest planningRequest = null;
 
-    private Graph graph;
+    private Graph graph = null;
 
     private FxViewPanel panel;
 
@@ -99,17 +100,15 @@ public class MenuPageController {
     private GraphProcessor graphProcessor;
 
     private Tour tour;
-    
-    private String[] selectedEdges = null;
-    
-    private List<String> graphEdges = new ArrayList<>();
-    
-    private PathThread pathThread = null;
 
-    
-    
+    private String[] selectedEdges = null;
+
+    private List<String> graphEdges = new ArrayList<>();
+
+    public static PathThread pathThread = null;
+
     public void updateSelection(GraphicElement element) {
-        
+
         System.out.println("UPDATE SELECTION");
         if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
@@ -119,7 +118,6 @@ public class MenuPageController {
                     for (Text t : this.pathList.getItems()) {
                         if (t.getId().contains(id)) {
                             this.pathList.getSelectionModel().select(t);
-                            String[] ids = t.getId().split("#");
                             String numString = t.getText().substring(5);
                             int num = Integer.parseInt(numString);
                             this.setSelectedPath(num);
@@ -148,25 +146,25 @@ public class MenuPageController {
             }
             return;
         }
-        
+
         if (this.planningRequest == null) {
             return;
         }
         if (element.getSelectorType() != Selector.Type.SPRITE) {
             return;
         }
-        
+
         String idElement = element.getId();
-        
+
         this.setSelectedSprite(element.getId());
         Text spriteText = null;
-        for(Text t : this.requestList.getItems()) {
-            if(t.getId().equals(idElement)) {
+        for (Text t : this.requestList.getItems()) {
+            if (t.getId().equals(idElement)) {
                 spriteText = t;
             }
         }
         this.requestList.getSelectionModel().select(spriteText);
-               
+
     }
 
     @FXML
@@ -177,7 +175,7 @@ public class MenuPageController {
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
         //this.graph.setAutoCreate(true);
         //this.graph.setStrict(false);
-        
+
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
@@ -220,7 +218,7 @@ public class MenuPageController {
                 if (edge != null) {
                     edge.setAttribute("ui.style", "fill-color: red;");
                     edge.setAttribute("ui.style", "size: 4px;");
-                    edge.setAttribute("ui.class","pathEdge");
+                    edge.setAttribute("ui.class", "pathEdge");
                     this.graphEdges.add(edge.getId());
                     id = id + edge.getId() + "#";
                 } else {
@@ -228,7 +226,7 @@ public class MenuPageController {
                     if (edge != null) {
                         edge.setAttribute("ui.style", "fill-color: red;");
                         edge.setAttribute("ui.style", "size: 4px;");
-                        edge.setAttribute("ui.class","pathEdge");
+                        edge.setAttribute("ui.class", "pathEdge");
                         this.graphEdges.add(edge.getId());
                         id = id + edge.getId() + "#";
                     } else {
@@ -249,6 +247,10 @@ public class MenuPageController {
     }
 
     private void chargerGraph(Map map) {
+        if (graph != null) {
+            initUI();
+        }
+
         this.graph = new SingleGraph("Graph test 1");
 
         map.getIntersections().entrySet().forEach((mapentry) -> {
@@ -266,6 +268,7 @@ public class MenuPageController {
             try {
                 graph.addEdge(origin + "|" + destination, origin, destination);
                 graph.getEdge(origin + "|" + destination).setAttribute("segment.name", s.getName());
+                graph.getEdge(origin + "|" + destination).setAttribute("ui.class", "default");
             } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
                 //System.out.println("Error edge " + origin + " -> " + destination);
                 Edge ed = graph.getEdge(destination + "|" + origin);
@@ -276,44 +279,59 @@ public class MenuPageController {
         });
     }
 
+    public void initUI() {
+        this.planningRequest = null;
+        this.tour = null;
+        this.requestList.getItems().clear();
+        this.pathList.getItems().clear();
+        this.longitudeText.setText("Longitude = ");
+        this.latitudeText.setText("Latitude = ");
+        this.infosText.setText("");
+        
+        
+
+    }
+
     @FXML
     public void requestListClick(MouseEvent arg0) {
         System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
-        
+
         String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
         this.setSelectedSprite(spriteId);
-        
+
     }
-    
+
     @FXML
     public void pathListClick(MouseEvent arg0) {
         System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
         int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(5));
-        this.setSelectedPath(num);    
+        this.setSelectedPath(num);
     }
-    
+
     private void setSelectedPath(int num) {
-        if (this.pathThread != null) {
-            this.pathThread.end();
-            while(this.pathThread.isIsFinished() == false) {}
+        try {
+            stopThread();
+            pathThread = new PathThread(this, num);
+            pathThread.start();
+        } catch (Exception e) {
+            System.out.println("Error in setSelectedPath " + e);
         }
-        this.pathThread = new PathThread(this, num);
-        this.pathThread.start();
+
     }
-    
+
     private void setSelectedSprite(String spriteId) {
         Sprite sprite = sman.getSprite(spriteId);
         sman.removeSprite("bigSprite");
         Sprite bigSprite = sman.addSprite("bigSprite");
-        bigSprite.setPosition(sprite.getX(),sprite.getY(),sprite.getZ());
+        bigSprite.setPosition(sprite.getX(), sprite.getY(), sprite.getZ());
         String spriteType = (String) sprite.getAttribute("ui.class");
         String bigSpriteType = spriteType + "Selected";
-        bigSprite.setAttribute("ui.class",bigSpriteType);        
-        bigSprite.setAttribute("ui.style",sprite.getAttribute("ui.style"));
-        
+        bigSprite.setAttribute("ui.class", bigSpriteType);
+        bigSprite.setAttribute("ui.style", sprite.getAttribute("ui.style"));
+
         String longitude = "Longitude = ";
         String latitude = "Latitude = ";
-        if(spriteType.equals("depotSprite")) {
+        if (spriteType.equals("depotSprite")) {
             this.longitudeText.setText(longitude + String.valueOf(sprite.getX()));
             this.latitudeText.setText(latitude + String.valueOf(sprite.getY()));
             SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
@@ -356,7 +374,25 @@ public class MenuPageController {
     }
 
     private void chargerPlanningRequests() throws IOException {
-        sman = new SpriteManager(this.graph);
+        if (planningRequest != null) {
+            initUI();
+            
+            ArrayList<String> spriteIds = new ArrayList<String>();
+            for (Sprite s : this.sman.sprites()) {
+                spriteIds.add(s.getId());
+            }
+            for(String id : spriteIds) {
+                sman.removeSprite(id);
+            }
+                   
+            if(this.graphEdges != null) {
+                for(String edgeId : graphEdges) {
+                    graph.getEdge(edgeId).setAttribute("ui.class","default");
+                }
+            }
+            
+            
+        }
         this.planningRequest = App.choseRequestFile(this.xmlReader);
 
         Text txt;
@@ -395,7 +431,14 @@ public class MenuPageController {
             cpt++;
         }
     }
-
+    
+    public static void stopThread() {
+        if(pathThread != null) {
+            pathThread.end();
+            while(!pathThread.isIsFinished()) {}
+        }
+    }
+    
     public Graph getGraph() {
         return graph;
     }
