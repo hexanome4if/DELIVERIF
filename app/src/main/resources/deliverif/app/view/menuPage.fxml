@@ -56,7 +56,7 @@
             <Insets top="20.0" />
           </VBox.margin>
         </Button>
-        <Button fx:id="editTourButton" mnemonicParsing="false" onAction="#editTourAction" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
+        <Button fx:id="editTourButton" mnemonicParsing="false" onAction="#computePathAction" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
           <VBox.margin>
             <Insets top="20.0" />
           </VBox.margin>

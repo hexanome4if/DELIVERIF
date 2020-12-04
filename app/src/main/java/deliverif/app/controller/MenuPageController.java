@@ -171,6 +171,9 @@ public class MenuPageController {
         this.map = App.choseMapFile(this.xmlReader);
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
+        //this.graph.setAutoCreate(true);
+        //this.graph.setStrict(false);
+        
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
@@ -193,13 +196,14 @@ public class MenuPageController {
             return;
         }
         this.chargerPlanningRequests();
-        System.out.println(this.planningRequest);
+        //System.out.println(this.planningRequest);
     }
 
     @FXML
     private void computeTourAction() throws IOException {
         System.out.println("computeTourAction");
         tour = graphProcessor.optimalTour(this.planningRequest);
+
         Text txt = null;
         int cpt = 1;
         for (Path p : tour.getPaths()) {
@@ -232,6 +236,50 @@ public class MenuPageController {
             this.pathList.getItems().add(txt);
             cpt++;
         }
+        System.out.println("compute tour done");
+        //computePathAction();
+        PathThread pt = new PathThread(this);
+        pt.start();
+    }
+    
+    protected void sleep() {
+        try { Thread.sleep(1000); } catch (Exception e) {}
+    }
+    
+    @FXML
+    private void computePathAction() {
+        
+        System.out.println("computePathAction");
+        
+        String color = "fill-color: blue;";
+        int pathIndex = 1;
+        
+        Path p = tour.getPaths().get(pathIndex);
+ 
+        for(Segment s : p.getSegments()) {
+            String originId = s.getOrigin().getId().toString();
+            String destId = s.getDestination().getId().toString();
+
+            Edge edge = graph.getEdge(originId + "|" + destId);
+            if (edge != null) {
+                //edge.setAttribute("ui.style", color);
+                //edge.setAttribute("ui.style", "size: 4px;");
+                edge.setAttribute("ui.class", "marked");
+
+                System.out.println("pause bleu --");
+                sleep();          
+                
+            } else {
+                edge = graph.getEdge(destId + "|" + originId);
+                if (edge != null) {
+                    edge.setAttribute("ui.style", color);
+                    edge.setAttribute("ui.style", "size: 4px;");
+
+                } else {
+                    System.out.println("Edge not found");
+                }
+            }
+        }            
     }
 
     @FXML
@@ -394,4 +442,13 @@ public class MenuPageController {
             cpt++;
         }
     }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public Tour getTour() {
+        return tour;
+    }
+    
 }
