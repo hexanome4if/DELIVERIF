@@ -15,7 +15,9 @@ import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
@@ -34,13 +36,18 @@ import org.graphstream.ui.spriteManager.SpriteManager;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.InteractiveElement;
 import java.util.Random;
+import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.graphicGraph.stylesheet.Selector;
+
 /**
  *
  * @author fabien
  */
 public class MenuPageController {
+
     @FXML
     private Button loadCityMapButton;
 
@@ -55,94 +62,109 @@ public class MenuPageController {
 
     @FXML
     private AnchorPane mapPane;
-  
-    @FXML 
+
+    @FXML
     private Text loadMapText;
-    
-    @FXML 
+
+    @FXML
     private Text longitudeText;
-        
-    @FXML 
+
+    @FXML
     private Text latitudeText;
-            
-    @FXML 
+
+    @FXML
     private Text infosText;
-    
+
     @FXML
     private Text segmentNameText;
+
+    @FXML
+    private ListView<Text> requestList;
     
+    @FXML
+    private ListView<Text> pathList;
+
     private final XmlReader xmlReader = new XmlReader();
-    
+
     private Map map;
-    
+
     private PlanningRequest planningRequest = null;
-    
+
     private Graph graph;
 
     private FxViewPanel panel;
 
     private SpriteManager sman;
-  
+
     private GraphProcessor graphProcessor;
 
     private Tour tour;
     
+    private String[] selectedEdges = null;
+    
+    private List<String> graphEdges = new ArrayList<>();
+
+    
+    
     public void updateSelection(GraphicElement element) {
+        
         System.out.println("UPDATE SELECTION");
-        if(element.getSelectorType() == Selector.Type.EDGE) {
+        if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
+            for (String id : this.graphEdges) {
+                if (element.getId().equals(id)) {
+                    System.out.println(id + " is on the path");
+                    for (Text t : this.pathList.getItems()) {
+                        if (t.getId().contains(id)) {
+                            this.pathList.getSelectionModel().select(t);
+                            String[] ids = t.getId().split("#");
+                            this.setSelectedPath(ids);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
             String name = (String) edge.getAttribute("segment.name");
             System.out.println(name);
-            if(name != null) {
+            if (name != null) {
                 segmentNameText.setText(name);
                 sman.removeSprite("segmentSprite");
-                
+
                 Sprite segmentSprite = sman.addSprite("segmentSprite");
-                double x,y,z;
-                
+                double x, y, z;
+
                 segmentSprite.setAttribute("ui.class", "segmentSprite");
                 segmentSprite.setAttribute("ui.style", "fill-color: green;");
                 Node origin = edge.getNode0();
                 Node dest = edge.getNode1();
-                Float longitude = ( ((Float) origin.getAttribute("x")) + ((Float) dest.getAttribute("x")) )/2 ;
-                Float latitude = ( ((Float) origin.getAttribute("y")) + ((Float) dest.getAttribute("y")) )/2 ;
+                Float longitude = (((Float) origin.getAttribute("x")) + ((Float) dest.getAttribute("x"))) / 2;
+                Float latitude = (((Float) origin.getAttribute("y")) + ((Float) dest.getAttribute("y"))) / 2;
                 segmentSprite.setPosition(longitude, latitude, 0);
             }
             return;
         }
+        
         if (this.planningRequest == null) {
             return;
         }
+        if (element.getSelectorType() != Selector.Type.SPRITE) {
+            return;
+        }
+        
         String idElement = element.getId();
-        String longitude = "Longitude = ";
-        String latitude = "Latitude = ";
-        Intersection depot = this.planningRequest.getDepot().getAddress();
-        if (depot.getId().toString().equals(idElement)) {
-            this.longitudeText.setText(longitude + String.valueOf(depot.getLongitude()));
-            this.latitudeText.setText(latitude + String.valueOf(depot.getLatitude()));
-            SimpleDateFormat hourFormat =new SimpleDateFormat("HH:mm:ss"); 
-            String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
-            this.infosText.setText("Departure time = " + strDate);
-        } else {
-            for (Request r : this.planningRequest.getRequests()) {
-                String idPickupAddress = r.getPickupAddress().getId().toString();
-                String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
-                if (idPickupAddress.equals(idElement)) {
-                    this.longitudeText.setText(longitude + String.valueOf(r.getPickupAddress().getLongitude()));
-                    this.latitudeText.setText(latitude + String.valueOf(r.getPickupAddress().getLatitude()));
-                    this.infosText.setText("Pickup duration = " + String.valueOf(r.getPickupDuration()));
-                    return;
-                }
-                if (idDeliveryAdress.equals(idElement)) {
-                    this.longitudeText.setText(longitude + String.valueOf(r.getDeliveryAddress().getLongitude()));
-                    this.latitudeText.setText(latitude + String.valueOf(r.getDeliveryAddress().getLatitude()));
-                    this.infosText.setText("Delivery duration = " + String.valueOf(r.getDeliveryDuration()));
-                    return;
-                }
+        
+        this.setSelectedSprite(element.getId());
+        Text spriteText = null;
+        for(Text t : this.requestList.getItems()) {
+            if(t.getId().equals(idElement)) {
+                spriteText = t;
             }
         }
+        this.requestList.getSelectionModel().select(spriteText);
+               
     }
-    
+
     @FXML
     private void loadCityMapAction() throws IOException {
         System.out.println("loadCityMapAction");
@@ -155,7 +177,7 @@ public class MenuPageController {
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
-        panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.NODE, InteractiveElement.SPRITE), this));
+        panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.SPRITE), this));
         mapPane.getChildren().remove(loadMapText);
         mapPane.getChildren().add(panel);
         AnchorPane.setTopAnchor(panel, 1.0);
@@ -181,29 +203,38 @@ public class MenuPageController {
     private void computeTourAction() throws IOException {
         System.out.println("computeTourAction");
         tour = graphProcessor.optimalTour(this.planningRequest);
-        
-        //System.out.println("----------------");
-        //System.out.println(tour.getPaths());
-        //System.out.println("----------------");
-        
+
+        Text txt = null;
+        int cpt = 1;
         for (Path p : tour.getPaths()) {
-            for(Segment s : p.getSegments()) {
+            txt = new Text("Step " + cpt);
+            String id = "";
+            for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
                 String destId = s.getDestination().getId().toString();
                 Edge edge = graph.getEdge(originId + "|" + destId);
                 if (edge != null) {
                     edge.setAttribute("ui.style", "fill-color: red;");
                     edge.setAttribute("ui.style", "size: 4px;");
+                    edge.setAttribute("ui.class","pathEdge");
+                    this.graphEdges.add(edge.getId());
+                    id = id + edge.getId() + "#";
                 } else {
                     edge = graph.getEdge(destId + "|" + originId);
                     if (edge != null) {
                         edge.setAttribute("ui.style", "fill-color: red;");
                         edge.setAttribute("ui.style", "size: 4px;");
+                        edge.setAttribute("ui.class","pathEdge");
+                        this.graphEdges.add(edge.getId());
+                        id = id + edge.getId() + "#";
                     } else {
                         System.out.println("Edge not found");
                     }
                 }
             }
+            txt.setId(id);
+            this.pathList.getItems().add(txt);
+            cpt++;
         }
         System.out.println("compute tour done");
         //computePathAction();
@@ -265,7 +296,7 @@ public class MenuPageController {
             graph.addNode(nodeId);
             graph.getNode(nodeId).setAttribute("x", intersection.getLongitude());
             graph.getNode(nodeId).setAttribute("y", intersection.getLatitude());
-            
+
         });
 
         map.getSegments().forEach((s) -> {
@@ -273,59 +304,142 @@ public class MenuPageController {
             String destination = s.getDestination().getId().toString();
             try {
                 graph.addEdge(origin + "|" + destination, origin, destination);
-                graph.getEdge(origin+"|"+destination).setAttribute("segment.name",s.getName());
+                graph.getEdge(origin + "|" + destination).setAttribute("segment.name", s.getName());
             } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
                 //System.out.println("Error edge " + origin + " -> " + destination);
-                Edge ed = graph.getEdge(destination + "|" + origin) ;
-                if(ed != null) {
+                Edge ed = graph.getEdge(destination + "|" + origin);
+                if (ed != null) {
                     ed.setAttribute("ui.style", "size: 2px;");
                 }
             }
         });
     }
+
+    @FXML
+    public void requestListClick(MouseEvent arg0) {
+        System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
+        
+        String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
+        this.setSelectedSprite(spriteId);
+        
+    }
     
-    public String randomColorSprite(){
+    @FXML
+    public void pathListClick(MouseEvent arg0) {
+        System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
+
+        String[] ids = this.pathList.getSelectionModel().getSelectedItem().getId().split("#");
+        this.setSelectedPath(ids);
         
-        String color;
+    }
+    
+    private void setSelectedPath(String[] pathIds) {
+        if (this.selectedEdges != null) {
+            for (String edge : this.selectedEdges) {
+                Edge pathEdge = this.graph.getEdge(edge);
+                pathEdge.setAttribute("ui.style", "fill-color: red;");
+            }
+        }
+        
+        for(String id : pathIds) {
+            Edge pathEdge = this.graph.getEdge(id);
+            pathEdge.setAttribute("ui.style", "fill-color: blue;");
+        }
+        this.selectedEdges = pathIds;
+    }
+    
+    private void setSelectedSprite(String spriteId) {
+        Sprite sprite = sman.getSprite(spriteId);
+        sman.removeSprite("bigSprite");
+        Sprite bigSprite = sman.addSprite("bigSprite");
+        bigSprite.setPosition(sprite.getX(),sprite.getY(),sprite.getZ());
+        String spriteType = (String) sprite.getAttribute("ui.class");
+        String bigSpriteType = spriteType + "Selected";
+        bigSprite.setAttribute("ui.class",bigSpriteType);        
+        bigSprite.setAttribute("ui.style",sprite.getAttribute("ui.style"));
+        
+        String longitude = "Longitude = ";
+        String latitude = "Latitude = ";
+        if(spriteType.equals("depotSprite")) {
+            this.longitudeText.setText(longitude + String.valueOf(sprite.getX()));
+            this.latitudeText.setText(latitude + String.valueOf(sprite.getY()));
+            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
+            String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
+            this.infosText.setText("Departure time = " + strDate);
+        } else {
+            for (Request r : this.planningRequest.getRequests()) {
+                String idPickupAddress = r.getPickupAddress().getId().toString();
+                String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
+                if (idPickupAddress.equals(spriteId)) {
+                    this.longitudeText.setText(longitude + String.valueOf(r.getPickupAddress().getLongitude()));
+                    this.latitudeText.setText(latitude + String.valueOf(r.getPickupAddress().getLatitude()));
+                    this.infosText.setText("Pickup duration = " + String.valueOf(r.getPickupDuration()));
+                    return;
+                }
+                if (idDeliveryAdress.equals(spriteId)) {
+                    this.longitudeText.setText(longitude + String.valueOf(r.getDeliveryAddress().getLongitude()));
+                    this.latitudeText.setText(latitude + String.valueOf(r.getDeliveryAddress().getLatitude()));
+                    this.infosText.setText("Delivery duration = " + String.valueOf(r.getDeliveryDuration()));
+                    return;
+                }
+            }
+        }
+    }
+
+    public int[] randomColorSprite() {
+
         Random rand = new Random();
-        
+
         int min, max;
         min = 55;
         max = 200;
-        
+
         int r = rand.nextInt((max - min) + 1) + min;
         int g = rand.nextInt((max - min) + 1) + min;
         int b = rand.nextInt((max - min) + 1) + min;
-                
-        color = "fill-color: rgb("+r+","+g+","+b+");";
-        return color;
+
+        int[] rgb = {r, g, b};
+        return rgb;
     }
 
     private void chargerPlanningRequests() throws IOException {
         sman = new SpriteManager(this.graph);
         this.planningRequest = App.choseRequestFile(this.xmlReader);
-        
+
+        Text txt;
         Intersection depot = planningRequest.getDepot().getAddress();
         Sprite depotSprite = sman.addSprite(depot.getId().toString());
         depotSprite.setAttribute("ui.class", "depotSprite");
-        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);  
-        
-        for(Request r : planningRequest.getRequests()) {
-     
-            String color = randomColorSprite();
-          
+        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);
+        txt = new Text("Depot");
+        txt.setId(depotSprite.getId());
+        txt.setFill(Color.RED);
+        this.requestList.getItems().add(txt);
+        int cpt = 1;
+        for (Request r : planningRequest.getRequests()) {
+
+            int[] rgb = randomColorSprite();
+            String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
             Intersection pickupAddress = r.getPickupAddress();
             Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
             pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
             pickupAddressSprite.setAttribute("ui.style", color);
             pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-     
-            
+            txt = new Text("Pickup " + cpt);
+            txt.setId(pickupAddressSprite.getId());
+            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+            this.requestList.getItems().add(txt);
+
             Intersection deliveryAdress = r.getDeliveryAddress();
             Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
             deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
             deliveryAdressSprite.setAttribute("ui.style", color);
             deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
+            txt = new Text("Delivery " + cpt);
+            txt.setId(deliveryAdressSprite.getId());
+            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+            this.requestList.getItems().add(txt);
+            cpt++;
         }
     }
 
@@ -337,6 +451,4 @@ public class MenuPageController {
         return tour;
     }
     
-    
-
 }
