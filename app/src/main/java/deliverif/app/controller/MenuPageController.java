@@ -17,7 +17,9 @@ import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
@@ -78,6 +80,12 @@ public class MenuPageController implements Observer {
     private Text infosText;
 
     @FXML
+    private Text infosTextTour1;
+
+    @FXML
+    private Text infosTextTour2;
+
+    @FXML
     private Text segmentNameText;
 
     @FXML
@@ -129,7 +137,7 @@ public class MenuPageController implements Observer {
                         if (t.getId().contains(id)) {
                             this.pathList.getSelectionModel().select(t);
                             String[] ids = t.getId().split("#");
-                            String numString = t.getText().substring(5);
+                            String numString = t.getText().substring(1, 2);
                             int num = Integer.parseInt(numString);
                             this.setSelectedPath(num);
                             break;
@@ -225,7 +233,7 @@ public class MenuPageController implements Observer {
         Text txt = null;
         int cpt = 1;
         for (Path p : tour.getPaths()) {
-            txt = new Text("Step " + cpt);
+            txt = new Text("[" + cpt + "]");
             String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -254,6 +262,14 @@ public class MenuPageController implements Observer {
             this.pathList.getItems().add(txt);
             cpt++;
         }
+        float distance = this.tour.getTotalDistance();
+        int duration = this.tour.getTotalDuration();
+        Date departure = this.tour.getDepartureTime();
+        Date arrival = this.tour.getArrivalTime();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+        // System.out.println(dtf.format(now));
+        this.infosTextTour1.setText("TOUR = dist. : " + distance + " m, duration :  " + duration + " min");
+        this.infosTextTour2.setText("from " + departure + " to " + arrival);
         System.out.println("compute tour done");
     }
 
@@ -302,7 +318,7 @@ public class MenuPageController implements Observer {
     @FXML
     public void pathListClick(MouseEvent arg0) {
         System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
-        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(5));
+        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
         this.setSelectedPath(num);
     }
 

@@ -58,6 +58,10 @@ public class Tour extends Observable {
                 pr.getDepot().getDepartureTime().getTime() / (60 * 1000) );
     }
     
+    public Date getDepartureTime() {
+        return paths.get(0).getDepatureTime();
+    }
+    
     public Date getArrivalTime() {
         return paths.get(paths.size()-1).getArrivalTime();
     }
