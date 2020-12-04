@@ -32,5 +32,14 @@ public class KeyboardEventManager implements EventHandler<KeyEvent> {
         if (kc == KeyCode.DELETE) {
             mpc.removeRequest();
         }
+
+        if (kc == KeyCode.Z && t.isControlDown()) {
+            mpc.undo();
+        }
+
+        if (kc == KeyCode.Y && t.isControlDown()) {
+            mpc.redo();
+        }
+
     }
 }

@@ -230,6 +230,10 @@ public class MenuPageController implements Observer {
     }
 
     public void renderTour() {
+        for (String edgeId : graphEdges) {
+            resetEdge(edgeId);
+        }
+        graphEdges.clear();
         Text txt = null;
         int cpt = 1;
         for (Path p : tour.getPaths()) {
@@ -483,9 +487,11 @@ public class MenuPageController implements Observer {
     }
 
     public void removeRequest() {
+        System.out.println("Try to remove");
         if (selectedNode == null) {
             return;
         }
+        System.out.println("Node selected");
         Request selectedRequest = null;
         for (Request r : this.planningRequest.getRequests()) {
             String idPickupAddress = r.getPickupAddress().getId().toString();
@@ -502,6 +508,7 @@ public class MenuPageController implements Observer {
         if (selectedRequest == null) {
             return;
         }
+        System.out.println("Found request");
         RemoveRequest rr = new RemoveRequest(graphProcessor, tour, selectedRequest);
         loc.addCommand(rr);
         rr.doCommand();
@@ -515,6 +522,18 @@ public class MenuPageController implements Observer {
             return;
         }
         renderTour();
+    }
+
+    public void undo() {
+        loc.undo();
+    }
+
+    public void redo() {
+        loc.redo();
+    }
+
+    private void resetEdge(String edgeId) {
+        graph.getEdge(edgeId).setAttribute("ui.class", "default");
     }
 
     // Instance (Singleton)
