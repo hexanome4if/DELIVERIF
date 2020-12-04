@@ -15,7 +15,9 @@ import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -74,6 +76,12 @@ public class MenuPageController {
 
     @FXML
     private Text infosText;
+    
+    @FXML
+    private Text infosTextTour1;
+    
+    @FXML
+    private Text infosTextTour2;
 
     @FXML
     private Text segmentNameText;
@@ -240,6 +248,14 @@ public class MenuPageController {
             this.pathList.getItems().add(txt);
             cpt++;
         }
+        float distance = this.tour.getTotalDistance();
+        int duration = this.tour.getTotalDuration();
+        Date departure = this.tour.getDepartureTime();
+        Date arrival = this.tour.getArrivalTime();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss"); 
+   SysteSystem.out.println(dtf.format(now));  
+        this.infosTextTour1.setText("TOUR = dist. : " + distance + " m, duration :  " + duration + " min");
+        this.infosTextTour2.setText("from " + departure + " to " + arrival);
         System.out.println("compute tour done");
     }
 
