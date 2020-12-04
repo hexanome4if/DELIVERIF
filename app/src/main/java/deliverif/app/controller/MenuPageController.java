@@ -120,7 +120,7 @@ public class MenuPageController {
                         if (t.getId().contains(id)) {
                             this.pathList.getSelectionModel().select(t);
                             String[] ids = t.getId().split("#");
-                            String numString = t.getText().substring(5);
+                            String numString = t.getText().substring(1,2);
                             int num = Integer.parseInt(numString);
                             this.setSelectedPath(num);
                             break;
@@ -211,7 +211,7 @@ public class MenuPageController {
         Text txt = null;
         int cpt = 1;
         for (Path p : tour.getPaths()) {
-            txt = new Text("Step " + cpt);
+            txt = new Text("["+cpt+"]");
             String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -288,7 +288,7 @@ public class MenuPageController {
     @FXML
     public void pathListClick(MouseEvent arg0) {
         System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
-        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(5));
+        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(1,2));
         this.setSelectedPath(num);    
     }
     
