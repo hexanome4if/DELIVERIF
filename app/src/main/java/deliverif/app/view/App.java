@@ -22,7 +22,6 @@ public class App extends Application {
     private static Scene scene;
 
     private static Stage stageGraph;
-
     public static final String styleSheet
             = "node {\n"
             + "	size: 3px;\n"
@@ -32,7 +31,7 @@ public class App extends Application {
             + "	z-index: 0;\n"
             + "}\n"
             + "\n"
-            + "edge {\n"
+            + "edge.default {\n"
             + "     size: 1px;\n"
             + "	shape: line;\n"
             + "     fill-mode: dyn-plain;"
@@ -94,8 +93,9 @@ public class App extends Application {
             + "}\n"
             + "\n"
             + "sprite.segmentSprite {\n"
-            + " shape: cross; size: 7px; z-index: 99;"
-            + " fill-color: blue;"
+            + "     shape: cross; "
+            + "     size: 9px; z-index: 99;"
+            + "     fill-color: green;"
             + "}\n"
             + "\n"
             + "edge.marked {\n"
@@ -111,10 +111,18 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         App.stageGraph = stage;
+        stage.setTitle("DELIVERIF");
         scene = new Scene(loadFXML("menuPage"));
         App.stageGraph.setScene(scene);
         App.stageGraph.show();
         KeyboardEventManager kem = new KeyboardEventManager();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        System.out.println("Arret de l'appli");
+        MenuPageController.stopThread();
+        super.stop();
     }
 
     static void setRoot(String fxml) throws IOException {

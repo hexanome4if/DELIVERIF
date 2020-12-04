@@ -100,7 +100,7 @@ public class MenuPageController implements Observer {
 
     private PlanningRequest planningRequest = null;
 
-    private Graph graph;
+    private Graph graph = null;
 
     private FxViewPanel panel;
 
@@ -114,7 +114,7 @@ public class MenuPageController implements Observer {
 
     private List<String> graphEdges = new ArrayList<>();
 
-    private PathThread pathThread = null;
+    private static PathThread pathThread = null;
 
     private String selectedNode = null;
 
@@ -279,6 +279,10 @@ public class MenuPageController implements Observer {
     }
 
     private void chargerGraph(Map map) {
+        if (graph != null) {
+            initUI();
+        }
+
         this.graph = new SingleGraph("Graph test 1");
 
         map.getIntersections().entrySet().forEach((mapentry) -> {
@@ -296,6 +300,7 @@ public class MenuPageController implements Observer {
             try {
                 graph.addEdge(origin + "|" + destination, origin, destination);
                 graph.getEdge(origin + "|" + destination).setAttribute("segment.name", s.getName());
+                graph.getEdge(origin + "|" + destination).setAttribute("ui.class", "default");
             } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
                 //System.out.println("Error edge " + origin + " -> " + destination);
                 Edge ed = graph.getEdge(destination + "|" + origin);
@@ -304,6 +309,17 @@ public class MenuPageController implements Observer {
                 }
             }
         });
+    }
+
+    public void initUI() {
+        this.planningRequest = null;
+        this.tour = null;
+        this.requestList.getItems().clear();
+        this.pathList.getItems().clear();
+        this.longitudeText.setText("Longitude = ");
+        this.latitudeText.setText("Latitude = ");
+        this.infosText.setText("");
+
     }
 
     @FXML
@@ -323,13 +339,14 @@ public class MenuPageController implements Observer {
     }
 
     private void setSelectedPath(int num) {
-        if (this.pathThread != null) {
-            this.pathThread.end();
-            while (this.pathThread.isIsFinished() == false) {
-            }
+        try {
+            stopThread();
+            pathThread = new PathThread(this, num);
+            pathThread.start();
+        } catch (Exception e) {
+            System.out.println("Error in setSelectedPath " + e);
         }
-        this.pathThread = new PathThread(this, num);
-        this.pathThread.start();
+
     }
 
     private void setSelectedSprite(String spriteId) {
@@ -388,7 +405,24 @@ public class MenuPageController implements Observer {
     }
 
     private void chargerPlanningRequests() throws IOException {
-        sman = new SpriteManager(this.graph);
+        if (planningRequest != null) {
+            initUI();
+
+            ArrayList<String> spriteIds = new ArrayList<String>();
+            for (Sprite s : this.sman.sprites()) {
+                spriteIds.add(s.getId());
+            }
+            for (String id : spriteIds) {
+                sman.removeSprite(id);
+            }
+
+            if (this.graphEdges != null) {
+                for (String edgeId : graphEdges) {
+                    graph.getEdge(edgeId).setAttribute("ui.class", "default");
+                }
+            }
+
+        }
         this.planningRequest = App.choseRequestFile(this.xmlReader);
 
         Text txt;
@@ -425,6 +459,14 @@ public class MenuPageController implements Observer {
             txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
             this.requestList.getItems().add(txt);
             cpt++;
+        }
+    }
+
+    public static void stopThread() {
+        if (pathThread != null) {
+            pathThread.end();
+            while (!pathThread.isIsFinished()) {
+            }
         }
     }
 
