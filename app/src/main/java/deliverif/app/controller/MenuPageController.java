@@ -103,6 +103,8 @@ public class MenuPageController {
     private String[] selectedEdges = null;
     
     private List<String> graphEdges = new ArrayList<>();
+    
+    private PathThread pathThread = null;
 
     
     
@@ -118,7 +120,9 @@ public class MenuPageController {
                         if (t.getId().contains(id)) {
                             this.pathList.getSelectionModel().select(t);
                             String[] ids = t.getId().split("#");
-                            this.setSelectedPath(ids);
+                            String numString = t.getText().substring(5);
+                            int num = Integer.parseInt(numString);
+                            this.setSelectedPath(num);
                             break;
                         }
                     }
@@ -237,49 +241,6 @@ public class MenuPageController {
             cpt++;
         }
         System.out.println("compute tour done");
-        //computePathAction();
-        PathThread pt = new PathThread(this);
-        pt.start();
-    }
-    
-    protected void sleep() {
-        try { Thread.sleep(1000); } catch (Exception e) {}
-    }
-    
-    @FXML
-    private void computePathAction() {
-        
-        System.out.println("computePathAction");
-        
-        String color = "fill-color: blue;";
-        int pathIndex = 1;
-        
-        Path p = tour.getPaths().get(pathIndex);
- 
-        for(Segment s : p.getSegments()) {
-            String originId = s.getOrigin().getId().toString();
-            String destId = s.getDestination().getId().toString();
-
-            Edge edge = graph.getEdge(originId + "|" + destId);
-            if (edge != null) {
-                //edge.setAttribute("ui.style", color);
-                //edge.setAttribute("ui.style", "size: 4px;");
-                edge.setAttribute("ui.class", "marked");
-
-                System.out.println("pause bleu --");
-                sleep();          
-                
-            } else {
-                edge = graph.getEdge(destId + "|" + originId);
-                if (edge != null) {
-                    edge.setAttribute("ui.style", color);
-                    edge.setAttribute("ui.style", "size: 4px;");
-
-                } else {
-                    System.out.println("Edge not found");
-                }
-            }
-        }            
     }
 
     @FXML
@@ -327,25 +288,17 @@ public class MenuPageController {
     @FXML
     public void pathListClick(MouseEvent arg0) {
         System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
-
-        String[] ids = this.pathList.getSelectionModel().getSelectedItem().getId().split("#");
-        this.setSelectedPath(ids);
-        
+        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(5));
+        this.setSelectedPath(num);    
     }
     
-    private void setSelectedPath(String[] pathIds) {
-        if (this.selectedEdges != null) {
-            for (String edge : this.selectedEdges) {
-                Edge pathEdge = this.graph.getEdge(edge);
-                pathEdge.setAttribute("ui.style", "fill-color: red;");
-            }
+    private void setSelectedPath(int num) {
+        if (this.pathThread != null) {
+            this.pathThread.end();
+            while(this.pathThread.isIsFinished() == false) {}
         }
-        
-        for(String id : pathIds) {
-            Edge pathEdge = this.graph.getEdge(id);
-            pathEdge.setAttribute("ui.style", "fill-color: blue;");
-        }
-        this.selectedEdges = pathIds;
+        this.pathThread = new PathThread(this, num);
+        this.pathThread.start();
     }
     
     private void setSelectedSprite(String spriteId) {

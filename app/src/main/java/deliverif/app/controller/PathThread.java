@@ -7,6 +7,8 @@ package deliverif.app.controller;
 
 import deliverif.app.model.map.Segment;
 import deliverif.app.model.request.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.graphstream.graph.Edge;
 
 /**
@@ -17,46 +19,70 @@ public class PathThread extends Thread{
     
     private MenuPageController mpc;
     
-    public PathThread (MenuPageController mpc) {
+    private int num;
+    
+    private volatile boolean continueRun = true;
+    
+    private volatile boolean isFinished = true;
+    
+    public PathThread (MenuPageController mpc, int num) {
         this.mpc = mpc;
+        this.num = num;
     }
     @Override
     public void run() {
+        this.isFinished = false;
         System.out.println("computePathAction");
         
         String color = "fill-color: blue;";
-        int pathIndex = 2;
+        int pathIndex = num - 1;
         
         Path p = mpc.getTour().getPaths().get(pathIndex);
- 
-        for(Segment s : p.getSegments()) {
+        while(this.continueRun) {
+            this.changeColor(p, "marked");
+            sleep();
+            this.changeColor(p, "unmarked");
+        }
+        this.isFinished = true;
+    }
+    
+    public void end() {
+        this.continueRun = false;
+    }
+    
+    public boolean isIsFinished() {
+        return isFinished;
+    }
+    
+    protected void sleep() {
+        try { Thread.sleep(200); } catch (Exception e) {}
+    }
+    
+    private void changeColor(Path p, String uiClass) {
+        ArrayList<Segment> listSegment = p.getSegments();
+        for(int i = listSegment.size()-1 ; i>=0 ; i--) {
+            if (!this.continueRun && uiClass.equals("marked"))
+                break;
+            Segment s = listSegment.get(i);
             String originId = s.getOrigin().getId().toString();
             String destId = s.getDestination().getId().toString();
 
             Edge edge = mpc.getGraph().getEdge(originId + "|" + destId);
             if (edge != null) {
-                //edge.setAttribute("ui.style", color);
-                //edge.setAttribute("ui.style", "size: 4px;");
-                edge.setAttribute("ui.class", "marked");
-
-                System.out.println("pause bleu --");
-                sleep();          
-                
+                edge.setAttribute("ui.class", uiClass);
+                if (uiClass.equals("marked"))
+                    sleep();
             } else {
                 edge = mpc.getGraph().getEdge(destId + "|" + originId);
                 if (edge != null) {
-                    edge.setAttribute("ui.class", "marked");
-                    sleep(); 
+                    edge.setAttribute("ui.class", uiClass);
+                    if (uiClass.equals("marked"))
+                        sleep();
                 } else {
                     System.out.println("Edge not found");
                 }
             }
-        } 
+        }
     }
-    
-    protected void sleep() {
-        try { Thread.sleep(500); } catch (Exception e) {}
-    }
-    
     
 }

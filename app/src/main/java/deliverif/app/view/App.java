@@ -99,8 +99,13 @@ public class App extends Application {
         + "}\n"
         + "\n"    
         + "edge.marked {\n"
-        + "size: 4px;"
+        + " size: 4px;"
         + " fill-color: blue;"   
+        + "}\n"
+        + "\n"    
+        + "edge.unmarked {\n"
+        + " size: 4px;"
+        + " fill-color: red;"   
         + "}\n";
             
     @Override
