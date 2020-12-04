@@ -203,6 +203,63 @@ public class GraphProcessor {
         return tour;
     }
     
+    public Tour addRequest(Tour tour, Request rqst){
+        PlanningRequest pr = tour.getPr();
+        pr.getRequests().add(rqst);
+        ArrayList<Path> paths = tour.getPaths();
+        paths.remove(paths.size()-1);
+        Graph g = new Graph();
+        Vertex lastPoint = graph.getVertexById(paths.get(paths.size()-1).getArrival().getId());
+        Vertex pickup = graph.getVertexById(rqst.getPickupAddress().getId());
+        Vertex delivery = graph.getVertexById(rqst.getDeliveryAddress().getId());
+        Vertex warehouse = graph.getVertexById(paths.get(0).getDeparture().getId());
+        List<Vertex> goalPickup = new ArrayList<Vertex>();
+        goalPickup.add(pickup);
+        List<Vertex> goalDelivery = new ArrayList<Vertex>();
+        goalDelivery.add(delivery);
+        List<Vertex> goalWarehouse = new ArrayList<Vertex>();
+        goalWarehouse.add(warehouse);
+        dijkstra(g, lastPoint, goalPickup);
+        dijkstra(g, pickup, goalDelivery);
+        dijkstra(g, delivery, goalWarehouse);
+        Path beforePickup = paths.get(paths.size()-1);
+        Path lastToPick = fullPath.get(lastPoint.getId()+"-"+pickup.getId()).convertToPath(map);
+        Path pickToDeli = fullPath.get(pickup.getId()+"-"+delivery.getId()).convertToPath(map);
+        Path deliToWrhs = fullPath.get(delivery.getId()+"-"+warehouse.getId()).convertToPath(map);
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beforePickup.getArrivalTime());
+        
+        lastToPick.setDepatureTime(cal.getTime());
+        double velocity = 15 * 1000 / 60;
+        double commute = lastToPick.getLength() / velocity;
+        cal.add(Calendar.MINUTE, (int) commute);
+        lastToPick.setArrivalTime(cal.getTime());
+        cal.add(Calendar.MINUTE, rqst.getPickupDuration());
+        lastToPick.setRequest(rqst);
+        
+        pickToDeli.setDepatureTime(cal.getTime());
+        commute = pickToDeli.getLength() / velocity;
+        cal.add(Calendar.MINUTE, (int) commute);
+        pickToDeli.setArrivalTime(cal.getTime());
+        cal.add(Calendar.MINUTE, rqst.getDeliveryDuration());
+        lastToPick.setRequest(rqst);
+        
+        deliToWrhs.setDepatureTime(cal.getTime());
+        commute = deliToWrhs.getLength() / velocity;
+        cal.add(Calendar.MINUTE, (int) commute);
+        deliToWrhs.setArrivalTime(cal.getTime());
+        cal.add(Calendar.MINUTE, rqst.getDeliveryDuration());
+        
+        paths.add(lastToPick);
+        paths.add(pickToDeli);
+        paths.add(deliToWrhs);
+        
+        tour.setPaths(paths);
+        tour.setPr(pr);
+        return tour;
+    }
+
     public Tour removeRequestFromTour(Tour t, Request r) {
         t.getPr().removeRequest(r);
         Intersection pickup = r.getPickupAddress();
