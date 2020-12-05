@@ -5,8 +5,10 @@
  */
 package deliverif.app.model.graph;
 
+import deliverif.app.model.request.Observable;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
+import deliverif.app.model.request.Request;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -14,13 +16,33 @@ import java.util.Date;
  *
  * @author zakaria
  */
-public class Tour {
+public class Tour extends Observable {
     private ArrayList<Path> paths;
     private PlanningRequest pr;
     
     public Tour (PlanningRequest pr) {
         this.pr = pr;
         this.paths = new ArrayList<Path>();
+    }
+    
+    public Tour (Tour t){
+        this.pr = t.pr;
+        paths = new ArrayList<Path>();
+        for (Path p : t.getPaths()) {
+            paths.add(p);
+        }
+    }
+    
+    public void copyTour (Tour t){
+        this.pr = new PlanningRequest();
+        pr.setDepot(t.getPr().getDepot());
+        for (Request r : t.getPr().getRequests()) {
+            pr.addRequest(r);
+        }
+        paths.clear();
+        for (Path p : t.getPaths()) {
+            paths.add(p);
+        }
     }
     
     public float getTotalDistance() {

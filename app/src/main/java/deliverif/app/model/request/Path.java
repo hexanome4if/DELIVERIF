@@ -121,7 +121,8 @@ public class Path {
         for (Segment s : segments) {
             seg += s.toString();
         }
-        return "Path{" + "segments=" + segments + ", \n departure=" + departure + ", arrival=" + arrival + ", length=" + length + ", depatureTime=" + depatureTime + ", arrivalTime=" + arrivalTime + ", request=" + request + '}';
+        //return "Path{" + "segments=" + segments + ", \n departure=" + departure + ", arrival=" + arrival + ", length=" + length + ", depatureTime=" + depatureTime + ", arrivalTime=" + arrivalTime + ", request=" + request + '}';
+        return "Departure: " + departure + "\nArrival: " + arrival;
     }
     
     
