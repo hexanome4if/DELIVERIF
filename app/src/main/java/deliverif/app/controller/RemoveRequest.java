@@ -13,18 +13,18 @@ import deliverif.app.model.request.Request;
  * @author zakaria
  */
 public class RemoveRequest implements Command {
+
     GraphProcessor gp;
     Tour oldTour;
     Tour tour;
     Request request;
-    
+
     public RemoveRequest(GraphProcessor gp, Tour t, Request r) {
         this.gp = gp;
         tour = t;
         oldTour = new Tour(t);
         request = r;
     }
-    
 
     @Override
     public void doCommand() {
@@ -34,8 +34,9 @@ public class RemoveRequest implements Command {
 
     @Override
     public void undoCommand() {
+        tour.getPr().addRequest(request);
         tour.copyTour(oldTour);
         tour.notifiyObservers(null);
     }
-    
+
 }
