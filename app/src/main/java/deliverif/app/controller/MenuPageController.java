@@ -52,6 +52,8 @@ import org.graphstream.ui.view.util.InteractiveElement;
  */
 public class MenuPageController implements Observer {
 
+    //PRIVATE FXML ATTRIBUTES
+    
     @FXML
     private Button loadCityMapButton;
 
@@ -93,8 +95,8 @@ public class MenuPageController implements Observer {
 
     @FXML
     private ListView<Text> pathList;
-
-    private final XmlReader xmlReader = new XmlReader();
+    
+    //PRIVATE ATTRIBUTES
 
     private Map map;
 
@@ -114,13 +116,20 @@ public class MenuPageController implements Observer {
 
     private List<String> graphEdges = new ArrayList<>();
 
-    private static PathThread pathThread = null;
-
-    private String selectedNode = null;
+    private volatile String selectedNode = null;
 
     private ListOfCommands loc = null;
     
     private State currentState;
+    
+    private final XmlReader xmlReader = new XmlReader();
+    
+    private static PathThread pathThread = null;
+    
+    // Instance (Singleton)
+    private static MenuPageController instance = null;
+    
+    //CONSTRUCTOR
 
     public MenuPageController() {
         loc = new ListOfCommands();
@@ -128,8 +137,26 @@ public class MenuPageController implements Observer {
         currentState = new InitialState(this);
     }
     
+    //PUBLIC METHODS
+    
+    public static MenuPageController getInstance() {
+        return instance;
+    }
+    
     public void setCurrentState(State s){
         currentState = s;
+    }
+    
+        
+    public void initUI() {
+        this.planningRequest = null;
+        this.tour = null;
+        this.requestList.getItems().clear();
+        this.pathList.getItems().clear();
+        this.longitudeText.setText("Longitude = ");
+        this.latitudeText.setText("Latitude = ");
+        this.infosText.setText("");
+
     }
 
     public void updateSelection(GraphicElement element) {
@@ -176,6 +203,13 @@ public class MenuPageController implements Observer {
         if (this.planningRequest == null) {
             return;
         }
+        
+        if (element.getSelectorType() == Selector.Type.NODE) {
+            this.selectedNode = element.getId();
+            System.out.println("CHANGE : " + this.selectedNode);
+            return;
+        }
+        
         if (element.getSelectorType() != Selector.Type.SPRITE) {
             return;
         }
@@ -192,12 +226,7 @@ public class MenuPageController implements Observer {
         this.requestList.getSelectionModel().select(spriteText);
 
     }
-
-    @FXML
-    private void loadCityMapAction() throws IOException {
-        currentState.loadMap();
-    }
-
+    
     public void loadMap () throws IOException {
         System.out.println("loadCityMapAction");
         this.map = App.choseMapFile(this.xmlReader);
@@ -209,7 +238,7 @@ public class MenuPageController implements Observer {
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
-        panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.SPRITE), this));
+        panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.SPRITE, InteractiveElement.NODE), this));
         mapPane.getChildren().remove(loadMapText);
         mapPane.getChildren().add(panel);
         AnchorPane.setTopAnchor(panel, 1.0);
@@ -220,11 +249,6 @@ public class MenuPageController implements Observer {
         sman = new SpriteManager(this.graph);
     }
     
-    @FXML
-    private void loadRequestAction() throws IOException {
-        currentState.loadRequest();
-    }
-
     public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
         if (this.xmlReader.getMap() == null) {
@@ -235,11 +259,6 @@ public class MenuPageController implements Observer {
         //System.out.println(this.planningRequest);
     }
     
-    @FXML
-    private void computeTourAction() throws IOException {
-        currentState.computeTour();
-    }
-
     public void computeTour() {
         System.out.println("computeTourAction");
         tour = graphProcessor.optimalTour(this.planningRequest);
@@ -247,6 +266,7 @@ public class MenuPageController implements Observer {
 
         renderTour();
     }
+    
     public void renderTour() {
         for (String edgeId : graphEdges) {
             resetEdge(edgeId);
@@ -294,83 +314,7 @@ public class MenuPageController implements Observer {
         this.infosTextTour2.setText("from " + departure + " to " + arrival);
         System.out.println("compute tour done");
     }
-
-    @FXML
-    private void editTourAction() throws IOException {
-        System.out.println("editTourAction");
-    }
-
-    private void chargerGraph(Map map) {
-        if (graph != null) {
-            initUI();
-        }
-
-        this.graph = new SingleGraph("Graph test 1");
-
-        map.getIntersections().entrySet().forEach((mapentry) -> {
-            String nodeId = mapentry.getKey().toString();
-            Intersection intersection = (Intersection) mapentry.getValue();
-            graph.addNode(nodeId);
-            graph.getNode(nodeId).setAttribute("x", intersection.getLongitude());
-            graph.getNode(nodeId).setAttribute("y", intersection.getLatitude());
-
-        });
-
-        map.getSegments().forEach((s) -> {
-            String origin = s.getOrigin().getId().toString();
-            String destination = s.getDestination().getId().toString();
-            try {
-                graph.addEdge(origin + "|" + destination, origin, destination);
-                graph.getEdge(origin + "|" + destination).setAttribute("segment.name", s.getName());
-                graph.getEdge(origin + "|" + destination).setAttribute("ui.class", "default");
-            } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
-                //System.out.println("Error edge " + origin + " -> " + destination);
-                Edge ed = graph.getEdge(destination + "|" + origin);
-                if (ed != null) {
-                    ed.setAttribute("ui.style", "size: 2px;");
-                }
-            }
-        });
-    }
-
-    public void initUI() {
-        this.planningRequest = null;
-        this.tour = null;
-        this.requestList.getItems().clear();
-        this.pathList.getItems().clear();
-        this.longitudeText.setText("Longitude = ");
-        this.latitudeText.setText("Latitude = ");
-        this.infosText.setText("");
-
-    }
-
-    @FXML
-    public void requestListClick(MouseEvent arg0) {
-        System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
-
-        String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
-        this.currentState.selectNode(spriteId);
-
-    }
-
-    @FXML
-    public void pathListClick(MouseEvent arg0) {
-        System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
-        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
-        this.setSelectedPath(num);
-    }
-
-    private void setSelectedPath(int num) {
-        try {
-            stopThread();
-            pathThread = new PathThread(this, num);
-            pathThread.start();
-        } catch (Exception e) {
-            System.out.println("Error in setSelectedPath " + e);
-        }
-
-    }
-
+    
     public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
@@ -409,7 +353,7 @@ public class MenuPageController implements Observer {
             }
         }
     }
-
+    
     public int[] randomColorSprite() {
 
         Random rand = new Random();
@@ -424,6 +368,187 @@ public class MenuPageController implements Observer {
 
         int[] rgb = {r, g, b};
         return rgb;
+    }
+    
+    public static void stopThread() {
+        if (pathThread != null) {
+            pathThread.end();
+            while (!pathThread.isIsFinished()) {
+            }
+        }
+    }
+    
+    public void removeRequest() {
+        System.out.println("Try to remove");
+        if (selectedNode == null) {
+            return;
+        }
+        System.out.println("Node selected");
+        Request selectedRequest = null;
+        for (Request r : this.planningRequest.getRequests()) {
+            String idPickupAddress = r.getPickupAddress().getId().toString();
+            String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
+            if (idPickupAddress.equals(selectedNode)) {
+                selectedRequest = r;
+                break;
+            }
+            if (idDeliveryAdress.equals(selectedNode)) {
+                selectedRequest = r;
+                break;
+            }
+        }
+        if (selectedRequest == null) {
+            return;
+        }
+        System.out.println("Found request");
+        stopThread();
+        RemoveRequest rr = new RemoveRequest(graphProcessor, tour, selectedRequest);
+        sman.removeSprite(selectedRequest.getDeliveryAddress().getId().toString());
+        sman.removeSprite(selectedRequest.getPickupAddress().getId().toString());
+        sman.removeSprite("bigSprite");
+        loc.addCommand(rr);
+        rr.doCommand();
+
+    }
+    
+    public void startAddRequest() {
+        System.out.println("Start add request");
+        SelectNodeThread selectNodeThread = new SelectNodeThread(this);
+        selectNodeThread.start();
+    }
+    
+    public void addRequest(String pickupId, String deliveryId){
+        Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
+        Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
+        Request r = new Request (pickup,delivery, 120, 67);
+        AddRequest ar = new AddRequest(graphProcessor,tour,r);
+        loc.addCommand(ar);
+        ar.doCommand();
+    }
+    
+
+    @Override
+    public void update(Observable observed, Object arg) {
+        Tour t = (Tour) observed;
+        if (t != tour) {
+            return;
+        }
+        renderTour();
+    }
+
+    public void undo() {
+        loc.undo();
+    }
+
+    public void redo() {
+        loc.redo();
+    }
+
+    public State getCurrentState() {
+        return currentState;
+    }
+    
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public Tour getTour() {
+        return tour;
+    }
+
+    public String getSelectedNode() {
+        return selectedNode;
+    }
+    
+    public void setSelectedNode(String selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+    
+    //PUBLIC FXML METHODS
+    
+    @FXML
+    public void requestListClick(MouseEvent arg0) {
+        System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
+
+        String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
+        this.currentState.selectNode(spriteId);
+
+    }
+    
+    @FXML
+    public void pathListClick(MouseEvent arg0) {
+        System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
+        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
+        this.setSelectedPath(num);
+    }
+    
+    
+    //PRIVATE FXML METHODS
+
+    @FXML
+    private void loadCityMapAction() throws IOException {
+        currentState.loadMap();
+    }
+    
+    @FXML
+    private void loadRequestAction() throws IOException {
+        currentState.loadRequest();
+    }
+    
+    @FXML
+    private void computeTourAction() throws IOException {
+        currentState.computeTour();
+    }
+
+    @FXML
+    private void editTourAction() throws IOException {
+        System.out.println("editTourAction");
+    }
+    
+    //PRIVATE METHODS
+
+    private void chargerGraph(Map map) {
+        if (graph != null) {
+            initUI();
+        }
+
+        this.graph = new SingleGraph("Graph test 1");
+
+        map.getIntersections().entrySet().forEach((mapentry) -> {
+            String nodeId = mapentry.getKey().toString();
+            Intersection intersection = (Intersection) mapentry.getValue();
+            graph.addNode(nodeId);
+            graph.getNode(nodeId).setAttribute("x", intersection.getLongitude());
+            graph.getNode(nodeId).setAttribute("y", intersection.getLatitude());
+
+        });
+
+        map.getSegments().forEach((s) -> {
+            String origin = s.getOrigin().getId().toString();
+            String destination = s.getDestination().getId().toString();
+            try {
+                graph.addEdge(origin + "|" + destination, origin, destination);
+                graph.getEdge(origin + "|" + destination).setAttribute("segment.name", s.getName());
+                graph.getEdge(origin + "|" + destination).setAttribute("ui.class", "default");
+            } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {
+                //System.out.println("Error edge " + origin + " -> " + destination);
+                Edge ed = graph.getEdge(destination + "|" + origin);
+                if (ed != null) {
+                    ed.setAttribute("ui.style", "size: 2px;");
+                }
+            }
+        });
+    }
+
+    private void setSelectedPath(int num) {
+        try {
+            stopThread();
+            pathThread = new PathThread(this, num);
+            pathThread.start();
+        } catch (Exception e) {
+            System.out.println("Error in setSelectedPath " + e);
+        }
+
     }
 
     private void chargerPlanningRequests() throws IOException {
@@ -484,94 +609,7 @@ public class MenuPageController implements Observer {
         }
     }
 
-    public static void stopThread() {
-        if (pathThread != null) {
-            pathThread.end();
-            while (!pathThread.isIsFinished()) {
-            }
-        }
-    }
-
-    public State getCurrentState() {
-        return currentState;
-    }
-    
-    public Graph getGraph() {
-        return graph;
-    }
-
-    public Tour getTour() {
-        return tour;
-    }
-
-    public String getSelectedNode() {
-        return selectedNode;
-    }
-
-    public void removeRequest() {
-        System.out.println("Try to remove");
-        if (selectedNode == null) {
-            return;
-        }
-        System.out.println("Node selected");
-        Request selectedRequest = null;
-        for (Request r : this.planningRequest.getRequests()) {
-            String idPickupAddress = r.getPickupAddress().getId().toString();
-            String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
-            if (idPickupAddress.equals(selectedNode)) {
-                selectedRequest = r;
-                break;
-            }
-            if (idDeliveryAdress.equals(selectedNode)) {
-                selectedRequest = r;
-                break;
-            }
-        }
-        if (selectedRequest == null) {
-            return;
-        }
-        System.out.println("Found request");
-        RemoveRequest rr = new RemoveRequest(graphProcessor, tour, selectedRequest);
-        loc.addCommand(rr);
-        rr.doCommand();
-
-    }
-    
-    public void addRequest(String pickupId, String deliveryId){
-        Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
-        Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
-        Request r = new Request (pickup,delivery, 120, 67);
-        AddRequest ar = new AddRequest(graphProcessor,tour,r);
-        loc.addCommand(ar);
-        ar.doCommand();
-    }
-    
-
-    @Override
-    public void update(Observable observed, Object arg) {
-        Tour t = (Tour) observed;
-        if (t != tour) {
-            return;
-        }
-        renderTour();
-    }
-
-    public void undo() {
-        loc.undo();
-    }
-
-    public void redo() {
-        loc.redo();
-    }
-
     private void resetEdge(String edgeId) {
         graph.getEdge(edgeId).setAttribute("ui.class", "default");
-    }
-
-    // Instance (Singleton)
-    private static MenuPageController instance = null;
-
-    public static MenuPageController getInstance() {
-        return instance;
     }
 }
