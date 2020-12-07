@@ -206,7 +206,7 @@ public class MenuPageController implements Observer {
         //this.graph.setAutoCreate(true);
         //this.graph.setStrict(false);
 
-        Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
         panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.SPRITE), this));
