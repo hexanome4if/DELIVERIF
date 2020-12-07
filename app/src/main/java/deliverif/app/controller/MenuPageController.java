@@ -181,7 +181,7 @@ public class MenuPageController implements Observer {
         }
 
         String idElement = element.getId();
-
+        if(idElement.equals("segmentSprite")) return;
         this.currentState.selectNode(element.getId());
         Text spriteText = null;
         for (Text t : this.requestList.getItems()) {
@@ -341,7 +341,7 @@ public class MenuPageController implements Observer {
         this.longitudeText.setText("Longitude = ");
         this.latitudeText.setText("Latitude = ");
         this.infosText.setText("");
-
+        stopThread();
     }
 
     @FXML
@@ -374,10 +374,11 @@ public class MenuPageController implements Observer {
     public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
+        String spriteType = (String) sprite.getAttribute("ui.class");
+        if(spriteType == null || spriteType == "segmentSprite") return;
         sman.removeSprite("bigSprite");
         Sprite bigSprite = sman.addSprite("bigSprite");
         bigSprite.setPosition(sprite.getX(), sprite.getY(), sprite.getZ());
-        String spriteType = (String) sprite.getAttribute("ui.class");
         String bigSpriteType = spriteType + "Selected";
         bigSprite.setAttribute("ui.class", bigSpriteType);
         bigSprite.setAttribute("ui.style", sprite.getAttribute("ui.style"));
