@@ -28,7 +28,7 @@ public class AddingRequestState extends State {
     @Override
     public void selectNode(String nodeId) {
         if (pickupId == null || deliveryId == null) {
-            super.selectNode(nodeId);
+            //super.selectNode(nodeId);
             if (pickupId == null){
                 SelectNodeCommand snc = new SelectNodeCommand(this,false,nodeId);
                 loc.addCommand(snc);

@@ -42,6 +42,7 @@ public class TourComputedState extends State {
     @Override
     public void startAddRequest() {
         // todo
+        mpc.startAddRequest();
         mpc.setCurrentState(new AddingRequestState(mpc));
     }
 
