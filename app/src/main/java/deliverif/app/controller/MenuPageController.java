@@ -61,9 +61,12 @@ public class MenuPageController implements Observer {
 
     @FXML
     private Button computeTourButton;
-
+    
     @FXML
-    private Button editTourButton;
+    private Button addRequestButton;
+    
+    @FXML
+    private Button deleteRequestButton;
 
     @FXML
     private AnchorPane mapPane;
@@ -152,6 +155,8 @@ public class MenuPageController implements Observer {
         this.infosText.setText("");
         this.infosTextTour1.setText("Tour infos = ");
         this.infosTextTour2.setText("");
+        this.addRequestButton.setVisible(false);
+        this.deleteRequestButton.setVisible(false);
         stopThread();
         if (this.graphEdges != null) {
             for (String edgeId : graphEdges) {
@@ -267,6 +272,7 @@ public class MenuPageController implements Observer {
         tour.addObserver(this);
 
         renderTour();
+        this.addRequestButton.setVisible(true);
     }
 
     public void renderTour() {
@@ -399,6 +405,7 @@ public class MenuPageController implements Observer {
                     }
                 }
             }
+            this.deleteRequestButton.setVisible(true);
         } else {
             Text spriteText = null;
             for (Text t : this.requestList.getItems()) {
@@ -533,7 +540,7 @@ public class MenuPageController implements Observer {
             int endNum = this.requestList.getSelectionModel().getSelectedItem().getText().indexOf("]", 2);
             int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, endNum));
             String departureId = this.tour.getPaths().get(num - 1).getDeparture().getId().toString();
-            this.setBigSprite(departureId);
+            this.currentState.selectNode(departureId);
             this.setSelectedPath(num);
         }
     }
@@ -553,10 +560,17 @@ public class MenuPageController implements Observer {
     private void computeTourAction() throws IOException {
         currentState.computeTour();
     }
-
+    
     @FXML
-    private void editTourAction() throws IOException {
-        System.out.println("editTourAction");
+    private void addRequestAction() throws IOException {
+        System.out.println("addRequestAction");
+    }
+    
+    @FXML
+    private void deleteRequestAction() throws IOException {
+        System.out.println("deleteRequestAction");
+        this.currentState.removeRequest();
+        this.deleteRequestButton.setVisible(false);
     }
 
     //PRIVATE METHODS
