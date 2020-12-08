@@ -17,7 +17,7 @@
   <center>
     <AnchorPane fx:id="mapPane" prefHeight="316.0" prefWidth="483.0" style="-fx-background-color:transparent;;" BorderPane.alignment="CENTER">
       <children>
-        <Text fx:id="loadMapText" layoutX="135.0" layoutY="171.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP">
+        <Text fx:id="loadMapText" layoutX="31.0" layoutY="157.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP" wrappingWidth="300.36962890625">
           <font>
             <Font name="System Bold" size="15.0" />
           </font>

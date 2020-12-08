@@ -104,19 +104,19 @@ public class XmlReader {
 
                 }
             }	
-
+            this.map = new Map(intersections, segments);
+            
         }catch (Exception e){  
-            e.printStackTrace();  
+            //e.printStackTrace(); 
+            System.out.println("/!\\ Errors on map file");
         }
-        
-        this.map = new Map(intersections, segments);
         
         return this.map != null;
    }
 
     public PlanningRequest readRequest(String filename){
         
-        PlanningRequest pr;
+        PlanningRequest pr = null;
         List<Request> requests = new ArrayList<Request>();
         Depot depot = null;
         
@@ -191,12 +191,13 @@ public class XmlReader {
                 
                 }
             }
-
+            pr = new PlanningRequest (depot, requests);
+            
         }catch (Exception e){  
-            e.printStackTrace();  
+            //e.printStackTrace();  
+            System.out.println("/!\\ Errors on request file");
         }  
         
-        pr = new PlanningRequest (depot, requests);
         return pr;
     }
 }

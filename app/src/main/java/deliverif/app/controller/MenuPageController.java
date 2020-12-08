@@ -199,6 +199,12 @@ public class MenuPageController implements Observer {
     public void loadMap () throws IOException {
         System.out.println("loadCityMapAction");
         this.map = App.choseMapFile(this.xmlReader);
+        
+        if(this.map == null){
+            this.loadMapText.setText("FORMAT ERRORS ON MAP FILE - Load another file");
+            return;
+        }
+        
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
         //this.graph.setAutoCreate(true);
@@ -468,8 +474,13 @@ public class MenuPageController implements Observer {
             }
 
         }
+        this.segmentNameText.setText("");
         this.planningRequest = App.choseRequestFile(this.xmlReader);
-
+        if(this.planningRequest == null){
+            this.segmentNameText.setText("FORMAT ERRORS ON REQUEST FILE - Load another file");
+            return;
+        }
+        
         Text txt;
         Intersection depot = planningRequest.getDepot().getAddress();
         Sprite depotSprite = sman.addSprite(depot.getId().toString());
