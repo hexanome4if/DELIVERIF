@@ -16,8 +16,8 @@ import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import deliverif.app.view.App;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -91,9 +91,6 @@ public class MenuPageController implements Observer {
     @FXML
     private ListView<Text> requestList;
 
-    @FXML
-    private ListView<Text> pathList;
-
     private final XmlReader xmlReader = new XmlReader();
 
     private Map map;
@@ -108,7 +105,7 @@ public class MenuPageController implements Observer {
 
     private GraphProcessor graphProcessor;
 
-    private Tour tour;
+    private Tour tour = null;
 
     private String[] selectedEdges = null;
 
@@ -140,9 +137,9 @@ public class MenuPageController implements Observer {
             for (String id : this.graphEdges) {
                 if (element.getId().equals(id)) {
                     System.out.println(id + " is on the path");
-                    for (Text t : this.pathList.getItems()) {
+                    for (Text t : this.requestList.getItems()) {
                         if (t.getId().contains(id)) {
-                            this.pathList.getSelectionModel().select(t);
+                            this.requestList.getSelectionModel().select(t);
                             String[] ids = t.getId().split("#");
                             String numString = t.getText().substring(1, 2);
                             int num = Integer.parseInt(numString);
@@ -177,6 +174,9 @@ public class MenuPageController implements Observer {
             return;
         }
         if (element.getSelectorType() != Selector.Type.SPRITE) {
+            return;
+        }  
+        if (this.tour != null) {
             return;
         }
 
@@ -248,14 +248,21 @@ public class MenuPageController implements Observer {
         renderTour();
     }
     public void renderTour() {
+        
         for (String edgeId : graphEdges) {
             resetEdge(edgeId);
         }
         graphEdges.clear();
+        
+        this.requestList.getItems().clear();
+        
         Text txt = null;
         int cpt = 1;
+        SimpleDateFormat dtf = new SimpleDateFormat("HH:mm:ss"); 
+        int[] rgb = randomColorSprite();
+        
         for (Path p : tour.getPaths()) {
-            txt = new Text("[" + cpt + "]");
+            
             String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -280,18 +287,41 @@ public class MenuPageController implements Observer {
                     }
                 }
             }
+            Long departId = p.getDeparture().getId();
+            String typePoint = tour.getPr().researchTypeIntersection(departId);
+            
+            if(typePoint != ""){
+                txt = new Text("[" + cpt + "] "+typePoint+" from "+ dtf.format(p.getDepatureTime())
+                                + " to " + dtf.format(p.getArrivalTime()) + " "+ p.getLength()/1000+ "km");
+            }else{
+                txt = new Text("[" + cpt + "] Depot from "+ dtf.format(p.getDepatureTime())
+                                + " to " + dtf.format(p.getArrivalTime()) + " "+ p.getLength()/1000+ "km");
+            }
+            
+            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
             txt.setId(id);
-            this.pathList.getItems().add(txt);
+            this.requestList.getItems().add(txt);
             cpt++;
         }
+        
         float distance = this.tour.getTotalDistance();
-        int duration = this.tour.getTotalDuration();
+        int time = this.tour.getTotalDuration();
+        
+        System.out.println("getDuration/"+time);
+        distance = distance / 1000;
+        float duration = time/ 60;
+        System.out.println("Duration/"+duration);
+        int hours = (int)duration;
+        float min = duration - hours;
+        int mins = (int)(60*min);
+        System.out.println("hours/"+duration+"/ min/"+min+"/ mins/"+mins);
+
         Date departure = this.tour.getDepartureTime();
         Date arrival = this.tour.getArrivalTime();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
-        // System.out.println(dtf.format(now));
-        this.infosTextTour1.setText("TOUR = dist. : " + distance + " m, duration :  " + duration + " min");
-        this.infosTextTour2.setText("from " + departure + " to " + arrival);
+        
+        this.infosTextTour1.setText("TOUR = " + distance + " km / " + hours +"h"+ mins + "min");
+        this.infosTextTour2.setText("from " + dtf.format(departure) + " to " + dtf.format(arrival));
+
         System.out.println("compute tour done");
     }
 
@@ -337,27 +367,26 @@ public class MenuPageController implements Observer {
         this.planningRequest = null;
         this.tour = null;
         this.requestList.getItems().clear();
-        this.pathList.getItems().clear();
         this.longitudeText.setText("Longitude = ");
         this.latitudeText.setText("Latitude = ");
         this.infosText.setText("");
+        this.infosTextTour1.setText("Tour infos = ");
+        this.infosTextTour2.setText("");
         stopThread();
     }
 
     @FXML
     public void requestListClick(MouseEvent arg0) {
-        System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
-
-        String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
-        this.currentState.selectNode(spriteId);
-
-    }
-
-    @FXML
-    public void pathListClick(MouseEvent arg0) {
-        System.out.println("clicked on " + this.pathList.getSelectionModel().getSelectedItem().getText());
-        int num = Integer.parseInt(this.pathList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
-        this.setSelectedPath(num);
+        
+        if (this.tour == null){
+            System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
+            String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
+            this.currentState.selectNode(spriteId);
+        }else{
+            System.out.println("clicked on " + this.requestList.getSelectionModel().getSelectedItem().getText());
+            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
+            this.setSelectedPath(num);
+        }
     }
 
     private void setSelectedPath(int num) {

@@ -48,6 +48,26 @@ public class PlanningRequest {
     public void removeRequest(Request r){
         this.requests.remove(r);
     }
+    
+    public String researchTypeIntersection(Long id){
+        
+        String res = "";
+        
+        for(Request r : requests){
+            
+            if(r.getDeliveryAddress().getId() == id){
+                res = "Delivery";
+                break;
+            }
+            
+            if(r.getPickupAddress().getId() == id){
+                res = "Pickup";
+                break;
+            }
+        }
+        return res;
+    }
+    
     @Override
     public String toString() {
         return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';
