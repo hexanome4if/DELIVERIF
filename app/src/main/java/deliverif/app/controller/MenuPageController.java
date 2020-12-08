@@ -462,7 +462,6 @@ public class MenuPageController implements Observer {
         Request r = new Request (pickup,delivery, 120, 67);
         AddRequest ar = new AddRequest(graphProcessor,tour,r);
         loc.addCommand(ar);
-        ar.doCommand();
     }
     
 

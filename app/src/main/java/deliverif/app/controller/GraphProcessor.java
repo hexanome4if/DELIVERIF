@@ -190,7 +190,7 @@ public class GraphProcessor {
             } else if (deliveries.containsKey(next.getId())) {
                 commute += deliveries.get(next.getId());
             }
-            cal.add(Calendar.MINUTE, (int) commute);
+            cal.add(Calendar.SECOND, (int) commute);
             path.setArrivalTime(cal.getTime());
             //System.out.println("Path" + i + ":" + path + "\n");
             tour.addPath(path);
@@ -202,7 +202,7 @@ public class GraphProcessor {
         Path back = shortestPathBetweenTwoIntersections(last, warehouse);
         back.setDepatureTime(cal.getTime());
         double commute = back.getLength() / velocity;
-        cal.add(Calendar.MINUTE, (int) commute);
+        cal.add(Calendar.SECOND, (int) commute);
         back.setArrivalTime(cal.getTime());
         tour.addPath(back);
         System.out.println("-----------End of Tour---------");
@@ -211,7 +211,7 @@ public class GraphProcessor {
 
     public Tour addRequestToTour(Tour tour, Request rqst) {
         PlanningRequest pr = tour.getPr();
-        pr.getRequests().add(rqst);
+        pr.addRequest(rqst);
         ArrayList<Path> paths = tour.getPaths();
         paths.remove(paths.size() - 1);
         Vertex lastPoint = graph.getVertexById(paths.get(paths.size() - 1).getArrival().getId());
