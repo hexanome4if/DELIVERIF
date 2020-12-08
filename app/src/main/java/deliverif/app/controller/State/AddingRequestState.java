@@ -3,7 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.controller;
+package deliverif.app.controller.State;
+
+import deliverif.app.controller.Command.ListOfCommands;
+import deliverif.app.controller.MenuPageController;
+import deliverif.app.controller.Command.SelectNodeCommand;
+import deliverif.app.controller.State.TourComputedState;
+import deliverif.app.controller.State.State;
 
 /**
  *

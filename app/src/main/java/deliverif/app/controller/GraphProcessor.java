@@ -5,6 +5,7 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.controller.Command.RemoveRequestCommand;
 import deliverif.app.controller.tsp.TSP1;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
@@ -239,23 +240,23 @@ public class GraphProcessor {
         lastToPick.setDepatureTime(cal.getTime());
         double velocity = 15 * 1000 / 60;
         double commute = lastToPick.getLength() / velocity;
-        cal.add(Calendar.MINUTE, (int) commute);
+        cal.add(Calendar.SECOND, (int) commute);
         lastToPick.setArrivalTime(cal.getTime());
-        cal.add(Calendar.MINUTE, rqst.getPickupDuration());
+        cal.add(Calendar.SECOND, rqst.getPickupDuration());
         lastToPick.setRequest(rqst);
 
         pickToDeli.setDepatureTime(cal.getTime());
         commute = pickToDeli.getLength() / velocity;
-        cal.add(Calendar.MINUTE, (int) commute);
+        cal.add(Calendar.SECOND, (int) commute);
         pickToDeli.setArrivalTime(cal.getTime());
-        cal.add(Calendar.MINUTE, rqst.getDeliveryDuration());
+        cal.add(Calendar.SECOND, rqst.getDeliveryDuration());
         lastToPick.setRequest(rqst);
 
         deliToWrhs.setDepatureTime(cal.getTime());
         commute = deliToWrhs.getLength() / velocity;
-        cal.add(Calendar.MINUTE, (int) commute);
+        cal.add(Calendar.SECOND, (int) commute);
         deliToWrhs.setArrivalTime(cal.getTime());
-        cal.add(Calendar.MINUTE, rqst.getDeliveryDuration());
+        cal.add(Calendar.SECOND, rqst.getDeliveryDuration());
 
         paths.add(lastToPick);
         paths.add(pickToDeli);
@@ -319,7 +320,7 @@ public class GraphProcessor {
             Calendar cal = Calendar.getInstance();
             cal.setTime(beforePickup.getDepatureTime());
             double commute = path.getLength() / velocity;
-            cal.add(Calendar.MINUTE, (int) commute);
+            cal.add(Calendar.SECOND, (int) commute);
             path.setArrivalTime(cal.getTime());
             t.getPaths().add(pickupIndex, path);
         } else {
@@ -328,7 +329,7 @@ public class GraphProcessor {
             Calendar cal = Calendar.getInstance();
             cal.setTime(beforePickup.getDepatureTime());
             double commute = pickupPath.getLength() / velocity;
-            cal.add(Calendar.MINUTE, (int) commute);
+            cal.add(Calendar.SECOND, (int) commute);
             pickupPath.setArrivalTime(cal.getTime());
             t.getPaths().add(pickupIndex, pickupPath);
 
@@ -336,7 +337,7 @@ public class GraphProcessor {
             deliveryPath.setDepatureTime(beforeDelivery.getDepatureTime());
             cal.setTime(beforeDelivery.getDepatureTime());
             commute = deliveryPath.getLength() / velocity;
-            cal.add(Calendar.MINUTE, (int) commute);
+            cal.add(Calendar.SECOND, (int) commute);
             deliveryPath.setArrivalTime(cal.getTime());
             t.getPaths().add(deliveryIndex, deliveryPath);
         }
@@ -356,7 +357,7 @@ public class GraphProcessor {
         System.out.println("Nb paths: " + tour.getPaths().size());
         //gp.removeRequestFromTour(tour, pr.getRequests().get(1));
 
-        RemoveRequest rr = new RemoveRequest(gp, tour, pr.getRequests().get(1));
+        RemoveRequestCommand rr = new RemoveRequestCommand(gp, tour, pr.getRequests().get(1));
         rr.doCommand();
         System.out.println("Duration after deletion: " + tour.getTotalDuration());
         System.out.println("Distance after deletion: " + tour.getTotalDistance());

@@ -5,6 +5,11 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.controller.Command.ListOfCommands;
+import deliverif.app.controller.Command.RemoveRequestCommand;
+import deliverif.app.controller.Command.AddRequestCommand;
+import deliverif.app.controller.State.InitialState;
+import deliverif.app.controller.State.State;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
@@ -441,7 +446,7 @@ public class MenuPageController implements Observer {
         }
         System.out.println("Found request");
         stopThread();
-        RemoveRequest rr = new RemoveRequest(graphProcessor, tour, selectedRequest);
+        RemoveRequestCommand rr = new RemoveRequestCommand(graphProcessor, tour, selectedRequest);
         sman.removeSprite(selectedRequest.getDeliveryAddress().getId().toString());
         sman.removeSprite(selectedRequest.getPickupAddress().getId().toString());
         sman.removeSprite("bigSprite");
@@ -460,7 +465,7 @@ public class MenuPageController implements Observer {
         Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
         Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
         Request r = new Request (pickup,delivery, 120, 67);
-        AddRequest ar = new AddRequest(graphProcessor,tour,r);
+        AddRequestCommand ar = new AddRequestCommand(graphProcessor,tour,r);
         loc.addCommand(ar);
     }
     

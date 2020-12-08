@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.controller;
+package deliverif.app.controller.Command;
 
+import deliverif.app.controller.Command.Command;
+import deliverif.app.controller.GraphProcessor;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
 
@@ -12,13 +14,14 @@ import deliverif.app.model.request.Request;
  *
  * @author zakaria
  */
-public class AddRequest implements Command {
+public class RemoveRequestCommand implements Command {
+
     GraphProcessor gp;
     Tour oldTour;
     Tour tour;
     Request request;
-    
-    public AddRequest(GraphProcessor gp, Tour t, Request r) {
+
+    public RemoveRequestCommand(GraphProcessor gp, Tour t, Request r) {
         this.gp = gp;
         tour = t;
         oldTour = new Tour(t);
@@ -27,14 +30,15 @@ public class AddRequest implements Command {
 
     @Override
     public void doCommand() {
-        gp.addRequestToTour(tour, request);
+        gp.removeRequestFromTour(tour, request);
         tour.notifiyObservers(null);
     }
 
     @Override
     public void undoCommand() {
+        tour.getPr().addRequest(request);
         tour.copyTour(oldTour);
         tour.notifiyObservers(null);
     }
-    
+
 }
