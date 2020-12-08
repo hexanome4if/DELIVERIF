@@ -5,7 +5,7 @@
  */
 package deliverif.app.model.graph;
 
-import deliverif.app.model.request.Observable;
+import deliverif.app.controller.Observer.Observable;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
