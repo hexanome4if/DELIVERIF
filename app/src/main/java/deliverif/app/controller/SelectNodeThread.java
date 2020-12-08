@@ -32,6 +32,7 @@ public class SelectNodeThread extends Thread {
         try {
             this.isFinished = false;
             System.out.println("start thread");
+            this.mpc.setSelectedNode(null);
             while (this.mpc.getSelectedNode() == null) {}
             String pickupId = this.mpc.getSelectedNode();
             this.mpc.setSelectedNode(null);
