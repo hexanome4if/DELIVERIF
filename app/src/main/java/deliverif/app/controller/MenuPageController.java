@@ -353,32 +353,6 @@ public class MenuPageController implements Observer {
         System.out.println("compute tour done");
     }
 
-    //@FXML
-    /*public void requestListClick(MouseEvent arg0) {
-        
-        if (this.tour == null){
-            System.out.println("clicked on " + requestList.getSelectionModel().getSelectedItem().getText());
-            String spriteId = requestList.getSelectionModel().getSelectedItem().getId();
-            this.currentState.selectNode(spriteId);
-        }else{
-            System.out.println("clicked on " + this.requestList.getSelectionModel().getSelectedItem().getText());
-            int endNum = this.requestList.getSelectionModel().getSelectedItem().getText().indexOf("]", 2);
-            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, endNum));
-            this.setSelectedPath(num);
-        }
-    }
-
-    private void setSelectedPath(int num) {
-        try {
-            stopThread();
-            pathThread = new PathThread(this, num);
-            pathThread.start();
-        } catch (Exception e) {
-            System.out.println("Error in setSelectedPath " + e);
-        }
-
-    }*/
-
     public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
@@ -540,7 +514,8 @@ public class MenuPageController implements Observer {
             this.currentState.selectNode(spriteId);
         }else{
             System.out.println("clicked on " + this.requestList.getSelectionModel().getSelectedItem().getText());
-            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
+            int endNum = this.requestList.getSelectionModel().getSelectedItem().getText().indexOf("]", 2);
+            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, endNum));
             this.setSelectedPath(num);
         }
     }
