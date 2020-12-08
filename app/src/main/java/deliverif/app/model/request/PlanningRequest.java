@@ -7,70 +7,117 @@ package deliverif.app.model.request;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author zakaria
  */
 public class PlanningRequest {
-    private Depot depot;
-    List<Request> requests;
 
+    private Depot depot;
+    private List<Request> requests;
+
+    /**
+     * Create an empty planning request
+     */
     public PlanningRequest() {
-        this.requests = new ArrayList<Request>();
+        this.requests = new ArrayList<>();
     }
 
+    /**
+     * Create a new planning request
+     *
+     * @param depot the planning depot
+     * @param requests planning's requests
+     */
     public PlanningRequest(Depot depot, List<Request> requests) {
         this.depot = depot;
         this.requests = requests;
     }
 
+    /**
+     * Get planning depot
+     *
+     * @return planning depot
+     */
     public Depot getDepot() {
         return depot;
     }
 
+    /**
+     * Get the requests composing the planning
+     *
+     * @return planning's requests
+     */
     public List<Request> getRequests() {
         return requests;
     }
 
+    /**
+     * Set the planning depot
+     *
+     * @param depot new planning depot
+     */
     public void setDepot(Depot depot) {
         this.depot = depot;
     }
 
+    /**
+     * Set the requests composing the planning
+     *
+     * @param requests planning's requests
+     */
     public void setRequests(List<Request> requests) {
         this.requests = requests;
     }
-    
+
+    /**
+     * Add a request to the planning
+     *
+     * @param r the request to add
+     */
     public void addRequest(Request r) {
         this.requests.add(r);
     }
-    
-    public void removeRequest(Request r){
+
+    /**
+     * Remove a request from the planning
+     *
+     * @param r the request to remove
+     */
+    public void removeRequest(Request r) {
         this.requests.remove(r);
     }
-    
-    public String researchTypeIntersection(Long id){
-        
+
+    /**
+     * Get intersection type from requests
+     *
+     * @param id intersection id
+     * @return intersection type can be either "Delivery" or "Pickup"
+     */
+    public String researchTypeIntersection(Long id) {
+
         String res = "";
-        
-        for(Request r : requests){
-            
-            if(r.getDeliveryAddress().getId() == id){
+
+        for (Request r : requests) {
+
+            if (Objects.equals(r.getDeliveryAddress().getId(), id)) {
                 res = "Delivery";
                 break;
             }
-            
-            if(r.getPickupAddress().getId() == id){
+
+            if (Objects.equals(r.getPickupAddress().getId(), id)) {
                 res = "Pickup";
                 break;
             }
         }
         return res;
     }
-    
+
     @Override
     public String toString() {
         return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';
     }
-    
+
 }

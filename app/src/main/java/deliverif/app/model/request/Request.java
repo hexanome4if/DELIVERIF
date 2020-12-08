@@ -6,19 +6,32 @@
 package deliverif.app.model.request;
 
 import deliverif.app.model.map.Intersection;
+
 /**
  *
  * @author zakaria
  */
 public class Request {
+
     private Intersection pickupAddress;
     private Intersection deliveryAddress;
     private Integer pickupDuration;
     private Integer deliveryDuration;
 
+    /**
+     * Create an empty request
+     */
     public Request() {
     }
 
+    /**
+     * Create a new request
+     *
+     * @param pickupAddress pickup address of the request as an intersection
+     * @param deliveryAddress delivery address of the request as an intersection
+     * @param pickupDuration duration in seconds of the pickup
+     * @param deliveryDuration duration in seconds of the delivery
+     */
     public Request(Intersection pickupAddress, Intersection deliveryAddress, Integer pickupDuration, Integer deliveryDuration) {
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
@@ -26,34 +39,74 @@ public class Request {
         this.deliveryDuration = deliveryDuration;
     }
 
+    /**
+     * Get pickup address as an intersection
+     *
+     * @return intersection representing pickup address
+     */
     public Intersection getPickupAddress() {
         return pickupAddress;
     }
 
+    /**
+     * Get delivery address as an intersection
+     *
+     * @return intersection representing delivery address
+     */
     public Intersection getDeliveryAddress() {
         return deliveryAddress;
     }
 
+    /**
+     * Get pickup duration in seconds
+     *
+     * @return pickup duration in seconds
+     */
     public Integer getPickupDuration() {
         return pickupDuration;
     }
 
+    /**
+     * Get delivery duration in seconds
+     *
+     * @return delivery duration in seconds
+     */
     public Integer getDeliveryDuration() {
         return deliveryDuration;
     }
 
+    /**
+     * Set pickup address for that request
+     *
+     * @param pickupAddress intersection representing the pickup address
+     */
     public void setPickupAddress(Intersection pickupAddress) {
         this.pickupAddress = pickupAddress;
     }
 
+    /**
+     * Set delivery address for that request
+     *
+     * @param deliveryAddress intersection representing the delivery address
+     */
     public void setDeliveryAddress(Intersection deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
     }
 
+    /**
+     * Set pickup duration in seconds for that request
+     *
+     * @param pickupDuration pickup duration in seconds
+     */
     public void setPickupDuration(Integer pickupDuration) {
         this.pickupDuration = pickupDuration;
     }
 
+    /**
+     * Set delivery duration in seconds for that request
+     *
+     * @param deliveryDuration delivery duration in seconds
+     */
     public void setDeliveryDuration(Integer deliveryDuration) {
         this.deliveryDuration = deliveryDuration;
     }
@@ -62,6 +115,5 @@ public class Request {
     public String toString() {
         return "Request{" + "pickupAddress=" + pickupAddress + ", deliveryAddress=" + deliveryAddress + ", pickupDuration=" + pickupDuration + ", deliveryDuration=" + deliveryDuration + '}';
     }
-    
-    
+
 }

@@ -15,6 +15,7 @@ import java.util.Date;
  * @author zakaria
  */
 public class Path {
+
     private ArrayList<Segment> segments;
     private Intersection departure;
     private Intersection arrival;
@@ -23,18 +24,26 @@ public class Path {
     private Date arrivalTime;
     private Request request;
     private Type type;
-    
+
     public enum Type {
         PICKUP,
         DELIVERY,
         WAREHOUSE;
     }
-    
-    public Path () {
+
+    /**
+     * Create an empty path
+     */
+    public Path() {
         this.segments = new ArrayList<>();
     }
-    
-    public Path (Path p) {
+
+    /**
+     * Create a copy of a path
+     *
+     * @param p the path to copy informations from
+     */
+    public Path(Path p) {
         this.segments = p.getSegments();
         this.departure = p.getDeparture();
         this.arrival = p.getArrival();
@@ -45,67 +54,147 @@ public class Path {
         this.type = p.getType();
     }
 
+    /**
+     * Get path's segments
+     *
+     * @return path's segments
+     */
     public ArrayList<Segment> getSegments() {
         return segments;
     }
 
+    /**
+     * Get path departure point
+     *
+     * @return intersection representing departure point
+     */
     public Intersection getDeparture() {
         return departure;
     }
 
+    /**
+     * Get path arrival
+     *
+     * @return intersection representing arrival point
+     */
     public Intersection getArrival() {
         return arrival;
     }
 
+    /**
+     * Get path length
+     *
+     * @return path length
+     */
     public float getLength() {
         return length;
     }
 
+    /**
+     * Get departure time
+     *
+     * @return departure time
+     */
     public Date getDepatureTime() {
         return depatureTime;
     }
 
+    /**
+     * Get arrival time
+     *
+     * @return arrival time
+     */
     public Date getArrivalTime() {
         return arrivalTime;
     }
 
+    /**
+     * Get the request represented by the path
+     *
+     * @return requests of the path
+     */
     public Request getRequest() {
         return request;
     }
 
+    /**
+     * Get path type
+     *
+     * @return path type
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Set path's segments
+     *
+     * @param segments segments representing the path
+     */
     public void setSegments(ArrayList<Segment> segments) {
         this.segments = segments;
     }
 
+    /**
+     * Set path departure
+     *
+     * @param departure intersection representing the departure point
+     */
     public void setDeparture(Intersection departure) {
         this.departure = departure;
     }
 
+    /**
+     * Set path arrival
+     *
+     * @param arrival intersection representing the arrival point
+     */
     public void setArrival(Intersection arrival) {
         this.arrival = arrival;
     }
 
+    /**
+     * Set path length
+     *
+     * @param length path length
+     */
     public void setLength(float length) {
         this.length = length;
     }
 
+    /**
+     * Set departure time
+     *
+     * @param depatureTime departure time as a date object
+     */
     public void setDepatureTime(Date depatureTime) {
         this.depatureTime = depatureTime;
     }
 
+    /**
+     * Set arrival time
+     *
+     * @param arrivalTime arrival time as a date object
+     */
     public void setArrivalTime(Date arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
+    /**
+     * Set the request representing the path
+     *
+     * @param request request represented by the path
+     */
     public void setRequest(Request request) {
         this.request = request;
     }
-    
-    public void addSegment (Segment s) {
+
+    /**
+     * Add a segment to the path
+     *
+     * @param s the segemnt to add
+     */
+    public void addSegment(Segment s) {
         if (segments.isEmpty()) {
             departure = s.getOrigin();
             arrival = s.getDestination();
@@ -117,13 +206,7 @@ public class Path {
 
     @Override
     public String toString() {
-        String seg =  "";
-        for (Segment s : segments) {
-            seg += s.toString();
-        }
-        //return "Path{" + "segments=" + segments + ", \n departure=" + departure + ", arrival=" + arrival + ", length=" + length + ", depatureTime=" + depatureTime + ", arrivalTime=" + arrivalTime + ", request=" + request + '}';
         return "Departure: " + departure + "\nArrival: " + arrival;
     }
-    
-    
+
 }
