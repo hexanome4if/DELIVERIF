@@ -32,7 +32,7 @@ public abstract class TemplateTSP implements TSP {
             this.timeLimit = timeLimit;
             this.g = g;
             bestSol = new Vertex[g.getNbVertices()];
-            Collection<Vertex> unvisited = new ArrayList<>(g.getNbVertices()-1);
+            ArrayList<Vertex> unvisited = new ArrayList<>(g.getNbVertices()-1);
             for (Edge e : start.getAdj()) 
                 unvisited.add(e.dest);
             //unvisited.add(start);
@@ -59,7 +59,7 @@ public abstract class TemplateTSP implements TSP {
 	 * @return a lower bound of the cost of paths in <code>g</code> starting from <code>currentVertex</code>, visiting 
 	 * every vertex in <code>unvisited</code> exactly once, and returning back to vertex <code>0</code>.
 	 */
-	protected abstract float bound(Vertex currentVertex, Collection<Vertex> unvisited);
+	protected abstract float bound(Vertex currentVertex, ArrayList<Vertex> unvisited);
 	
 	/**
 	 * Method that must be defined in TemplateTSP subclasses
@@ -77,7 +77,7 @@ public abstract class TemplateTSP implements TSP {
 	 * @param visited the sequence of vertices that have been already visited (including currentVertex)
 	 * @param currentCost the cost of the path corresponding to <code>visited</code>
 	 */	
-	private void branchAndBound(Vertex currentVertex, Collection<Vertex> unvisited, 
+	private void branchAndBound(Vertex currentVertex, ArrayList<Vertex> unvisited, 
 			Collection<Vertex> visited, float currentCost, Vertex start, 
                         List<Long> ordre){
             if (System.currentTimeMillis() - startTime > timeLimit) return;

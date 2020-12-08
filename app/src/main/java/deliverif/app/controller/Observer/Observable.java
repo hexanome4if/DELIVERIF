@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.model.request;
+package deliverif.app.controller.Observer;
 
 import java.util.ArrayList;
 import java.util.Collection;
