@@ -32,6 +32,7 @@ public class GraphProcessor {
     private Graph graph;
     private Map map;
     private HashMap<String, VertexPath> fullPath;
+    private List<Vertex> currentVertex;
 
     public GraphProcessor(Map m) {
         graph = new Graph();
@@ -43,6 +44,7 @@ public class GraphProcessor {
             graph.addEdge(s.getOrigin().getId(), s.getDestination().getId(), s.getLength());
         }
         fullPath = new HashMap<>();
+        currentVertex = new ArrayList<>();
     }
 
     public void dijkstra(Graph completeGraph, Vertex source, List<Vertex> goals) {
@@ -153,6 +155,7 @@ public class GraphProcessor {
     }
 
     public Tour optimalTour(PlanningRequest pr) {
+        currentVertex.clear();
         Tour tour = new Tour(pr);
         fullPath.clear();
         TSP1 tsp = hamiltonianCircuit(pr);
@@ -165,6 +168,7 @@ public class GraphProcessor {
         }
         for (int i = 0; i < sol.length; i++) {
             System.out.println("Vertex " + i + ":" + sol[i].getId());
+            currentVertex.add(sol[i]);
         }
         HashMap<Long, Integer> pickups = new HashMap<>();
         HashMap<Long, Integer> deliveries = new HashMap<>();
@@ -210,20 +214,20 @@ public class GraphProcessor {
         pr.getRequests().add(rqst);
         ArrayList<Path> paths = tour.getPaths();
         paths.remove(paths.size() - 1);
-        Graph g = new Graph();
         Vertex lastPoint = graph.getVertexById(paths.get(paths.size() - 1).getArrival().getId());
         Vertex pickup = graph.getVertexById(rqst.getPickupAddress().getId());
         Vertex delivery = graph.getVertexById(rqst.getDeliveryAddress().getId());
         Vertex warehouse = graph.getVertexById(paths.get(0).getDeparture().getId());
-        List<Vertex> goalPickup = new ArrayList<Vertex>();
-        goalPickup.add(pickup);
-        List<Vertex> goalDelivery = new ArrayList<Vertex>();
-        goalDelivery.add(delivery);
-        List<Vertex> goalWarehouse = new ArrayList<Vertex>();
-        goalWarehouse.add(warehouse);
-        dijkstra(g, lastPoint, goalPickup);
-        dijkstra(g, pickup, goalDelivery);
-        dijkstra(g, delivery, goalWarehouse);
+        List<Vertex> goals = new ArrayList<>();
+        goals.add(pickup);
+        goals.add(delivery);
+        for (Vertex v : currentVertex) {
+            dijkstra(new Graph(), v, goals);
+        }
+        currentVertex.add(pickup);
+        currentVertex.add(delivery);
+        dijkstra(new Graph(), pickup, currentVertex);
+        dijkstra(new Graph(), delivery, currentVertex);
         Path beforePickup = paths.get(paths.size() - 1);
         Path lastToPick = fullPath.get(lastPoint.getId() + "-" + pickup.getId()).convertToPath(map);
         Path pickToDeli = fullPath.get(pickup.getId() + "-" + delivery.getId()).convertToPath(map);
