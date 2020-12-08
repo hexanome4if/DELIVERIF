@@ -141,7 +141,8 @@ public class MenuPageController implements Observer {
                         if (t.getId().contains(id)) {
                             this.requestList.getSelectionModel().select(t);
                             String[] ids = t.getId().split("#");
-                            String numString = t.getText().substring(1, 2);
+                            int endNum = t.getText().indexOf("]", 2);
+                            String numString = t.getText().substring(1, endNum);
                             int num = Integer.parseInt(numString);
                             this.setSelectedPath(num);
                             break;
@@ -292,10 +293,10 @@ public class MenuPageController implements Observer {
             
             if(typePoint != ""){
                 txt = new Text("[" + cpt + "] "+typePoint+" from "+ dtf.format(p.getDepatureTime())
-                                + " to " + dtf.format(p.getArrivalTime()) + " "+ p.getLength()/1000+ "km");
+                                + " to " + dtf.format(p.getArrivalTime()) + " / "+ String.format("%.03f", p.getLength()/1000)+ "km");
             }else{
                 txt = new Text("[" + cpt + "] Depot from "+ dtf.format(p.getDepatureTime())
-                                + " to " + dtf.format(p.getArrivalTime()) + " "+ p.getLength()/1000+ "km");
+                                + " to " + dtf.format(p.getArrivalTime()) + " / "+ String.format("%.03f", p.getLength()/1000)+ "km");
             }
             
             txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
@@ -309,6 +310,7 @@ public class MenuPageController implements Observer {
         
         System.out.println("getDuration/"+time);
         distance = distance / 1000;
+        
         float duration = time/ 60;
         System.out.println("Duration/"+duration);
         int hours = (int)duration;
@@ -319,7 +321,7 @@ public class MenuPageController implements Observer {
         Date departure = this.tour.getDepartureTime();
         Date arrival = this.tour.getArrivalTime();
         
-        this.infosTextTour1.setText("TOUR = " + distance + " km / " + hours +"h"+ mins + "min");
+        this.infosTextTour1.setText("TOUR = " + String.format("%.03f", distance) + " km / " + hours +"h"+ mins + "min");
         this.infosTextTour2.setText("from " + dtf.format(departure) + " to " + dtf.format(arrival));
 
         System.out.println("compute tour done");
@@ -384,7 +386,8 @@ public class MenuPageController implements Observer {
             this.currentState.selectNode(spriteId);
         }else{
             System.out.println("clicked on " + this.requestList.getSelectionModel().getSelectedItem().getText());
-            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, 2));
+            int endNum = this.requestList.getSelectionModel().getSelectedItem().getText().indexOf("]", 2);
+            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, endNum));
             this.setSelectedPath(num);
         }
     }
