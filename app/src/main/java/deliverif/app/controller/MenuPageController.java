@@ -181,7 +181,7 @@ public class MenuPageController implements Observer {
         }
 
         String idElement = element.getId();
-
+        if(idElement.equals("segmentSprite")) return;
         this.currentState.selectNode(element.getId());
         Text spriteText = null;
         for (Text t : this.requestList.getItems()) {
@@ -206,7 +206,7 @@ public class MenuPageController implements Observer {
         //this.graph.setAutoCreate(true);
         //this.graph.setStrict(false);
 
-        Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);
         panel.enableMouseOptions();
         panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.SPRITE), this));
@@ -372,6 +372,7 @@ public class MenuPageController implements Observer {
         this.infosText.setText("");
         this.infosTextTour1.setText("Tour infos = ");
         this.infosTextTour2.setText("");
+        stopThread();
     }
 
     @FXML
@@ -402,10 +403,11 @@ public class MenuPageController implements Observer {
     public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
+        String spriteType = (String) sprite.getAttribute("ui.class");
+        if(spriteType == null || spriteType == "segmentSprite") return;
         sman.removeSprite("bigSprite");
         Sprite bigSprite = sman.addSprite("bigSprite");
         bigSprite.setPosition(sprite.getX(), sprite.getY(), sprite.getZ());
-        String spriteType = (String) sprite.getAttribute("ui.class");
         String bigSpriteType = spriteType + "Selected";
         bigSprite.setAttribute("ui.class", bigSpriteType);
         bigSprite.setAttribute("ui.style", sprite.getAttribute("ui.style"));
