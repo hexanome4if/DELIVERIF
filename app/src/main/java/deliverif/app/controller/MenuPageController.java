@@ -147,8 +147,6 @@ public class MenuPageController implements Observer {
         this.planningRequest = null;
         this.tour = null;
         this.requestList.getItems().clear();
-        this.longitudeText.setText("Longitude = ");
-        this.latitudeText.setText("Latitude = ");
         this.infosText.setText("");
         this.infosTextTour1.setText("Tour infos = ");
         this.infosTextTour2.setText("");
