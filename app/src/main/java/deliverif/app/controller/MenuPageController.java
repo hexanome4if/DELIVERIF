@@ -73,13 +73,10 @@ public class MenuPageController implements Observer {
 
     @FXML
     private Text loadMapText;
-
+    
     @FXML
-    private Text longitudeText;
-
-    @FXML
-    private Text latitudeText;
-
+    private Text selectionText;
+    
     @FXML
     private Text infosText;
 
@@ -232,11 +229,19 @@ public class MenuPageController implements Observer {
             return;
         }
         this.currentState.selectNode(element.getId());
+        //this.requestList.getSelectionModel().select(spriteText);
+        //this.selectionText.setText(requestList.getSelectionModel().getSelectedItem().getText()); 
     }
 
     public void loadMap() throws IOException {
         System.out.println("loadCityMapAction");
         this.map = App.choseMapFile(this.xmlReader);
+        
+        if(this.map == null){
+            this.loadMapText.setText("FORMAT ERRORS ON MAP FILE - Load another file");
+            return;
+        }
+        
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
         //this.graph.setAutoCreate(true);
@@ -353,7 +358,7 @@ public class MenuPageController implements Observer {
 
         System.out.println("compute tour done");
     }
-
+  
     public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
@@ -369,8 +374,6 @@ public class MenuPageController implements Observer {
         String longitude = "Longitude = ";
         String latitude = "Latitude = ";
         if (spriteType.equals("depotSprite")) {
-            this.longitudeText.setText(longitude + String.valueOf(sprite.getX()));
-            this.latitudeText.setText(latitude + String.valueOf(sprite.getY()));
             SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
             String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
             this.infosText.setText("Departure time = " + strDate);
@@ -379,15 +382,11 @@ public class MenuPageController implements Observer {
                 String idPickupAddress = r.getPickupAddress().getId().toString();
                 String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
                 if (idPickupAddress.equals(spriteId)) {
-                    this.longitudeText.setText(longitude + String.valueOf(r.getPickupAddress().getLongitude()));
-                    this.latitudeText.setText(latitude + String.valueOf(r.getPickupAddress().getLatitude()));
-                    this.infosText.setText("Pickup duration = " + String.valueOf(r.getPickupDuration()));
+                    this.infosText.setText("Pickup duration = " + String.valueOf(r.getPickupDuration()/60)+" min");
                     break;
                 }
                 if (idDeliveryAdress.equals(spriteId)) {
-                    this.longitudeText.setText(longitude + String.valueOf(r.getDeliveryAddress().getLongitude()));
-                    this.latitudeText.setText(latitude + String.valueOf(r.getDeliveryAddress().getLatitude()));
-                    this.infosText.setText("Delivery duration = " + String.valueOf(r.getDeliveryDuration()));
+                    this.infosText.setText("Delivery duration = " + String.valueOf(r.getDeliveryDuration()/60)+" min");
                     break;
                 }
             }

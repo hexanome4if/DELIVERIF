@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="890.0" style="-fx-background-color: #1DBCEB;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.MenuPageController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="890.0" style="-fx-background-color: #1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="deliverif.app.controller.MenuPageController">
   <bottom>
     <Text fx:id="segmentNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="" textAlignment="CENTER" BorderPane.alignment="CENTER">
       <font>
@@ -17,7 +17,7 @@
   <center>
     <AnchorPane fx:id="mapPane" prefHeight="316.0" prefWidth="483.0" style="-fx-background-color:transparent;;" BorderPane.alignment="CENTER">
       <children>
-        <Text fx:id="loadMapText" layoutX="135.0" layoutY="171.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP">
+        <Text fx:id="loadMapText" layoutX="31.0" layoutY="157.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP" wrappingWidth="300.36962890625">
           <font>
             <Font name="System Bold" size="15.0" />
           </font>
@@ -31,14 +31,23 @@
   <left>
     <AnchorPane prefHeight="334.0" prefWidth="276.0">
       <children>
-        <Text layoutX="14.0" layoutY="15.0" scaleX="1.006717880627213" scaleY="1.0991120526159952" strokeType="OUTSIDE" strokeWidth="0.0" text="Selection :" />
-        <Text fx:id="longitudeText" layoutX="30.0" layoutY="33.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Longitude =" />
-        <Text fx:id="latitudeText" layoutX="30.0" layoutY="53.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Latitude =" />
-        <Text id="infos" fx:id="infosText" layoutX="30.0" layoutY="71.0" scaleX="1.0" scaleY="1.0991093826480667" strokeType="OUTSIDE" strokeWidth="0.0" text="Infos =" />
-        <Text fx:id="infosTextTour1" layoutX="10.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tour Infos = " wrappingWidth="263.47003746032715" />
-        <Text fx:id="infosTextTour2" layoutX="51.0" layoutY="106.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="241.94662475585938" />
-        <ListView fx:id="requestList" onMouseClicked="#requestListClick" prefHeight="179.0" prefWidth="284.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="136.0" />
-        <Text layoutY="129.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Request points :" AnchorPane.leftAnchor="8.0" />
+            <AnchorPane layoutX="7.0" layoutY="1.0" prefHeight="56.0" prefWidth="287.0" style="-fx-background-color: #ebebe0; -fx-background-radius: 5;">
+               <children>
+              <Text fx:id="selectionText" layoutX="8.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selection :" wrappingWidth="271.05859375" />
+              <Text id="infos" fx:id="infosText" layoutX="7.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Infos =" wrappingWidth="279.359375" />
+               </children>
+            </AnchorPane>
+        <ListView fx:id="requestList" layoutX="7.0" layoutY="140.0" onMouseClicked="#requestListClick" prefHeight="175.0" prefWidth="287.0" style="-fx-background-color: #ebebe0;" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="140.0" />
+            <AnchorPane layoutX="7.0" layoutY="63.0" prefHeight="53.0" prefWidth="286.0" style="-fx-background-color: #ebebe0; -fx-background-radius: 5;">
+               <children>
+                  <Text fx:id="infosTextTour2" layoutX="2.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="282.9466247558594" />
+                  <Text fx:id="infosTextTour1" layoutX="2.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tour Infos = " wrappingWidth="282.47003746032715">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
       </children>
     </AnchorPane>
   </left>
