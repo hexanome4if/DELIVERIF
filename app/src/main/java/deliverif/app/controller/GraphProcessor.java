@@ -47,7 +47,12 @@ public class GraphProcessor {
         fullPath = new HashMap<>();
         currentVertex = new ArrayList<>();
     }
-
+    /**
+     * 
+     * @param completeGraph
+     * @param source
+     * @param goals 
+     */
     public void dijkstra(Graph completeGraph, Vertex source, List<Vertex> goals) {
         // Strutures
         HashMap<Long, Float> dis = new HashMap<>();  //distance : <idNoeud, distance>
