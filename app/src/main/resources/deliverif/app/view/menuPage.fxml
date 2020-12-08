@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="890.0" style="-fx-background-color: #1DBCEB;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.MenuPageController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="890.0" style="-fx-background-color: #1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="deliverif.app.controller.MenuPageController">
   <bottom>
     <Text fx:id="segmentNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="" textAlignment="CENTER" BorderPane.alignment="CENTER">
       <font>
@@ -17,7 +17,7 @@
   <center>
     <AnchorPane fx:id="mapPane" prefHeight="316.0" prefWidth="483.0" style="-fx-background-color:transparent;;" BorderPane.alignment="CENTER">
       <children>
-        <Text fx:id="loadMapText" layoutX="135.0" layoutY="171.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP">
+        <Text fx:id="loadMapText" layoutX="31.0" layoutY="157.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP" wrappingWidth="300.36962890625">
           <font>
             <Font name="System Bold" size="15.0" />
           </font>
