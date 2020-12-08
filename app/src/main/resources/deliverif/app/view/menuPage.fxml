@@ -57,19 +57,20 @@
         <Button fx:id="loadCityMapButton" mnemonicParsing="false" onAction="#loadCityMapAction" prefHeight="50.0" prefWidth="200.0" text="Load City Map" />
         <Button fx:id="loadRequestButton" mnemonicParsing="false" onAction="#loadRequestAction" prefHeight="50.0" prefWidth="200.0" text="Load Request">
           <VBox.margin>
-            <Insets top="20.0" />
+            <Insets top="20.0" fx:id="x1" />
           </VBox.margin>
         </Button>
         <Button fx:id="computeTourButton" mnemonicParsing="false" onAction="#computeTourAction" prefHeight="50.0" prefWidth="200.0" text="Compute Tour">
           <VBox.margin>
-            <Insets top="20.0" />
+            <Insets top="20.0" fx:id="x1" />
           </VBox.margin>
         </Button>
-        <Button fx:id="editTourButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" text="Edit Tour">
+        <Button id="computeTourButton" fx:id="addRequestButton" mnemonicParsing="false" onAction="#addRequestAction" prefHeight="50.0" prefWidth="200.0" text="Add request" visible="false">
           <VBox.margin>
-            <Insets top="20.0" />
+            <Insets top="20.0" fx:id="x1" />
           </VBox.margin>
         </Button>
+        <Button id="computeTourButton" fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#deleteRequestAction" prefHeight="50.0" prefWidth="200.0" text="Delete Request" visible="false" VBox.margin="$x1" />
       </children>
       <padding>
         <Insets top="40.0" />
