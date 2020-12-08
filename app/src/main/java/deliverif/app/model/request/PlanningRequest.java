@@ -5,6 +5,7 @@
  */
 package deliverif.app.model.request;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ public class PlanningRequest {
     List<Request> requests;
 
     public PlanningRequest() {
+        this.requests = new ArrayList<Request>();
     }
 
     public PlanningRequest(Depot depot, List<Request> requests) {
@@ -46,6 +48,26 @@ public class PlanningRequest {
     public void removeRequest(Request r){
         this.requests.remove(r);
     }
+    
+    public String researchTypeIntersection(Long id){
+        
+        String res = "";
+        
+        for(Request r : requests){
+            
+            if(r.getDeliveryAddress().getId() == id){
+                res = "Delivery";
+                break;
+            }
+            
+            if(r.getPickupAddress().getId() == id){
+                res = "Pickup";
+                break;
+            }
+        }
+        return res;
+    }
+    
     @Override
     public String toString() {
         return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';

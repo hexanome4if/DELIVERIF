@@ -39,7 +39,7 @@ public class Tour extends Observable {
         for (Request r : t.getPr().getRequests()) {
             pr.addRequest(r);
         }
-        paths = new ArrayList<Path>();
+        paths.clear();
         for (Path p : t.getPaths()) {
             paths.add(p);
         }
@@ -56,6 +56,10 @@ public class Tour extends Observable {
     public int getTotalDuration () {
         return (int) (paths.get(paths.size()-1).getArrivalTime().getTime() - 
                 pr.getDepot().getDepartureTime().getTime() / (60 * 1000) );
+    }
+    
+    public Date getDepartureTime() {
+        return paths.get(0).getDepatureTime();
     }
     
     public Date getArrivalTime() {

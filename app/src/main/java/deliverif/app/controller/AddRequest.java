@@ -5,10 +5,36 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.model.graph.Tour;
+import deliverif.app.model.request.Request;
+
 /**
  *
  * @author zakaria
  */
-public class AddRequest {
+public class AddRequest implements Command {
+    GraphProcessor gp;
+    Tour oldTour;
+    Tour tour;
+    Request request;
+    
+    public AddRequest(GraphProcessor gp, Tour t, Request r) {
+        this.gp = gp;
+        tour = t;
+        oldTour = new Tour(t);
+        request = r;
+    }
+
+    @Override
+    public void doCommand() {
+        gp.addRequestToTour(tour, request);
+        tour.notifiyObservers(null);
+    }
+
+    @Override
+    public void undoCommand() {
+        tour.copyTour(oldTour);
+        tour.notifiyObservers(null);
+    }
     
 }
