@@ -36,6 +36,7 @@ public class Path {
      */
     public Path() {
         this.segments = new ArrayList<>();
+        this.length = 0;
     }
 
     /**

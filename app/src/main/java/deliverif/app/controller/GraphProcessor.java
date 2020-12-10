@@ -49,11 +49,12 @@ public class GraphProcessor {
         fullPath = new HashMap<>();
         currentVertex = new ArrayList<>();
     }
+
     /**
-     * 
+     *
      * @param completeGraph
      * @param source
-     * @param goals 
+     * @param goals
      */
     public void dijkstra(Graph completeGraph, Vertex source, List<Vertex> goals) {
         // Strutures
@@ -193,13 +194,15 @@ public class GraphProcessor {
             Path path = shortestPathBetweenTwoIntersections(curr, next);
             path.setDepatureTime(cal.getTime());
             double commute = path.getLength() / velocity;
+
+            cal.add(Calendar.SECOND, (int) commute);
+            path.setArrivalTime(cal.getTime());
             if (pickups.containsKey(next.getId())) {
                 commute += pickups.get(next.getId());
             } else if (deliveries.containsKey(next.getId())) {
                 commute += deliveries.get(next.getId());
             }
             cal.add(Calendar.SECOND, (int) commute);
-            path.setArrivalTime(cal.getTime());
             //System.out.println("Path" + i + ":" + path + "\n");
             tour.addPath(path);
         }
@@ -245,7 +248,8 @@ public class GraphProcessor {
         cal.setTime(beforePickup.getArrivalTime());
 
         lastToPick.setDepatureTime(cal.getTime());
-        double velocity = 15 * 1000 / 60;
+        double velocity = 15 * 1000 / 3600;
+
         double commute = lastToPick.getLength() / velocity;
         cal.add(Calendar.SECOND, (int) commute);
         lastToPick.setArrivalTime(cal.getTime());
@@ -280,7 +284,7 @@ public class GraphProcessor {
         Intersection delivery = r.getDeliveryAddress();
         System.out.println("Pickup " + pickup);
         System.out.println("Delivery " + delivery);
-        double velocity = 15 * 1000 / 60;
+        double velocity = 15 * 1000 / 3600;
         Path beforePickup = null;
         Path afterPickup = null;
         Path beforeDelivery = null;
