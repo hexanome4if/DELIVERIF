@@ -5,6 +5,9 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.controller.tsp.GeneticAlgorithm.SalesmanGenome;
+import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman;
+import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman.SelectionType;
 import deliverif.app.controller.tsp.TSP1;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
@@ -149,6 +152,13 @@ public class GraphProcessor {
         tsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
         return tsp;
     }
+    
+    public Vertex[] hamiltonianCircuit2 (PlanningRequest pr) {
+        Graph g = completeGraph(pr);
+        TravellingSalesman tsp = new TravellingSalesman(SelectionType.ROULETTE,g, g.getVertexById(pr.getDepot().getAddress().getId()),1000);
+        SalesmanGenome genome = tsp.optimise();
+        return (Vertex[]) genome.getGenome().toArray();
+    }
 
     public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2) {
         Vertex source = graph.getVertexById(v1.getId());
@@ -165,8 +175,9 @@ public class GraphProcessor {
         currentVertex.clear();
         Tour tour = new Tour(pr);
         fullPath.clear();
-        TSP1 tsp = hamiltonianCircuit(pr);
-        Vertex[] sol = tsp.getSolution();
+        /*TSP1 tsp = hamiltonianCircuit(pr);
+        Vertex[] sol = tsp.getSolution();*/
+        Vertex[] sol = hamiltonianCircuit2(pr);
         double velocity = 15 * 1000 / 3600;
         Calendar cal = Calendar.getInstance();
         cal.setTime(pr.getDepot().getDepartureTime());

@@ -21,13 +21,12 @@ import java.util.Random;
 public class TravellingSalesman {
     private int generationSize;
     private int genomeSize;
-    private int numberOfStops;
     private int reproductionSize;
     private int maxIterations;
     private float mutationRate;
     private HashMap<String, Float> costs;
     private Vertex start;
-    private int targetFitness;
+    private float targetFitness;
     private int tournamentSize;
     private SelectionType selectionType;
     public enum SelectionType {
@@ -36,9 +35,7 @@ public class TravellingSalesman {
     }
     
     
-    public TravellingSalesman (int numberOfStops, SelectionType selectionType, Graph g, Vertex start, int targetFitness){
-        this.numberOfStops = numberOfStops;
-        this.genomeSize = numberOfStops-1;
+    public TravellingSalesman (SelectionType selectionType, Graph g, Vertex start, int maxIterations){
         this.selectionType = selectionType;
         onInit(g,start);
         this.start = start;
@@ -46,7 +43,7 @@ public class TravellingSalesman {
 
         generationSize = 5000;
         reproductionSize = 200;
-        maxIterations = 1000;
+        this.maxIterations = maxIterations;
         mutationRate = 0.1f;
         tournamentSize = 40;
     }
@@ -69,7 +66,7 @@ public class TravellingSalesman {
     public List<SalesmanGenome> initialPopulation(){
        List<SalesmanGenome> population = new ArrayList<>();
        for(int i=0; i<generationSize; i++){
-           population.add(new SalesmanGenome(numberOfStops, costs, start));
+           population.add(new SalesmanGenome(costs, start));
        }
        return population;
     }
@@ -90,11 +87,14 @@ public class TravellingSalesman {
     }
     
     public SalesmanGenome rouletteSelection(List<SalesmanGenome> population) {
-        int totalFitness = population.stream().map(SalesmanGenome::getFitness).mapToInt(Integer::intValue).sum();
+        float totalFitness = 0;
+        for (SalesmanGenome gen :  population){
+            totalFitness += gen.getFitness();
+        }
 
         // We pick a random value - a point on our roulette wheel
         Random random = new Random();
-        int selectedValue = random.nextInt(totalFitness);
+        int selectedValue = random.nextInt((int) totalFitness);
 
         // Because we're doing minimization, we need to use reciprocal
         // value so the probability of selecting a genome would be
@@ -156,7 +156,7 @@ public class TravellingSalesman {
             newVal = parent2Genome.get(i);
             Collections.swap(parent1Genome, parent1Genome.indexOf(newVal), i);
         }
-        children.add(new SalesmanGenome(parent1Genome, numberOfStops, costs, start));
+        children.add(new SalesmanGenome(parent1Genome, costs, start));
         parent1Genome = parents.get(0).getGenome(); // Reseting the edited parent
 
         // Creating child 2
@@ -164,7 +164,7 @@ public class TravellingSalesman {
             Vertex newVal = parent1Genome.get(i);
             Collections.swap(parent2Genome, parent2Genome.indexOf(newVal), i);
         }
-        children.add(new SalesmanGenome(parent2Genome, numberOfStops, costs, start));
+        children.add(new SalesmanGenome(parent2Genome, costs, start));
 
         return children;
     }
@@ -175,7 +175,7 @@ public class TravellingSalesman {
         if (mutate < mutationRate) {
             List<Vertex> genome = salesman.getGenome();
             Collections.swap(genome, random.nextInt(genomeSize), random.nextInt(genomeSize));
-            return new SalesmanGenome(genome, numberOfStops, costs, start);
+            return new SalesmanGenome(genome, costs, start);
         }
         return salesman;
     }
@@ -201,8 +201,6 @@ public class TravellingSalesman {
             List<SalesmanGenome> selected = selection(population);
             population = createGeneration(selected);
             globalBestGenome = Collections.min(population);
-            if (globalBestGenome.getFitness() < targetFitness)
-                break;
         }
         return globalBestGenome;
     }

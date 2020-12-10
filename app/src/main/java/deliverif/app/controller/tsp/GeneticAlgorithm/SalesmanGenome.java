@@ -5,6 +5,7 @@
  */
 package deliverif.app.controller.tsp.GeneticAlgorithm;
 
+import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Vertex;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,39 +21,34 @@ public class SalesmanGenome implements Comparable {
     List<Vertex> genome;
     public HashMap<String, Float> costs = new HashMap<>();
     Vertex start;
-    int numberOfStops;
-    int fitness;
+    float fitness;
     
-    public SalesmanGenome(int numberOfStops, HashMap<String, Float> costs, Vertex start) {
+    public SalesmanGenome(HashMap<String, Float> costs, Vertex start) {
         this.costs = costs;
         this.start = start;
-        this.numberOfStops = numberOfStops;
-
         this.genome = randomSalesman();
         this.fitness = this.calculateFitness();
     }
     
-    public SalesmanGenome(List<Vertex> permutationOfStops, int numberOfStops, HashMap<String, Float> costs, Vertex start) {
+    public SalesmanGenome(List<Vertex> permutationOfStops, HashMap<String, Float> costs, Vertex start) {
         this.genome = permutationOfStops;
         this.costs = costs;
         this.start = start;
-        this.numberOfStops = numberOfStops;
 
         this.fitness = this.calculateFitness();
     }
     
     private List<Vertex> randomSalesman() {
         List<Vertex> result = new ArrayList<Vertex>();
-        for (long i = 0; i < start.getId(); i++) {
-            if (i != start.getId())
-                result.add(new Vertex(i));
+        for (Edge e : start.getAdj()){
+            result.add(e.dest);
         }
         Collections.shuffle(result);
         return result;
     } 
        
-    public int calculateFitness() {
-        int fitness = 0;
+    public float calculateFitness() {
+        float fitness = 0;
         Vertex currentStop = start;
 
         // Calculating path cost
@@ -64,7 +60,7 @@ public class SalesmanGenome implements Comparable {
         // We have to add going back to the starting city to complete the circle
         // the genome is missing the starting city, and indexing starts at 0, which is why we subtract 2
 
-        fitness += costs.get(genome.get(numberOfStops-2).getId()+"-"+start.getId());
+        fitness += costs.get(genome.get(genome.size()-1).getId()+"-"+start.getId());
 
         return fitness;
     }
@@ -73,7 +69,7 @@ public class SalesmanGenome implements Comparable {
         return genome;
     }
 
-    public int getFitness() {
+    public float getFitness() {
         return fitness;
     }
     
