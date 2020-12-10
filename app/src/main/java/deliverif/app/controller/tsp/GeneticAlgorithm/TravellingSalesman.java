@@ -5,6 +5,8 @@
  */
 package deliverif.app.controller.tsp.GeneticAlgorithm;
 
+import deliverif.app.model.graph.Edge;
+import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +35,37 @@ public class TravellingSalesman {
         ROULETTE
     }
     
+    
+    public TravellingSalesman (int numberOfStops, SelectionType selectionType, Graph g, Vertex start, int targetFitness){
+        this.numberOfStops = numberOfStops;
+        this.genomeSize = numberOfStops-1;
+        this.selectionType = selectionType;
+        onInit(g,start);
+        this.start = start;
+        this.targetFitness = targetFitness;
+
+        generationSize = 5000;
+        reproductionSize = 200;
+        maxIterations = 1000;
+        mutationRate = 0.1f;
+        tournamentSize = 40;
+    }
+    
+    
+    protected void onInit(Graph g, Vertex start) {
+        for (Vertex v : g.getVertexMap().values()) {
+            for (Edge e : v.getAdj()) {
+                if (e.dest.getId() == start.getId()) {
+                    System.out.println("Add: " + v.getId() + "-" + "0");
+                    costs.put(v.getId() + "-" + "0", e.cost);
+                } else {
+                    System.out.println("Add: " + v.getId() + "-" + e.dest.getId());
+                    costs.put(v.getId() + "-" + e.dest.getId(), e.cost);
+                }
+            }
+        }
+    }
+    
     public List<SalesmanGenome> initialPopulation(){
        List<SalesmanGenome> population = new ArrayList<>();
        for(int i=0; i<generationSize; i++){
@@ -40,6 +73,7 @@ public class TravellingSalesman {
        }
        return population;
     }
+    
     public List<SalesmanGenome> selection(List<SalesmanGenome> population) {
         List<SalesmanGenome> selected = new ArrayList<>();
         SalesmanGenome winner;
@@ -160,7 +194,7 @@ public class TravellingSalesman {
         return generation;
     }
     
-    public SalesmanGenome optimiee() {
+    public SalesmanGenome optimise() {
         List<SalesmanGenome> population = initialPopulation();
         SalesmanGenome globalBestGenome = population.get(0);
         for (int i = 0; i < maxIterations; i++) {
