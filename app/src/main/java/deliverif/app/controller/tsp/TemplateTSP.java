@@ -38,7 +38,6 @@ public abstract class TemplateTSP implements TSP {
         for (Edge e : start.getAdj()) {
             unvisited.add(e.dest);
         }
-        //unvisited.add(start);
         List<Vertex> visited = new ArrayList<>(g.getNbVertices());
         visited.add(start); // The first visited vertex is 0
         bestSolCost = Integer.MAX_VALUE;
@@ -101,11 +100,6 @@ public abstract class TemplateTSP implements TSP {
             if (currentVertex.isEdge(start)) {
                 if (currentCost + currentVertex.getCost(start) < bestSolCost) {
                     bestSol = visited.toArray(bestSol);
-                    //System.out.println("Found a solution.");
-                    //System.out.println("Before visited vertices.");
-                    /*for (Vertex v : bestSol){
-                            System.out.println("Visited vertex: " + v);
-                        }*/
                     bestSolCost = currentCost + currentVertex.getCost(start);
                 }
             }

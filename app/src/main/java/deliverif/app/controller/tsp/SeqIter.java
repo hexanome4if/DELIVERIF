@@ -15,39 +15,42 @@ import java.util.Iterator;
  * @author zakaria
  */
 public class SeqIter implements Iterator<Vertex> {
+
     private Vertex[] candidates;
-    private int nbCandidates;
+    private int nbCandidates = 0;
 
     /**
-     * Create an iterator to traverse the set of vertices in <code>unvisited</code> 
-     * which are successors of <code>currentVertex</code> in <code>g</code>
-     * Vertices are traversed in the same order as in <code>unvisited</code>
+     * Create an iterator to traverse the set of vertices in
+     * <code>unvisited</code> which are successors of <code>currentVertex</code>
+     * in <code>g</code> Vertices are traversed in the same order as in
+     * <code>unvisited</code>
+     *
      * @param unvisited
      * @param currentVertex
      * @param g
      */
-    public SeqIter(Collection<Vertex> unvisited, Vertex currentVertex, Graph g){
+    public SeqIter(Collection<Vertex> unvisited, Vertex currentVertex, Graph g) {
         this.candidates = new Vertex[unvisited.size()];
-        for (Vertex s : unvisited){
-            if(currentVertex.isEdge(s)){
+        for (Vertex s : unvisited) {
+            if (currentVertex.isEdge(s)) {
                 candidates[nbCandidates++] = s;
-            }             
+            }
         }
     }
 
     @Override
     public boolean hasNext() {
-            return nbCandidates > 0;
+        return nbCandidates > 0;
     }
 
     @Override
     public Vertex next() {
-            nbCandidates--;
-            return candidates[nbCandidates];
+        nbCandidates--;
+        return candidates[nbCandidates];
     }
 
     @Override
-    public void remove() {}
+    public void remove() {
+    }
 
 }
-
