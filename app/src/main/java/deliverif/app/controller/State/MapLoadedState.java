@@ -6,8 +6,6 @@
 package deliverif.app.controller.State;
 
 import deliverif.app.controller.MenuPageController;
-import deliverif.app.controller.State.RequestLoadedState;
-import deliverif.app.controller.State.State;
 import java.io.IOException;
 
 /**
@@ -15,11 +13,16 @@ import java.io.IOException;
  * @author zakaria
  */
 public class MapLoadedState extends State {
-    
+
+    /**
+     * Start a map loaded state when only a map is loaded (no request)
+     *
+     * @param mpc the current view controller
+     */
     public MapLoadedState(MenuPageController mpc) {
         super(mpc);
     }
-    
+
     @Override
     public void loadMap() throws IOException {
         mpc.loadMap();
@@ -31,6 +34,5 @@ public class MapLoadedState extends State {
         mpc.loadRequest();
         mpc.setCurrentState(new RequestLoadedState(mpc));
     }
-    
-    
+
 }

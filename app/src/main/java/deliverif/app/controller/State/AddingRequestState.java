@@ -15,10 +15,15 @@ import deliverif.app.controller.MenuPageController;
  */
 public class AddingRequestState extends State {
 
-    String pickupId;
-    String deliveryId;
-    ListOfCommands loc;
+    private String pickupId;
+    private String deliveryId;
+    private ListOfCommands loc;
 
+    /**
+     * Start a state to add a request to the current tour
+     *
+     * @param mpc current view controller
+     */
     public AddingRequestState(MenuPageController mpc) {
         super(mpc);
         loc = new ListOfCommands();
@@ -70,10 +75,20 @@ public class AddingRequestState extends State {
         loc.redo();
     }
 
+    /**
+     * Set the pickup node id
+     *
+     * @param id pickup node id
+     */
     public void setPickupId(String id) {
         pickupId = id;
     }
 
+    /**
+     * Set the delivery node id
+     *
+     * @param id delivery node id
+     */
     public void setDeliveryId(String id) {
         deliveryId = id;
     }

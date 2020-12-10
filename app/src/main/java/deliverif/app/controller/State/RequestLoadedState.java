@@ -6,19 +6,24 @@
 package deliverif.app.controller.State;
 
 import deliverif.app.controller.MenuPageController;
-import deliverif.app.controller.State.TourComputedState;
-import deliverif.app.controller.State.State;
 import java.io.IOException;
 
 /**
  *
  * @author zakaria
  */
-public class RequestLoadedState  extends State {
+public class RequestLoadedState extends State {
+
+    /**
+     * Start a request loaded state when a request has been selected but no tour
+     * has been computed yet
+     *
+     * @param mpc the current view controller
+     */
     public RequestLoadedState(MenuPageController mpc) {
         super(mpc);
     }
-    
+
     @Override
     public void loadMap() throws IOException {
         mpc.loadMap();
@@ -36,6 +41,5 @@ public class RequestLoadedState  extends State {
         mpc.computeTour();
         mpc.setCurrentState(new TourComputedState(mpc));
     }
-    
-    
+
 }

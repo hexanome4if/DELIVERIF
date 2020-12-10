@@ -14,6 +14,11 @@ import java.io.IOException;
  */
 public class TourComputedState extends State {
 
+    /**
+     * Start a tour computed state when a tour has been computed
+     *
+     * @param mpc the current view controller
+     */
     public TourComputedState(MenuPageController mpc) {
         super(mpc);
     }
