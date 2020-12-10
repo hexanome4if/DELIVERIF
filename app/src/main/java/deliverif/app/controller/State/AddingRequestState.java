@@ -44,11 +44,13 @@ public class AddingRequestState extends State {
                 loc.addCommand(snc);
                 snc.doCommand();
                 System.out.println("Pickup added");
+                this.mpc.schowInfoAlert("Select Delivery point", "Pickup added ! Now select a delivery point on the map please.");
             } else if (deliveryId == null) {
                 SelectNodeCommand snc = new SelectNodeCommand(this, true, nodeId);
                 loc.addCommand(snc);
                 snc.doCommand();
                 System.out.println("Delivery added");
+                this.addRequest(); //On lance la requete
             }
         } else {
             System.out.println("Déjà 2 points sélectionné");

@@ -308,7 +308,6 @@ public class MenuPageController implements Observer {
         int[] rgb = randomColorSprite();
 
         for (Path p : tour.getPaths()) {
-
             String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -493,9 +492,19 @@ public class MenuPageController implements Observer {
         rr.doCommand();
 
     }
+    
+    public void schowInfoAlert(String title, String content) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();  
+    }
 
     public void startAddRequest() {
         System.out.println("Start add request");
+        this.addRequestMode();
+        this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
 
     public void addRequest(String pickupId, String deliveryId) {
@@ -504,6 +513,7 @@ public class MenuPageController implements Observer {
         Request r = new Request(pickup, delivery, 120, 67);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
+        this.defaultMode();
     }
 
     @Override
@@ -720,5 +730,24 @@ public class MenuPageController implements Observer {
         alert.setContentText(content);
 
         alert.showAndWait();
+    }
+    
+    private void addRequestMode() {
+        this.loadCityMapButton.setVisible(false);
+        this.loadRequestButton.setVisible(false);
+        this.computeTourButton.setVisible(false);
+        this.addRequestButton.setVisible(false);
+        this.deleteRequestButton.setVisible(false);
+        this.requestList.setMouseTransparent(true);
+        this.requestList.setFocusTraversable(false);
+    }
+    
+    private void defaultMode() {
+        this.loadCityMapButton.setVisible(true);
+        this.loadRequestButton.setVisible(true);
+        this.computeTourButton.setVisible(true);
+        this.addRequestButton.setVisible(true);
+        this.requestList.setMouseTransparent(false);
+        this.requestList.setFocusTraversable(true);
     }
 }
