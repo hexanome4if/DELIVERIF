@@ -27,10 +27,12 @@ public class AddingRequestState extends State {
     @Override
     public void addRequest() {
         if (pickupId == null || deliveryId == null) {
+            System.out.println("Il manque des points de selection");
             return;
         }
         mpc.addRequest(pickupId, deliveryId);
         mpc.setCurrentState(new TourComputedState(mpc));
+        System.out.println("Requete ajoutée");
     }
 
     @Override
@@ -41,11 +43,15 @@ public class AddingRequestState extends State {
                 SelectNodeCommand snc = new SelectNodeCommand(this, false, nodeId);
                 loc.addCommand(snc);
                 snc.doCommand();
+                System.out.println("Pickup added");
             } else if (deliveryId == null) {
                 SelectNodeCommand snc = new SelectNodeCommand(this, true, nodeId);
                 loc.addCommand(snc);
                 snc.doCommand();
+                System.out.println("Delivery added");
             }
+        } else {
+            System.out.println("Déjà 2 points sélectionné");
         }
     }
 
