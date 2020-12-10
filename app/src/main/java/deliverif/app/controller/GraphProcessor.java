@@ -166,7 +166,7 @@ public class GraphProcessor {
         fullPath.clear();
         TSP1 tsp = hamiltonianCircuit(pr);
         Vertex[] sol = tsp.getSolution();
-        double velocity = 15 * 1000 / 60;
+        double velocity = 15 * 1000 / 3600;
         Calendar cal = Calendar.getInstance();
         cal.setTime(pr.getDepot().getDepartureTime());
         if (sol == null || sol[0] == null) {
