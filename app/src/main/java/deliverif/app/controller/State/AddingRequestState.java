@@ -43,6 +43,7 @@ public class AddingRequestState extends State {
     @Override
     public void selectNode(String nodeId) {
         if (mpc.isNodeOnTour(nodeId)) {
+            this.mpc.schowInfoAlert("Point already on the tour", "Impossible to add, the point is already on the tour.");
             return;
         }
         if (pickupId == null || deliveryId == null) {

@@ -49,7 +49,9 @@ public class ListOfCommands {
      * Redo the last command
      */
     public void redo() {
-        i++;
-        l.get(i).doCommand();
+        if (i+1 < l.size()) {
+            i++;
+            l.get(i).doCommand();   
+        }
     }
 }
