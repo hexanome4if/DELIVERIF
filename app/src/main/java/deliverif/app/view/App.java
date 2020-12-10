@@ -141,7 +141,7 @@ public class App extends Application {
     // Choix des fichiers XML
     public static Map choseMapFile(XmlReader reader) throws IOException {
 
-        JFileChooser dialogue = new JFileChooser(new File("."));
+        JFileChooser dialogue = new JFileChooser(new File("./src/main/resources/deliverif/app/fichiersXML2020"));
 
         PrintWriter sortie;
 
@@ -157,14 +157,19 @@ public class App extends Application {
             filename = fichier.getPath();
             sortie.close();
         }
-        reader.readMap(filename);
+        if(filename != "") {
+            if(!reader.readMap(filename)) return null;
+        } else {
+            //Canceled
+            return new Map();
+        }
 
         return reader.getMap();
     }
 
     public static PlanningRequest choseRequestFile(XmlReader reader) throws IOException {
 
-        JFileChooser dialogue = new JFileChooser(new File("."));
+        JFileChooser dialogue = new JFileChooser(new File("./src/main/resources/deliverif/app/fichiersXML2020"));
 
         PrintWriter sortie;
 
@@ -180,7 +185,13 @@ public class App extends Application {
             filename = fichier.getPath();
             sortie.close();
         }
-        PlanningRequest pr = reader.readRequest(filename);
+        
+        PlanningRequest pr;
+        if(filename.equals("")) {
+            pr = new PlanningRequest();
+        } else {
+            pr = reader.readRequest(filename);
+        }
         return pr;
     }
 

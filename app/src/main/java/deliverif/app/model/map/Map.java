@@ -105,5 +105,8 @@ public class Map {
     public String toString() {
         return "Map{intersections=" + intersections + ", segments=" + segments + '}';
     }
-
+    
+    public boolean isEmpty() {
+        return intersections == null || segments == null;
+    }
 }

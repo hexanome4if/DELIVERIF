@@ -53,9 +53,13 @@ public class Tour extends Observable {
         return total;
     }
     
+    /**
+     * 
+     * @return Total duration of the tour (seconds) 
+     */
     public int getTotalDuration () {
-        return (int) (paths.get(paths.size()-1).getArrivalTime().getTime() - 
-                pr.getDepot().getDepartureTime().getTime() / (60 * 1000) );
+        return (int) ((paths.get(paths.size()-1).getArrivalTime().getTime() - 
+                pr.getDepot().getDepartureTime().getTime() ) / 1000 );
     }
     
     public Date getDepartureTime() {

@@ -119,5 +119,9 @@ public class PlanningRequest {
     public String toString() {
         return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';
     }
+    
+    public boolean isEmpty() {
+        return requests.isEmpty() || depot == null ;
+    }
 
 }

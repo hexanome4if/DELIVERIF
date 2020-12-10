@@ -40,8 +40,8 @@ public class XmlReader {
     
     public boolean readMap(String filename){
 
-        List<Segment> segments = new ArrayList<Segment>(); 
-        HashMap<Long, Intersection> intersections = new HashMap<Long, Intersection>();
+        List<Segment> segments = new ArrayList<>(); 
+        HashMap<Long, Intersection> intersections = new HashMap<>();
        
         try {  
             //creating a constructor of file class and parsing an XML file  
@@ -57,6 +57,8 @@ public class XmlReader {
             doc.getDocumentElement().normalize();  
 
             //System.out.println("Root element: " + doc.getDocumentElement().getNodeName());  
+            if(!doc.getDocumentElement().getNodeName().equals("map")) return false;
+            
             NodeList nodeList = doc.getElementsByTagName("intersection");  
             // nodeList is not iterable, so we are using for loop  
 
@@ -109,6 +111,7 @@ public class XmlReader {
         }catch (Exception e){  
             //e.printStackTrace(); 
             System.out.println("/!\\ Errors on map file");
+            return false;
         }
         
         return this.map != null;
@@ -133,7 +136,9 @@ public class XmlReader {
 
             Document doc = db.parse(file);  
             doc.getDocumentElement().normalize();  
-
+            
+            if(!doc.getDocumentElement().getNodeName().equals("planningRequest")) return null;
+            
             NodeList nodeList = doc.getElementsByTagName("depot");  
             SimpleDateFormat hourFormat =new SimpleDateFormat("HH:mm:ss"); 
             
