@@ -15,11 +15,18 @@ import deliverif.app.model.request.Request;
  */
 public class AddRequestCommand implements Command {
 
-    GraphProcessor gp;
-    Tour oldTour;
-    Tour tour;
-    Request request;
+    private GraphProcessor gp;
+    private Tour oldTour;
+    private Tour tour;
+    private Request request;
 
+    /**
+     * Create an add request command
+     *
+     * @param gp the graphprocessor
+     * @param t the current tour
+     * @param r the request to add
+     */
     public AddRequestCommand(GraphProcessor gp, Tour t, Request r) {
         this.gp = gp;
         tour = t;

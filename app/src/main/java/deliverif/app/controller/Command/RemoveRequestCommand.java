@@ -5,7 +5,6 @@
  */
 package deliverif.app.controller.Command;
 
-import deliverif.app.controller.Command.Command;
 import deliverif.app.controller.GraphProcessor;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
@@ -16,11 +15,18 @@ import deliverif.app.model.request.Request;
  */
 public class RemoveRequestCommand implements Command {
 
-    GraphProcessor gp;
-    Tour oldTour;
-    Tour tour;
-    Request request;
+    private GraphProcessor gp;
+    private Tour oldTour;
+    private Tour tour;
+    private Request request;
 
+    /**
+     * Create a remove request command
+     *
+     * @param gp the graphprocessor
+     * @param t the current tour
+     * @param r the request to remove from the tour
+     */
     public RemoveRequestCommand(GraphProcessor gp, Tour t, Request r) {
         this.gp = gp;
         tour = t;
