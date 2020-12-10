@@ -152,12 +152,23 @@ public class GraphProcessor {
         tsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
         return tsp;
     }
-    
-    public Vertex[] hamiltonianCircuit2 (PlanningRequest pr) {
+
+    public Vertex[] hamiltonianCircuit2(PlanningRequest pr) {
         Graph g = completeGraph(pr);
-        TravellingSalesman tsp = new TravellingSalesman(SelectionType.ROULETTE,g, g.getVertexById(pr.getDepot().getAddress().getId()),1000);
+        List<Long> ordre = new ArrayList<>();
+        for (Request r : pr.getRequests()) {
+            ordre.add(r.getPickupAddress().getId());
+            ordre.add(r.getDeliveryAddress().getId());
+        }
+        TravellingSalesman tsp = new TravellingSalesman(SelectionType.ROULETTE, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre, 4000);
         SalesmanGenome genome = tsp.optimise();
-        return (Vertex[]) genome.getGenome().toArray();
+        List<Vertex> listResult = genome.getGenome();
+        Vertex[] result = new Vertex[listResult.size()];
+        int i = 0;
+        for (Vertex v : listResult) {
+            result[i++] = v;
+        }
+        return result;
     }
 
     public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2) {

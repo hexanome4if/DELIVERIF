@@ -112,9 +112,10 @@ public abstract class TemplateTSP implements TSP {
                 unvisited.remove(nextVertex);
 
                 boolean allowed = true;
-                if (ordre.indexOf(nextVertex.getId()) % 2 != 0) {
+                int index = ordre.indexOf(nextVertex.getId());
+                if (index % 2 != 0) {
                     for (Vertex unv : unvisited) {
-                        if (Objects.equals(unv.getId(), ordre.get(ordre.indexOf(nextVertex.getId()) - 1))) {
+                        if (Objects.equals(unv.getId(), ordre.get(index - 1))) {
                             allowed = false;
                             break;
                         }
