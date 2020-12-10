@@ -10,6 +10,7 @@ import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -33,6 +34,41 @@ public class Tour extends Observable {
         }
     }
     
+    public void update(){
+        ArrayList<Path> newPaths = new ArrayList<>();
+        double velocity = 15 * 1000 / 60;
+        for(Path p : paths){
+            if(paths.indexOf(p) == 0){
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(pr.getDepot().getDepartureTime());
+                p.setDepatureTime(cal.getTime());
+                double commute = p.getLength() / velocity;
+                cal.add(Calendar.MINUTE, (int) commute);
+                p.setArrivalTime(cal.getTime());
+                p.setRequest(pr.findRequestByAddress(p.getArrival().getId()));
+            }
+            else {
+                //MAJ departureTime = last arraivalTime + its duration
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(paths.get(paths.indexOf(p)-1).getArrivalTime());
+                cal.add(Calendar.SECOND, pr.getDuration(p.getDeparture().getId()));
+                p.setDepatureTime(cal.getTime());
+                
+                //MAJ arrivalTime = departureTime + commuteTime
+                double commute = p.getLength() / velocity;
+                cal.add(Calendar.MINUTE, (int) commute);
+                p.setArrivalTime(cal.getTime());
+                
+                //p.request = request corresponding to the destination of this path
+                if(paths.indexOf(p) == paths.size()-1){
+                    p.setRequest(pr.findRequestByAddress(p.getArrival().getId()));
+                }
+            }
+            newPaths.add(p);
+        }
+        this.setPaths(newPaths);
+    }
+    
     public void copyTour (Tour t){
         this.pr = new PlanningRequest();
         pr.setDepot(t.getPr().getDepot());
@@ -51,6 +87,15 @@ public class Tour extends Observable {
             total += p.getLength();
         }
         return total;
+    }
+    
+    public ArrayList<Long> getOrder(){
+        ArrayList<Long> order = new ArrayList<>();
+        order.add(paths.get(0).getDeparture().getId());
+        for(Path p : paths){
+            order.add(p.getArrival().getId());
+        }
+        return order;
     }
     
     /**
