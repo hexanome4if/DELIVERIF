@@ -13,52 +13,76 @@ import java.util.List;
  * @author zakaria
  */
 public class Vertex {
-    Long id;        // The name of this Vertex
-    List<Edge>  adj;    // The adjacency list for this Vertex
- 
-    int dist;      // variable for use by algorithms
-    int prev;      // variable for use by algorithms
-    int scratch;   // variable for use by algorithms
- 
-    public Vertex( Long id )    {
+
+    private Long id;        // The name of this Vertex
+    private List<Edge> adj;    // The adjacency list for this Vertex
+
+    private int dist;      // variable for use by algorithms
+    private int prev;      // variable for use by algorithms
+    private int scratch;   // variable for use by algorithms
+
+    /**
+     * Create a vertex with an id
+     *
+     * @param id vertex id
+     */
+    public Vertex(Long id) {
         this.id = id;                      // name of this Vertex
-        adj  = new LinkedList<Edge>( ); // Start an empty adj list
+        adj = new LinkedList<>(); // Start an empty adj list
     }
 
+    /**
+     * Get the list of edges which are linked to the current vertex
+     *
+     * @return the list of edges
+     */
     public List<Edge> getAdj() {
         return adj;
     }
 
+    /**
+     * Get vertex id
+     *
+     * @return vertex id
+     */
     public Long getId() {
         return id;
     }
-    
-    public boolean isEdge(Vertex v){
-        for (Edge e : adj){
-            if (e.dest == v){
+
+    /**
+     * Check if there is an edge between the current vertex and a given vertex
+     *
+     * @param v the vertex to check
+     * @return wether an edge exists between the current edge and v
+     */
+    public boolean isEdge(Vertex v) {
+        for (Edge e : adj) {
+            if (e.dest == v) {
                 return true;
             }
         }
         return false;
     }
-    
+
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         Vertex v = (Vertex) o;
-        if(v.getId()==id){
-            return true;
-        }
-        return false;
+        return v.getId().equals(id);
     }
-    
-    public float getCost(Vertex v){
-        for (Edge e : adj){
-            if (e.dest == v){
+
+    /**
+     * Get the cost of the path to another vertex
+     *
+     * @param v the other vertex
+     * @return the cost to go from the current vertex to other vertex
+     */
+    public float getCost(Vertex v) {
+        for (Edge e : adj) {
+            if (e.dest == v) {
                 return e.cost;
             }
         }
         return -1;
     }
-    
-    
+
 }

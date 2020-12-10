@@ -308,7 +308,6 @@ public class MenuPageController implements Observer {
         int[] rgb = randomColorSprite();
 
         for (Path p : tour.getPaths()) {
-
             String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -334,6 +333,7 @@ public class MenuPageController implements Observer {
                 }
             }
             Long departId = p.getDeparture().getId();
+            System.out.println("Point: " + departId);
             String typePoint = tour.getPr().researchTypeIntersection(departId);
 
             if (typePoint != "") {
@@ -460,6 +460,14 @@ public class MenuPageController implements Observer {
         }
         System.out.println("Node selected");
         Request selectedRequest = null;
+        if (this.planningRequest.getDepot().getAddress().getId().toString().equals(this.selectedNode)) {
+            showErrorAlert("Suppression error", "Impossible to remove the deposit");
+            return;
+        }
+        if (this.planningRequest.getRequests().size() == 1) {
+            showErrorAlert("Suppression error", "Impossible to remove the request because it's the last one");
+            return;
+        }
         for (Request r : this.planningRequest.getRequests()) {
             String idPickupAddress = r.getPickupAddress().getId().toString();
             String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
@@ -486,8 +494,18 @@ public class MenuPageController implements Observer {
 
     }
 
+    public void schowInfoAlert(String title, String content) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     public void startAddRequest() {
         System.out.println("Start add request");
+        this.addRequestMode();
+        this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
 
     public void addRequest(String pickupId, String deliveryId) {
@@ -496,6 +514,7 @@ public class MenuPageController implements Observer {
         Request r = new Request(pickup, delivery, 120, 67);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
+        this.defaultMode();
     }
 
     @Override
@@ -537,6 +556,11 @@ public class MenuPageController implements Observer {
 
     public void setSelectedNode(String selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public boolean isNodeOnTour(String nodeId) {
+        Sprite sprite = sman.getSprite(nodeId);
+        return sprite != null;
     }
 
     //PUBLIC FXML METHODS
@@ -712,5 +736,24 @@ public class MenuPageController implements Observer {
         alert.setContentText(content);
 
         alert.showAndWait();
+    }
+
+    private void addRequestMode() {
+        this.loadCityMapButton.setVisible(false);
+        this.loadRequestButton.setVisible(false);
+        this.computeTourButton.setVisible(false);
+        this.addRequestButton.setVisible(false);
+        this.deleteRequestButton.setVisible(false);
+        this.requestList.setMouseTransparent(true);
+        this.requestList.setFocusTraversable(false);
+    }
+
+    private void defaultMode() {
+        this.loadCityMapButton.setVisible(true);
+        this.loadRequestButton.setVisible(true);
+        this.computeTourButton.setVisible(true);
+        this.addRequestButton.setVisible(true);
+        this.requestList.setMouseTransparent(false);
+        this.requestList.setFocusTraversable(true);
     }
 }

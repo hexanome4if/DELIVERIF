@@ -13,18 +13,75 @@ import java.io.IOException;
  * @author zakaria
  */
 public abstract class State {
-    public MenuPageController mpc;
+
+    protected MenuPageController mpc;
+
+    /**
+     * Create a new state
+     *
+     * @param mpc the main view controller
+     */
     public State(MenuPageController mpc) {
         this.mpc = mpc;
     }
-    public  void loadMap() throws IOException {};
-    public  void loadRequest() throws IOException {};
-    public  void computeTour() {};
-    public  void undo() {};
-    public  void redo() {};
-    public  void addRequest() {};
-    public void removeRequest() {};
-    public void startAddRequest() {};
+
+    /**
+     * Try to load a map if possible
+     *
+     * @throws IOException when an error occured with the selected file
+     */
+    public void loadMap() throws IOException {
+    }
+
+    /**
+     * Try to load a request if possible
+     *
+     * @throws IOException when an error occured with the selected file
+     */
+    public void loadRequest() throws IOException {
+    }
+
+    /**
+     * Try to compute a tour if possible
+     */
+    public void computeTour() {
+    }
+
+    /**
+     * Try to undo the last command if possible
+     */
+    public void undo() {
+    }
+
+    /**
+     * Try to redo the last command if possible
+     */
+    public void redo() {
+    }
+
+    /**
+     * Try to add a request to the current tour if possible
+     */
+    public void addRequest() {
+    }
+
+    /**
+     * Try to remove a request from the current tour if possible
+     */
+    public void removeRequest() {
+    }
+
+    /**
+     * Start adding a request to the current tour if possible
+     */
+    public void startAddRequest() {
+    }
+
+    /**
+     * Select a node
+     *
+     * @param nodeId the node id to select
+     */
     public void selectNode(String nodeId) {
         mpc.setSelectedSprite(nodeId);
     }

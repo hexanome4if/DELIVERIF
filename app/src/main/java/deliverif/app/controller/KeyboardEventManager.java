@@ -45,9 +45,9 @@ public class KeyboardEventManager implements EventHandler<KeyEvent> {
             mpc.getCurrentState().startAddRequest();
         }
         
-        if (kc == KeyCode.ENTER) {
+        /*if (kc == KeyCode.ENTER) {
             mpc.getCurrentState().addRequest();
-        }
+        }*/
         
     }
 }

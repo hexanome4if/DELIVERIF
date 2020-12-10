@@ -10,6 +10,14 @@ package deliverif.app.controller.Command;
  * @author zakaria
  */
 public interface Command {
+
+    /**
+     * Execute the command
+     */
     public void doCommand();
+
+    /**
+     * Reset the state as it was before the command was executed
+     */
     public void undoCommand();
 }
