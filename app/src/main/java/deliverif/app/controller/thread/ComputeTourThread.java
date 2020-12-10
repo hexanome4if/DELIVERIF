@@ -17,7 +17,7 @@ public class ComputeTourThread extends Thread {
     
     private MenuPageController mpc;
     private volatile boolean continueRun = true;
-    private volatile boolean isFinished = true;
+    private volatile boolean isFinished = false;
     private Tour tour = null;
     
     public ComputeTourThread(MenuPageController mpc) {
@@ -27,9 +27,11 @@ public class ComputeTourThread extends Thread {
      @Override
     public void run() {
         try {
-            
+            tour = mpc.getGraphProcessor().optimalTour(mpc.getPlanningRequest());
+            isFinished = true;
         } catch (Exception e) {
             System.err.println("ComputeTourThread error : " + e);
+            isFinished = true;
         }
     }
 
@@ -41,4 +43,7 @@ public class ComputeTourThread extends Thread {
         return isFinished;
     }   
     
+    public Tour getTour() {
+        return tour;
+    }
 }

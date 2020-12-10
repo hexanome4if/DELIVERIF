@@ -16,6 +16,8 @@ import deliverif.app.model.map.Map;
 import deliverif.app.model.map.Segment;
 import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;
+import deliverif.app.controller.thread.ComputeTourThread;
+import deliverif.app.controller.thread.TimerThread;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -27,12 +29,14 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -105,6 +109,21 @@ public class MenuPageController implements Observer {
     
     @FXML
     private ProgressIndicator progressIndicator; 
+    
+    @FXML
+    private TitledPane streetsTitledPlane;
+    
+    @FXML
+    private ListView<String> streetsList;
+    
+    @FXML 
+    private AnchorPane timerPane;
+    
+    @FXML
+    private Text timerText;
+    
+    @FXML
+    private Button renderTourButton;
 
     //PRIVATE ATTRIBUTES
     
@@ -135,6 +154,11 @@ public class MenuPageController implements Observer {
     private final XmlReader xmlReader = new XmlReader();
 
     private static PathThread pathThread = null;
+    
+    private static ComputeTourThread computeTourThread = null;
+    
+    private static TimerThread timerThread = null;
+    
 
     // Instance (Singleton)
     private static MenuPageController instance = null;
@@ -293,11 +317,17 @@ public class MenuPageController implements Observer {
 
     public void computeTour() {
         System.out.println("computeTourAction");
-        tour = graphProcessor.optimalTour(this.planningRequest);
-        tour.addObserver(this);
-
-        renderTour();
-        this.addRequestButton.setVisible(true);
+        //tour = graphProcessor.optimalTour(this.planningRequest);
+        computeTourThread = new ComputeTourThread(this);
+        computeTourThread.start();
+        timerThread = new TimerThread(this);
+        timerThread.start();
+        //while(!timerThread.isIsFinished()) {}
+        //this.tour = computeTourThread.getTour();
+        //tour.addObserver(this);
+        
+        //renderTour();
+        //this.addRequestButton.setVisible(true);
     }
 
     public void renderTour() {
@@ -536,6 +566,10 @@ public class MenuPageController implements Observer {
         return tour;
     }
 
+    public static ComputeTourThread getComputeTourThread() {
+        return computeTourThread;
+    }
+
     public GraphProcessor getGraphProcessor() {
         return graphProcessor;
     }
@@ -544,8 +578,28 @@ public class MenuPageController implements Observer {
         return selectedNode;
     }
 
+    public PlanningRequest getPlanningRequest() {
+        return planningRequest;
+    }
+
+    public AnchorPane getTimerPane() {
+        return timerPane;
+    }
+
+    public Text getTimerText() {
+        return timerText;
+    }
+    
     public void setSelectedNode(String selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public Button getRenderTourButton() {
+        return renderTourButton;
+    }
+
+    public ProgressIndicator getProgressIndicator() {
+        return progressIndicator;
     }
 
     //PUBLIC FXML METHODS
@@ -593,6 +647,16 @@ public class MenuPageController implements Observer {
         this.currentState.removeRequest();
         this.deleteRequestButton.setVisible(false);
     }
+    
+    @FXML
+    private void renderTourAction() {
+        this.renderTourButton.setVisible(false);
+        this.timerPane.setVisible(false);
+        System.out.println("renderTourAction");
+        this.tour = computeTourThread.getTour();
+        tour.addObserver(this);
+        renderTour();
+    }
 
     //PRIVATE METHODS
     private void chargerGraph(Map map) {
@@ -629,6 +693,8 @@ public class MenuPageController implements Observer {
     }
 
     private void setSelectedPath(int num) {
+        // complete list
+        completePathList(num);
         try {
             stopThread();
             pathThread = new PathThread(this, num);
@@ -638,7 +704,17 @@ public class MenuPageController implements Observer {
         }
 
     }
-
+    
+    private void completePathList(int num) {
+        streetsList.getItems().clear();
+        Path p = tour.getPaths().get(num-1);
+        for(int i = p.getSegments().size()-1 ; i >= 0 ; i--) {
+            Segment s = p.getSegments().get(i);
+            if(!this.streetsList.getItems().contains(s.getName()) && (s.getName()!="") ) {
+                this.streetsList.getItems().add(s.getName());
+            }
+        }
+    }
     private void chargerPlanningRequests() throws IOException {
         PlanningRequest pr = App.choseRequestFile(this.xmlReader);
         if(pr == null) {
