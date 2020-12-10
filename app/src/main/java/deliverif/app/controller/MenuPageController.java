@@ -514,6 +514,8 @@ public class MenuPageController implements Observer {
         Request r = new Request(pickup, delivery, 120, 67);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
+        Request requestAdded = this.planningRequest.getRequests().get(this.planningRequest.getRequests().size() - 1);
+        this.displayRequest(r);
         this.defaultMode();
     }
 
@@ -688,30 +690,50 @@ public class MenuPageController implements Observer {
         this.requestList.getItems().add(txt);
         int cpt = 1;
         for (Request r : planningRequest.getRequests()) {
-
-            int[] rgb = randomColorSprite();
-            String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
-            Intersection pickupAddress = r.getPickupAddress();
-            Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
-            pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
-            pickupAddressSprite.setAttribute("ui.style", color);
-            pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-            txt = new Text("Pickup " + cpt);
-            txt.setId(pickupAddressSprite.getId());
-            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
-            this.requestList.getItems().add(txt);
-
-            Intersection deliveryAdress = r.getDeliveryAddress();
-            Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
-            deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
-            deliveryAdressSprite.setAttribute("ui.style", color);
-            deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
-            txt = new Text("Delivery " + cpt);
-            txt.setId(deliveryAdressSprite.getId());
-            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
-            this.requestList.getItems().add(txt);
+            this.displayRequestWithAddToListView(r, cpt);
             cpt++;
         }
+    }
+    
+    private void displayRequestWithAddToListView(Request r, int cpt) {
+        Text txt;
+        int[] rgb = randomColorSprite();
+        String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
+        Intersection pickupAddress = r.getPickupAddress();
+        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
+        pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+        pickupAddressSprite.setAttribute("ui.style", color);
+        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+        txt = new Text("Pickup " + cpt);
+        txt.setId(pickupAddressSprite.getId());
+        txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+        this.requestList.getItems().add(txt);
+
+        Intersection deliveryAdress = r.getDeliveryAddress();
+        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
+        deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+        deliveryAdressSprite.setAttribute("ui.style", color);
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
+        txt = new Text("Delivery " + cpt);
+        txt.setId(deliveryAdressSprite.getId());
+        txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+        this.requestList.getItems().add(txt);  
+    }
+    
+    private void displayRequest(Request r) {
+        int[] rgb = randomColorSprite();
+        String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
+        Intersection pickupAddress = r.getPickupAddress();
+        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
+        pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+        pickupAddressSprite.setAttribute("ui.style", color);
+        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+
+        Intersection deliveryAdress = r.getDeliveryAddress();
+        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
+        deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+        deliveryAdressSprite.setAttribute("ui.style", color);
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);  
     }
 
     private void resetEdge(String edgeId) {
