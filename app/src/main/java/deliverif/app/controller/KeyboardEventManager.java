@@ -30,18 +30,22 @@ public class KeyboardEventManager implements EventHandler<KeyEvent> {
     public void handle(KeyEvent t) {
         KeyCode kc = t.getCode();
         if (kc == KeyCode.DELETE) {
+            MenuPageController.stopThread();
             mpc.getCurrentState().removeRequest();
         }
 
         if (kc == KeyCode.Z && t.isControlDown()) {
+            MenuPageController.stopThread();
             mpc.getCurrentState().undo();
         }
 
         if (kc == KeyCode.Y && t.isControlDown()) {
+            MenuPageController.stopThread();
             mpc.getCurrentState().redo();
         }
         
         if (kc == KeyCode.N && t.isControlDown()) {
+            MenuPageController.stopThread();
             mpc.getCurrentState().startAddRequest();
         }
         
