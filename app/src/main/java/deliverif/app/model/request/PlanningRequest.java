@@ -99,9 +99,7 @@ public class PlanningRequest {
     public String researchTypeIntersection(Long id) {
 
         String res = "";
-
         for (Request r : requests) {
-
             if (Objects.equals(r.getDeliveryAddress().getId(), id)) {
                 res = "Delivery";
                 break;
@@ -119,9 +117,9 @@ public class PlanningRequest {
     public String toString() {
         return "PlanningRequest{depot=" + depot + ", requests=" + requests + '}';
     }
-    
+
     public boolean isEmpty() {
-        return requests.isEmpty() || depot == null ;
+        return requests.isEmpty() || depot == null;
     }
 
 }

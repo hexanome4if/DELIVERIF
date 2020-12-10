@@ -333,6 +333,7 @@ public class MenuPageController implements Observer {
                 }
             }
             Long departId = p.getDeparture().getId();
+            System.out.println("Point: " + departId);
             String typePoint = tour.getPr().researchTypeIntersection(departId);
 
             if (typePoint != "") {
@@ -459,12 +460,12 @@ public class MenuPageController implements Observer {
         }
         System.out.println("Node selected");
         Request selectedRequest = null;
-        if(this.planningRequest.getDepot().getAddress().getId().toString().equals(this.selectedNode)) {
-           showErrorAlert("Suppression error","Impossible to remove the deposit");
-           return;
+        if (this.planningRequest.getDepot().getAddress().getId().toString().equals(this.selectedNode)) {
+            showErrorAlert("Suppression error", "Impossible to remove the deposit");
+            return;
         }
-        if(this.planningRequest.getRequests().size() == 1) {
-            showErrorAlert("Suppression error","Impossible to remove the request because it's the last one");
+        if (this.planningRequest.getRequests().size() == 1) {
+            showErrorAlert("Suppression error", "Impossible to remove the request because it's the last one");
             return;
         }
         for (Request r : this.planningRequest.getRequests()) {
@@ -492,13 +493,13 @@ public class MenuPageController implements Observer {
         rr.doCommand();
 
     }
-    
+
     public void schowInfoAlert(String title, String content) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setHeaderText(null);
         alert.setTitle(title);
         alert.setContentText(content);
-        alert.showAndWait();  
+        alert.showAndWait();
     }
 
     public void startAddRequest() {
@@ -736,7 +737,7 @@ public class MenuPageController implements Observer {
 
         alert.showAndWait();
     }
-    
+
     private void addRequestMode() {
         this.loadCityMapButton.setVisible(false);
         this.loadRequestButton.setVisible(false);
@@ -746,7 +747,7 @@ public class MenuPageController implements Observer {
         this.requestList.setMouseTransparent(true);
         this.requestList.setFocusTraversable(false);
     }
-    
+
     private void defaultMode() {
         this.loadCityMapButton.setVisible(true);
         this.loadRequestButton.setVisible(true);

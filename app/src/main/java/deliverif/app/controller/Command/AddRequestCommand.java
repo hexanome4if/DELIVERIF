@@ -5,7 +5,6 @@
  */
 package deliverif.app.controller.Command;
 
-import deliverif.app.controller.Command.Command;
 import deliverif.app.controller.GraphProcessor;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
@@ -15,11 +14,12 @@ import deliverif.app.model.request.Request;
  * @author zakaria
  */
 public class AddRequestCommand implements Command {
+
     GraphProcessor gp;
     Tour oldTour;
     Tour tour;
     Request request;
-    
+
     public AddRequestCommand(GraphProcessor gp, Tour t, Request r) {
         this.gp = gp;
         tour = t;
@@ -35,8 +35,9 @@ public class AddRequestCommand implements Command {
 
     @Override
     public void undoCommand() {
+        tour.getPr().removeRequest(request);
         tour.copyTour(oldTour);
         tour.notifiyObservers(null);
     }
-    
+
 }
