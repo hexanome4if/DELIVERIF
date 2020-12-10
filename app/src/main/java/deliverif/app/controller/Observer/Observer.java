@@ -5,12 +5,17 @@
  */
 package deliverif.app.controller.Observer;
 
-import deliverif.app.controller.Observer.Observable;
-
 /**
  *
  * @author zakaria
  */
 public interface Observer {
-    public void update (Observable observed, Object arg);
+
+    /**
+     * Update method which is called when an observed object has changed
+     *
+     * @param observed the observed object
+     * @param arg some data about the update
+     */
+    public void update(Observable observed, Object arg);
 }
