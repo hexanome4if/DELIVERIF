@@ -222,7 +222,7 @@ public class GraphProcessor {
     public Tour changeOrder(Tour tour, List<Long> newOrder){ 
         //newOrder === depot -> nodes -> depot
         if(newOrder.size()!=tour.getOrder().size()){
-            System.out.println("new list hasnt the same length!!!!!!");
+            System.out.println("not the same length!!!!!!");
         }
         Tour newTour = new Tour(tour);
         ArrayList<Path> newPaths = new ArrayList<>();
@@ -264,17 +264,7 @@ public class GraphProcessor {
         currentVertex.add(delivery);
         dijkstra(new Graph(), pickup, currentVertex);
         dijkstra(new Graph(), delivery, currentVertex);
-/*
-        List<Vertex> goalPickup = new ArrayList<>();
-        goalPickup.add(pickup);
-        List<Vertex> goalDelivery = new ArrayList<>();
-        goalDelivery.add(delivery);
-        List<Vertex> goalWarehouse = new ArrayList<>();
-        goalWarehouse.add(warehouse);
-        dijkstra(g, lastPoint, goalPickup);
-        dijkstra(g, pickup, goalDelivery);
-        dijkstra(g, delivery, goalWarehouse);
-*/
+
         Path beforePickup = paths.get(paths.size() - 1);
         Path lastToPick = fullPath.get(lastPoint.getId() + "-" + pickup.getId()).convertToPath(map);
         Path pickToDeli = fullPath.get(pickup.getId() + "-" + delivery.getId()).convertToPath(map);
@@ -386,9 +376,9 @@ public class GraphProcessor {
 
     public static void main(String[] args) {
         XmlReader reader = new XmlReader();
-        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml");
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp = new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsMedium3.xml");
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
         Tour tour = gp.optimalTour(pr);
         //System.out.println("Tour before deletion: " + tour);
         System.out.println("Duration before deletion: " + tour.getTotalDuration());
@@ -396,7 +386,7 @@ public class GraphProcessor {
         System.out.println("Nb paths: " + tour.getPaths().size());
         //gp.removeRequestFromTour(tour, pr.getRequests().get(1));
 
-        RemoveRequestCommand rr = new RemoveRequestCommand(gp, tour, pr.getRequests().get(1));
+        //RemoveRequestCommand rr = new RemoveRequestCommand(gp, tour, pr.getRequests().get(1));
         /*
         RemoveRequest rr = new RemoveRequest(gp, tour, pr.getRequests().get(1));
         rr.doCommand();
@@ -423,8 +413,8 @@ public class GraphProcessor {
         }
         
         Tour newTour = gp.changeOrder(tour,newOrder);
-        System.out.println("Duration before deletion: " + newTour.getTotalDuration());
-        System.out.println("Distance before deletion: " + newTour.getTotalDistance());
+        System.out.println("Duration after change: " + newTour.getTotalDuration());
+        System.out.println("Distance after change: " + newTour.getTotalDistance());
         System.out.println("Nb paths: " + newTour.getPaths().size());
         
         for(Path p : newTour.getPaths()){

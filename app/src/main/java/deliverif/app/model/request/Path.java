@@ -198,7 +198,6 @@ public class Path {
     public void addSegment(Segment s) {
         if (segments.isEmpty()) {
             departure = s.getOrigin();
-            arrival = s.getDestination();
         }
         this.segments.add(s);
         this.arrival = s.getDestination();
