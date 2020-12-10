@@ -13,7 +13,9 @@ import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +38,7 @@ public abstract class TemplateTSP implements TSP {
             for (Edge e : start.getAdj()) 
                 unvisited.add(e.dest);
             //unvisited.add(start);
-            Collection<Vertex> visited = new ArrayList<>(g.getNbVertices());
+            List<Vertex> visited = new ArrayList<>(g.getNbVertices());
             visited.add(start); // The first visited vertex is 0
             bestSolCost = Integer.MAX_VALUE;
             branchAndBound(start, unvisited, visited, 0, start, ordre);
@@ -78,13 +80,14 @@ public abstract class TemplateTSP implements TSP {
 	 * @param currentCost the cost of the path corresponding to <code>visited</code>
 	 */	
 	private void branchAndBound(Vertex currentVertex, ArrayList<Vertex> unvisited, 
-			Collection<Vertex> visited, float currentCost, Vertex start, 
+			List<Vertex> visited, float currentCost, Vertex start, 
                         List<Long> ordre){
             if (System.currentTimeMillis() - startTime > timeLimit) return;
 	    if (unvisited.isEmpty()){ 
                 //System.out.println("Unvisited empty.");
                 if(currentVertex.isEdge(start)) {
                     if (currentCost+currentVertex.getCost(start) < bestSolCost){ 
+                        Collections.reverse(visited);
                         bestSol=visited.toArray(bestSol);
                         //System.out.println("Found a solution.");
                         //System.out.println("Before visited vertices.");
