@@ -19,9 +19,7 @@ import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -295,25 +293,17 @@ public class GraphProcessor {
         for (Path p : t.getPaths()) {
             if (p.getDeparture().getId().equals(pickup.getId())) {
                 afterPickup = p;
-                //t.removePath(p);
                 pickupIndex = i;
-                i--;
             }
             if (p.getArrival().getId().equals(pickup.getId())) {
                 beforePickup = p;
-                //t.removePath(p);
-                i--;
             }
             if (p.getDeparture().getId().equals(delivery.getId())) {
                 afterDelivery = p;
-                //t.removePath(p);
                 deliveryIndex = i;
-                i--;
             }
             if (p.getArrival().getId().equals(delivery.getId())) {
                 beforeDelivery = p;
-                //t.removePath(p);
-                i--;
             }
             i++;
         }
@@ -321,10 +311,6 @@ public class GraphProcessor {
         if (beforePickup == null || afterPickup == null || beforeDelivery == null || afterDelivery == null) {
             return t;
         }
-        t.removePath(afterPickup);
-        t.removePath(beforePickup);
-        t.removePath(beforeDelivery);
-        t.removePath(afterDelivery);
         if (afterPickup == beforeDelivery) {
             Path path = shortestPathBetweenTwoIntersections(beforePickup.getDeparture(), afterDelivery.getArrival());
             path.setDepatureTime(beforePickup.getDepatureTime());
@@ -352,6 +338,10 @@ public class GraphProcessor {
             deliveryPath.setArrivalTime(cal.getTime());
             t.getPaths().add(deliveryIndex, deliveryPath);
         }
+        t.removePath(afterPickup);
+        t.removePath(beforePickup);
+        t.removePath(beforeDelivery);
+        t.removePath(afterDelivery);
 
         return t;
     }
