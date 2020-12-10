@@ -82,7 +82,7 @@ public class Graph {
         if (srcVex != null && dstVex != null) {
             internalAddEdge(srcVex, dstVex, cost);
         } else {
-            System.out.println("source is " + srcVex + ", destination is " + dstVex);
+            //System.out.println("source is " + srcVex + ", destination is " + dstVex);
         }
     }
 
@@ -99,7 +99,7 @@ public class Graph {
         if (srcVex != null && dstVex != null) {
             srcVex.getAdj().add(new Edge(dstVex, cost));
         } else {
-            System.out.println("source is " + srcVex + ", destination is " + dstVex);
+            //System.out.println("source is " + srcVex + ", destination is " + dstVex);
         }
     }
 

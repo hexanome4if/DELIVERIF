@@ -90,6 +90,27 @@ public class PlanningRequest {
         this.requests.remove(r);
     }
 
+    public Request findRequestByAddress(Long idItsc){
+        for(Request rq : requests){
+            if(Objects.equals(rq.getDeliveryAddress().getId(), idItsc) 
+            || Objects.equals(rq.getDeliveryAddress().getId(), idItsc)){
+                return rq;
+            }
+        }
+        return null;
+    }
+    
+    public int getDuration(Long idItsc){
+        for(Request rq : requests){
+            if(Objects.equals(rq.getPickupAddress().getId(), idItsc)){
+                return rq.getPickupDuration();
+            } else if(Objects.equals(rq.getDeliveryAddress().getId(), idItsc)){
+                return rq.getDeliveryDuration();
+            }
+        }
+        return -1;
+    }
+
     /**
      * Get intersection type from requests
      *
@@ -97,7 +118,7 @@ public class PlanningRequest {
      * @return intersection type can be either "Delivery" or "Pickup"
      */
     public String researchTypeIntersection(Long id) {
-
+        
         String res = "";
         for (Request r : requests) {
             if (Objects.equals(r.getDeliveryAddress().getId(), id)) {

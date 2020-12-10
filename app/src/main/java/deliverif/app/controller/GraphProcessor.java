@@ -20,6 +20,7 @@ import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -217,7 +218,32 @@ public class GraphProcessor {
         System.out.println("-----------End of Tour---------");
         return tour;
     }
+    
+    public Tour changeOrder(Tour tour, List<Long> newOrder){ 
+        //newOrder === depot -> nodes -> depot
+        if(newOrder.size()!=tour.getOrder().size()){
+            System.out.println("not the same length!!!!!!");
+        }
+        Tour newTour = new Tour(tour);
+        ArrayList<Path> newPaths = new ArrayList<>();
+        for(int i=0; i<newOrder.size()-1;i++){
+            newPaths.add(getNewPath(newOrder.get(i+1),newOrder.get(i)));
+        }
+        newTour.setPaths(newPaths);
+        newTour.update();// synchroniser les horaires
 
+        return newTour;
+    }
+    public Path getNewPath(Long idStart, Long idStop){
+        Graph g = new Graph();
+        Vertex start = graph.getVertexById(idStart);
+        Vertex stop = graph.getVertexById(idStop);
+        List<Vertex> goal = new ArrayList<>();
+        goal.add(stop);
+        dijkstra(g,start,goal);
+        return fullPath.get(idStart + "-" + idStop).convertToPath(map);
+    }
+    
     public Tour addRequestToTour(Tour tour, Request rqst) {
         tour.getPr().addRequest(rqst);
         tour.removePath(tour.getPaths().get(tour.getPaths().size() - 1));
@@ -361,9 +387,9 @@ public class GraphProcessor {
 
     public static void main(String[] args) {
         XmlReader reader = new XmlReader();
-        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/largeMap.xml");
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp = new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsLarge9.xml");
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
         Tour tour = gp.optimalTour(pr);
         //System.out.println("Tour before deletion: " + tour);
         System.out.println("Duration before deletion: " + tour.getTotalDuration());
@@ -371,7 +397,9 @@ public class GraphProcessor {
         System.out.println("Nb paths: " + tour.getPaths().size());
         //gp.removeRequestFromTour(tour, pr.getRequests().get(1));
 
-        RemoveRequestCommand rr = new RemoveRequestCommand(gp, tour, pr.getRequests().get(1));
+        //RemoveRequestCommand rr = new RemoveRequestCommand(gp, tour, pr.getRequests().get(1));
+        /*
+        RemoveRequest rr = new RemoveRequest(gp, tour, pr.getRequests().get(1));
         rr.doCommand();
         System.out.println("Duration after deletion: " + tour.getTotalDuration());
         System.out.println("Distance after deletion: " + tour.getTotalDistance());
@@ -381,5 +409,27 @@ public class GraphProcessor {
         System.out.println("Distance after undo: " + tour.getTotalDistance());
         System.out.println("Nb paths: " + tour.getPaths().size());
         //System.out.println("Tour after deletion: " + tour);
+        */
+        
+        List<Long> newOrder = new ArrayList<>();
+        for(Path p : tour.getPaths()){
+            newOrder.add(p.getArrival().getId());
+        }
+        newOrder.remove(newOrder.size()-1);
+        Collections.shuffle(newOrder);
+        newOrder.add(0,tour.getPr().getDepot().getAddress().getId());
+        newOrder.add(tour.getPr().getDepot().getAddress().getId());
+        for(int i=1;i<=newOrder.size();i++){
+            System.out.println("Node "+ i +": " + newOrder.get(i-1).toString());
+        }
+        
+        Tour newTour = gp.changeOrder(tour,newOrder);
+        System.out.println("Duration after change: " + newTour.getTotalDuration());
+        System.out.println("Distance after change: " + newTour.getTotalDistance());
+        System.out.println("Nb paths: " + newTour.getPaths().size());
+        
+        for(Path p : newTour.getPaths()){
+            System.out.println(p);
+        }
     }
 }
