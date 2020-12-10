@@ -557,6 +557,11 @@ public class MenuPageController implements Observer {
         this.selectedNode = selectedNode;
     }
 
+    public boolean isNodeOnTour(String nodeId) {
+        Sprite sprite = sman.getSprite(nodeId);
+        return sprite != null;
+    }
+
     //PUBLIC FXML METHODS
     @FXML
     public void requestListClick(MouseEvent arg0) {

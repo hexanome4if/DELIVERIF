@@ -37,6 +37,9 @@ public class AddingRequestState extends State {
 
     @Override
     public void selectNode(String nodeId) {
+        if (mpc.isNodeOnTour(nodeId)) {
+            return;
+        }
         if (pickupId == null || deliveryId == null) {
             //super.selectNode(nodeId);
             if (pickupId == null) {
