@@ -481,16 +481,14 @@ public class MenuPageController implements Observer {
             }
         }
         if (selectedRequest == null) {
+            System.out.println("Request not found");
             return;
         }
         System.out.println("Found request");
         stopThread();
         RemoveRequestCommand rr = new RemoveRequestCommand(graphProcessor, tour, selectedRequest);
-        sman.removeSprite(selectedRequest.getDeliveryAddress().getId().toString());
-        sman.removeSprite(selectedRequest.getPickupAddress().getId().toString());
         sman.removeSprite("bigSprite");
         loc.addCommand(rr);
-        rr.doCommand();
 
     }
 
@@ -514,9 +512,30 @@ public class MenuPageController implements Observer {
         Request r = new Request(pickup, delivery, 120, 67);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
-        Request requestAdded = this.planningRequest.getRequests().get(this.planningRequest.getRequests().size() - 1);
-        this.displayRequest(r);
         this.defaultMode();
+    }
+    
+    public void removeSpriteRequest(Request r) {
+        String pickupId = r.getPickupAddress().getId().toString();
+        String deliveryId = r.getDeliveryAddress().getId().toString();
+        sman.removeSprite(pickupId);
+        sman.removeSprite(deliveryId);
+    }
+        
+    public void displayRequest(Request r) {
+        int[] rgb = randomColorSprite();
+        String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
+        Intersection pickupAddress = r.getPickupAddress();
+        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
+        pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+        pickupAddressSprite.setAttribute("ui.style", color);
+        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+
+        Intersection deliveryAdress = r.getDeliveryAddress();
+        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
+        deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+        deliveryAdressSprite.setAttribute("ui.style", color);
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);  
     }
 
     @Override
@@ -525,6 +544,7 @@ public class MenuPageController implements Observer {
         if (t != tour) {
             return;
         }
+        this.planningRequest = t.getPr();
         renderTour();
     }
 
@@ -718,22 +738,6 @@ public class MenuPageController implements Observer {
         txt.setId(deliveryAdressSprite.getId());
         txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
         this.requestList.getItems().add(txt);  
-    }
-    
-    private void displayRequest(Request r) {
-        int[] rgb = randomColorSprite();
-        String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
-        Intersection pickupAddress = r.getPickupAddress();
-        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
-        pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
-        pickupAddressSprite.setAttribute("ui.style", color);
-        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-
-        Intersection deliveryAdress = r.getDeliveryAddress();
-        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
-        deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
-        deliveryAdressSprite.setAttribute("ui.style", color);
-        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);  
     }
 
     private void resetEdge(String edgeId) {

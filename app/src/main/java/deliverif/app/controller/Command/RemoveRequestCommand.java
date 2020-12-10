@@ -6,6 +6,7 @@
 package deliverif.app.controller.Command;
 
 import deliverif.app.controller.GraphProcessor;
+import deliverif.app.controller.MenuPageController;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
 
@@ -36,12 +37,16 @@ public class RemoveRequestCommand implements Command {
 
     @Override
     public void doCommand() {
+        MenuPageController mpc = MenuPageController.getInstance();
+        mpc.removeSpriteRequest(request);
         gp.removeRequestFromTour(tour, request);
         tour.notifiyObservers(null);
     }
 
     @Override
     public void undoCommand() {
+        MenuPageController mpc = MenuPageController.getInstance();
+        mpc.displayRequest(request);
         tour.getPr().addRequest(request);
         tour.copyTour(oldTour);
         tour.notifiyObservers(null);
