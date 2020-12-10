@@ -55,7 +55,7 @@ public class TSP1 extends TemplateTSP {
     protected void onInit(Graph g, Vertex start) {
         for (Vertex v : g.getVertexMap().values()) {
             for (Edge e : v.getAdj()) {
-                if (e.dest.getId() == start.getId()) {
+                if (e.dest.getId().equals(start.getId())) {
                     System.out.println("Add: " + v.getId() + "-" + "0");
                     costs.put(v.getId() + "-" + "0", e.cost);
                 } else {

@@ -6,7 +6,6 @@
 package deliverif.app.controller.State;
 
 import deliverif.app.controller.MenuPageController;
-import deliverif.app.controller.State.State;
 import java.io.IOException;
 
 /**
@@ -14,10 +13,11 @@ import java.io.IOException;
  * @author zakaria
  */
 public class TourComputedState extends State {
+
     public TourComputedState(MenuPageController mpc) {
         super(mpc);
     }
-    
+
     @Override
     public void loadMap() throws IOException {
         mpc.loadMap();
@@ -43,11 +43,9 @@ public class TourComputedState extends State {
 
     @Override
     public void startAddRequest() {
-        // todo
         mpc.startAddRequest();
         mpc.setCurrentState(new AddingRequestState(mpc));
     }
-
 
     @Override
     public void redo() {
@@ -58,7 +56,5 @@ public class TourComputedState extends State {
     public void undo() {
         mpc.undo();
     }
-    
-    
-    
+
 }

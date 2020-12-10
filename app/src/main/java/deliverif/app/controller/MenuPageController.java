@@ -5,17 +5,17 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.controller.Command.AddRequestCommand;
 import deliverif.app.controller.Command.ListOfCommands;
 import deliverif.app.controller.Command.RemoveRequestCommand;
-import deliverif.app.controller.Command.AddRequestCommand;
+import deliverif.app.controller.Observer.Observable;
+import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
 import deliverif.app.controller.State.State;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.map.Segment;
-import deliverif.app.controller.Observer.Observable;
-import deliverif.app.controller.Observer.Observer;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -37,7 +37,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.PopupWindow;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
@@ -102,12 +101,11 @@ public class MenuPageController implements Observer {
 
     @FXML
     private ListView<Text> pathList;
-    
+
     @FXML
-    private ProgressIndicator progressIndicator; 
+    private ProgressIndicator progressIndicator;
 
     //PRIVATE ATTRIBUTES
-    
     private Map map;
 
     private PlanningRequest planningRequest = null;
@@ -177,9 +175,8 @@ public class MenuPageController implements Observer {
     public void updateSelection(GraphicElement element) {
 
         System.out.println("UPDATE SELECTION");
-        
+
         // EDGES
-        
         if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
             for (String id : this.graphEdges) {
@@ -221,7 +218,7 @@ public class MenuPageController implements Observer {
             return;
         }
         // NODE
-        
+
         if (this.planningRequest == null) {
             return;
         }
@@ -236,9 +233,8 @@ public class MenuPageController implements Observer {
         if (element.getSelectorType() != Selector.Type.SPRITE) {
             return;
         }
-        
-        // SPRITE
 
+        // SPRITE
         String idElement = element.getId();
         if (idElement.equals("segmentSprite")) {
             return;
@@ -249,18 +245,15 @@ public class MenuPageController implements Observer {
     public void loadMap() throws IOException {
         System.out.println("loadCityMapAction");
         Map m = App.choseMapFile(this.xmlReader);
-        
+
         if (m == null) {
-            showErrorAlert("Bad file","FORMAT ERRORS ON MAP FILE - Load another file");
+            showErrorAlert("Bad file", "FORMAT ERRORS ON MAP FILE - Load another file");
             return;
         } else if (m.isEmpty()) {
             return;
         } else {
             this.map = m;
         }
-        
-        
-        
 
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
@@ -365,8 +358,8 @@ public class MenuPageController implements Observer {
 
         int duration = time / 60; //minutes
         System.out.println("Duration/" + duration);
-        int hours = duration/60;
-        int mins = duration - (60*hours);
+        int hours = duration / 60;
+        int mins = duration - (60 * hours);
         //System.out.println("hours/" + duration + "/ min/" + min + "/ mins/" + mins);
 
         Date departure = this.tour.getDepartureTime();
@@ -503,8 +496,6 @@ public class MenuPageController implements Observer {
 
     public void startAddRequest() {
         System.out.println("Start add request");
-        //SelectNodeThread selectNodeThread = new SelectNodeThread(this);
-        //selectNodeThread.start();
     }
 
     public void addRequest(String pickupId, String deliveryId) {
@@ -592,7 +583,7 @@ public class MenuPageController implements Observer {
 
     @FXML
     private void addRequestAction() throws IOException {
-        System.out.println("addRequestAction");
+        currentState.startAddRequest();
     }
 
     @FXML
@@ -649,13 +640,13 @@ public class MenuPageController implements Observer {
 
     private void chargerPlanningRequests() throws IOException {
         PlanningRequest pr = App.choseRequestFile(this.xmlReader);
-        if(pr == null) {
-            showErrorAlert("Bad file","FORMAT ERRORS ON REQUEST FILE - Load another file");
+        if (pr == null) {
+            showErrorAlert("Bad file", "FORMAT ERRORS ON REQUEST FILE - Load another file");
             return;
-        } else if (pr.isEmpty()){ 
+        } else if (pr.isEmpty()) {
             return;
-        }        
-        
+        }
+
         if (planningRequest != null) {
             initUI();
 
@@ -667,7 +658,7 @@ public class MenuPageController implements Observer {
                 sman.removeSprite(id);
             }
         }
-        
+
         this.planningRequest = pr;
 
         Text txt;
