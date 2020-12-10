@@ -32,10 +32,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.PopupWindow;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
@@ -100,8 +102,12 @@ public class MenuPageController implements Observer {
 
     @FXML
     private ListView<Text> pathList;
+    
+    @FXML
+    private ProgressIndicator progressIndicator; 
 
     //PRIVATE ATTRIBUTES
+    
     private Map map;
 
     private PlanningRequest planningRequest = null;
@@ -528,6 +534,10 @@ public class MenuPageController implements Observer {
 
     public Tour getTour() {
         return tour;
+    }
+
+    public GraphProcessor getGraphProcessor() {
+        return graphProcessor;
     }
 
     public String getSelectedNode() {
