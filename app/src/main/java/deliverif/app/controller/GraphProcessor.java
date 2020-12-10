@@ -72,8 +72,8 @@ public class GraphProcessor {
             gris.add(edg.dest);
         }
         noir.add(source);
-
-        while (!gris.isEmpty() && !noir.containsAll(goals)) {  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal
+        List<Vertex> found = new ArrayList<>();
+        while (!gris.isEmpty() && found.size() < goals.size()) {  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal
             float dis_MIN = Float.POSITIVE_INFINITY;
             Vertex vertex = null;
             // Parcours de liste gris pour trouver le noeud dont la valeur "distance" est minimal
@@ -102,6 +102,9 @@ public class GraphProcessor {
 
             gris.remove(vertex); //changement d'état gris->noir pour le noeud choisi
             noir.add(vertex);
+            if (goals.indexOf(vertex) != -1) {
+                found.add(vertex);
+            }
         }
 
         for (Vertex v : goals) {
