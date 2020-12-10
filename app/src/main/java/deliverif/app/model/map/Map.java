@@ -105,7 +105,12 @@ public class Map {
     public String toString() {
         return "Map{intersections=" + intersections + ", segments=" + segments + '}';
     }
-    
+
+    /**
+     * Return wether the map is empty or not
+     *
+     * @return wether the map is empty or not
+     */
     public boolean isEmpty() {
         return intersections == null || segments == null;
     }
