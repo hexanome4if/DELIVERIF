@@ -29,14 +29,15 @@ public class TimerThread extends Thread {
     public void run() {
         try {
             mpc.getTimerPane().setVisible(true);
+            mpc.getProgressIndicator().setVisible(true);
             Date beginning = new Date();
             Date current = new Date();
             while (continueRun && !mpc.getComputeTourThread().isIsFinished()) {
                 current = new Date();
                 int diff = (int) (current.getTime() - beginning.getTime()) / 1000;
-                mpc.getTimerText().setText("Time : " + diff + "s");
+                mpc.getTimerText().setText("Timer : " + diff + "s");
             }
-            mpc.getTimerText().setText("Tour computed !");
+            mpc.getTimerText().setText("Tour computed");
             mpc.getProgressIndicator().setVisible(false);
             mpc.getRenderTourButton().setVisible(true);
             isFinished = true;

@@ -718,9 +718,10 @@ public class MenuPageController implements Observer {
     private void chargerPlanningRequests() throws IOException {
         PlanningRequest pr = App.choseRequestFile(this.xmlReader);
         if(pr == null) {
-            showErrorAlert("Bad file","FORMAT ERRORS ON REQUEST FILE - Load another file");
+            showErrorAlert("Bad file","FORMAT ERRORS ON REQUEST FILE \nLoad another file");
             return;
         } else if (pr.isEmpty()){ 
+            showErrorAlert("Bad file","REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file");
             return;
         }        
         
