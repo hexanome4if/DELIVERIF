@@ -467,6 +467,14 @@ public class MenuPageController implements Observer {
         }
         System.out.println("Node selected");
         Request selectedRequest = null;
+        if(this.planningRequest.getDepot().getAddress().getId().toString().equals(this.selectedNode)) {
+           showErrorAlert("Suppression error","Impossible to remove the deposit");
+           return;
+        }
+        if(this.planningRequest.getRequests().size() == 1) {
+            showErrorAlert("Suppression error","Impossible to remove the request because it's the last one");
+            return;
+        }
         for (Request r : this.planningRequest.getRequests()) {
             String idPickupAddress = r.getPickupAddress().getId().toString();
             String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
