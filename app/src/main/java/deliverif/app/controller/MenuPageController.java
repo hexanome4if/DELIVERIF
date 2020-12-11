@@ -307,7 +307,11 @@ public class MenuPageController implements Observer {
 
     public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
-        if (this.xmlReader.getMap() == null) {
+        if (map == null) {
+            if(map == null){
+                showErrorAlert("Load a map", "You need to load a city map first");
+                return;
+            } 
             System.out.println("Il faut charger une map avant");
             return;
         }
@@ -316,18 +320,22 @@ public class MenuPageController implements Observer {
     }
 
     public void computeTour() {
+        
+        if(map == null){
+            showErrorAlert("Load a map", "You need to load a city map first");
+            return;
+        } 
+        if(this.planningRequest == null){
+            showErrorAlert("Load a request", "You need to load a request first");
+            return;
+        }
+        
+        addRequestMode();
         System.out.println("computeTourAction");
-        //tour = graphProcessor.optimalTour(this.planningRequest);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
         timerThread.start();
-        //while(!timerThread.isIsFinished()) {}
-        //this.tour = computeTourThread.getTour();
-        //tour.addObserver(this);
-
-        //renderTour();
-        //this.addRequestButton.setVisible(true);
     }
 
     public void renderTour() {
@@ -542,17 +550,18 @@ public class MenuPageController implements Observer {
         this.addRequestMode();
         this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
-
+  
     public void startSwapRequest() {
         System.out.println("Start swap request");
         this.addRequestMode();
         this.schowInfoAlert("Select a first point to swap", "Please select a point on the tour");
     }
 
-    public void addRequest(String pickupId, String deliveryId) {
+    public void addRequest(String pickupId, String deliveryId, int pickupDuration, int deliveryDuration) {
+
         Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
         Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
-        Request r = new Request(pickup, delivery, 120, 67);
+        Request r = new Request(pickup, delivery, pickupDuration, deliveryDuration);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
         this.defaultMode();
@@ -711,6 +720,7 @@ public class MenuPageController implements Observer {
 
     @FXML
     private void renderTourAction() {
+        defaultMode();
         this.renderTourButton.setVisible(false);
         this.timerPane.setVisible(false);
         System.out.println("renderTourAction");
@@ -885,6 +895,7 @@ public class MenuPageController implements Observer {
         this.requestList.setMouseTransparent(true);
         this.requestList.setFocusTraversable(false);
         this.swapRequestButton.setVisible(false);
+
     }
 
     private void defaultMode() {

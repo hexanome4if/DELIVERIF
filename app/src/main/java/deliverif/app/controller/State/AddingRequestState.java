@@ -8,6 +8,8 @@ package deliverif.app.controller.State;
 import deliverif.app.controller.Command.ListOfCommands;
 import deliverif.app.controller.Command.SelectNodeCommand;
 import deliverif.app.controller.MenuPageController;
+import java.util.Optional;
+import javafx.scene.control.TextInputDialog;
 
 /**
  *
@@ -17,6 +19,8 @@ public class AddingRequestState extends State {
 
     private String pickupId;
     private String deliveryId;
+    private int pickupDuration;
+    private int deliveryDuration;
     private ListOfCommands loc;
 
     /**
@@ -35,7 +39,7 @@ public class AddingRequestState extends State {
             System.out.println("Il manque des points de selection");
             return;
         }
-        mpc.addRequest(pickupId, deliveryId);
+        mpc.addRequest(pickupId, deliveryId, pickupDuration, deliveryDuration);
         mpc.setCurrentState(new TourComputedState(mpc));
         System.out.println("Requete ajoutée");
     }
@@ -53,12 +57,36 @@ public class AddingRequestState extends State {
                 loc.addCommand(snc);
                 snc.doCommand();
                 System.out.println("Pickup added");
+                TextInputDialog dialog = new TextInputDialog("Pickup Duration");
+                dialog.setTitle("Pickup duration");
+                dialog.setHeaderText("Enter pickup duration (secondes) : ");
+                dialog.setContentText("Duration :");
+                Optional<String> pickupDurationString = dialog.showAndWait();
+                while (!pickupDurationString.isPresent() || pickupDurationString.isEmpty() || !isParsable(pickupDurationString.get())) {
+                    dialog.setTitle("Pickup duration");
+                    dialog.setHeaderText("INVALID ANSWER - Enter pickup duration (secondes) : ");
+                    dialog.setContentText("Duration :");
+                    pickupDurationString = dialog.showAndWait();
+                }
+                pickupDuration = Integer.parseInt(pickupDurationString.get());
                 this.mpc.schowInfoAlert("Select Delivery point", "Pickup added ! Now select a delivery point on the map please.");
             } else if (deliveryId == null) {
                 SelectNodeCommand snc = new SelectNodeCommand(this, true, nodeId);
                 loc.addCommand(snc);
                 snc.doCommand();
                 System.out.println("Delivery added");
+                TextInputDialog dialog = new TextInputDialog("Delivery Duration");
+                dialog.setTitle("Delivery duration");
+                dialog.setHeaderText("Enter delivery duration (secondes) : ");
+                dialog.setContentText("Duration :");
+                Optional<String> deliveryDurationString = dialog.showAndWait();
+                while (!deliveryDurationString.isPresent() || deliveryDurationString.isEmpty() || !isParsable(deliveryDurationString.get())) {
+                    dialog.setTitle("Delivery duration");
+                    dialog.setHeaderText("INVALID ANSWER - Enter delivery duration (secondes) : ");
+                    dialog.setContentText("Duration :");
+                    deliveryDurationString = dialog.showAndWait();
+                }
+                deliveryDuration = Integer.parseInt(deliveryDurationString.get());
                 this.addRequest(); //On lance la requete
             }
         } else {
@@ -93,5 +121,16 @@ public class AddingRequestState extends State {
     public void setDeliveryId(String id) {
         deliveryId = id;
     }
+    
+    private boolean isParsable(String input) {
+    try {
+        System.out.println(input);
+        Integer.parseInt(input);
+        System.out.println("OK");
+        return true;
+    } catch (final NumberFormatException e) {
+        return false;
+    }
+}
 
 }
