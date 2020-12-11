@@ -155,6 +155,9 @@ public class XmlReader {
                         Long adrId = Long.parseLong(eElement.getAttribute("address"));
                         Intersection adr = map.getIntersections().get(adrId);
                         
+                        if(adr == null){
+                            break;
+                        }
                         Date departure = hourFormat.parse(eElement.getAttribute("departureTime"));
                         
                         depot = new Depot (adr, departure); 
@@ -190,7 +193,11 @@ public class XmlReader {
                     
                     Intersection pkAdr = map.getIntersections().get(pkId);
                     Intersection dlAdr = map.getIntersections().get(dlId);
-                            
+                    
+                    if(pkAdr == null || dlAdr == null){
+                        requests.clear();
+                        break;
+                    }
                     Request request = new Request(pkAdr, dlAdr, pkD, dlD);
                     requests.add(request); 
                 
