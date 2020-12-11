@@ -248,6 +248,7 @@ public class GraphProcessor {
         if (newOrder.size() != tour.getOrder().size()) {
             System.out.println("not the same length!!!!!!");
         }
+        newOrder.add(newOrder.get(0));
         Tour newTour = new Tour(tour);
         ArrayList<Path> newPaths = new ArrayList<>();
         for (int i = 0; i < newOrder.size() - 1; i++) {
