@@ -121,7 +121,7 @@ public class App extends Application {
     @Override
     public void stop() throws Exception {
         System.out.println("Arret de l'appli");
-        MenuPageController.stopThread();
+        MenuPageController.stopPathThread();
         super.stop();
     }
 

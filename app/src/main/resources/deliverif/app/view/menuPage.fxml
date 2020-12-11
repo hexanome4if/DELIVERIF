@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="890.0" style="-fx-background-color: #1DBCEB;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.MenuPageController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="1074.0" style="-fx-background-color: #1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="deliverif.app.controller.MenuPageController">
   <bottom>
     <Text fx:id="segmentNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="" textAlignment="CENTER" BorderPane.alignment="CENTER">
       <font>
@@ -17,9 +17,9 @@
   <center>
     <AnchorPane fx:id="mapPane" prefHeight="316.0" prefWidth="483.0" style="-fx-background-color:transparent;;" BorderPane.alignment="CENTER">
       <children>
-        <Text fx:id="loadMapText" layoutX="31.0" layoutY="157.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP" wrappingWidth="300.36962890625">
+        <Text fx:id="loadMapText" fill="WHITE" layoutX="28.0" layoutY="217.0" scaleX="1.0" scaleY="0.8792798559929338" strokeType="OUTSIDE" strokeWidth="0.0" text="YOU NEED TO LOAD A MAP" wrappingWidth="399.36962890625">
           <font>
-            <Font name="System Bold" size="15.0" />
+            <Font name="System Bold" size="24.0" fx:id="x2" />
           </font>
         </Text>
       </children>
@@ -31,23 +31,28 @@
   <left>
     <AnchorPane prefHeight="334.0" prefWidth="276.0">
       <children>
-        <AnchorPane layoutX="7.0" layoutY="1.0" prefHeight="56.0" prefWidth="287.0" style="-fx-background-color: #ebebe0; -fx-background-radius: 5;">
+        <AnchorPane layoutY="98.0" minHeight="40.0" prefHeight="66.0" prefWidth="286.0" style="-fx-background-color: #ebebe0; -fx-background-radius: 5;" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
+          <children>
+            <Text fx:id="infosTextTour2" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="282.9466247558594" AnchorPane.leftAnchor="2.0" />
+            <Text fx:id="infosTextTour1" layoutX="2.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tour Infos = " wrappingWidth="282.47003746032715" />
+          </children>
+        </AnchorPane>
+        <AnchorPane prefHeight="56.0" prefWidth="287.0" style="-fx-background-color: #ebebe0; -fx-background-radius: 5;" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0">
           <children>
             <Text fx:id="selectionText" layoutX="8.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selection :" wrappingWidth="271.05859375" />
             <Text id="infos" fx:id="infosText" layoutX="7.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Infos =" wrappingWidth="279.359375" />
           </children>
         </AnchorPane>
-        <ListView fx:id="requestList" onMouseClicked="#requestListClick" prefHeight="175.0" prefWidth="287.0" style="-fx-background-color: #ebebe0;" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="140.0" />
-        <AnchorPane layoutX="7.0" layoutY="63.0" prefHeight="53.0" prefWidth="286.0" style="-fx-background-color: #ebebe0; -fx-background-radius: 5;">
-          <children>
-            <Text fx:id="infosTextTour2" layoutX="2.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="282.9466247558594" />
-            <Text fx:id="infosTextTour1" layoutX="2.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tour Infos = " wrappingWidth="282.47003746032715">
-              <font>
-                <Font name="System Bold" size="12.0" />
-              </font>
-            </Text>
-          </children>
-        </AnchorPane>
+        <ListView fx:id="requestList" onMouseClicked="#requestListClick" prefHeight="139.0" prefWidth="287.0" style="-fx-background-color: #ebebe0;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="172.0" />
+        <TitledPane fx:id="streetsTitledPlane" animated="false" expanded="false" focusTraversable="false" prefHeight="164.0" prefWidth="286.0" text="Streets" visible="true" AnchorPane.leftAnchor="6.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="94.0" prefWidth="178.0">
+              <children>
+                <ListView id="streetsListView" fx:id="streetsList" prefHeight="163.99990000000253" prefWidth="283.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+              </children>
+            </AnchorPane>
+          </content>
+        </TitledPane>
       </children>
     </AnchorPane>
   </left>
@@ -71,6 +76,23 @@
           </VBox.margin>
         </Button>
         <Button id="computeTourButton" fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#deleteRequestAction" prefHeight="50.0" prefWidth="200.0" text="Delete Request" visible="false" VBox.margin="$x1" />
+        <AnchorPane fx:id="timerPane" prefHeight="106.0" prefWidth="104.0" visible="false">
+          <children>
+            <Text id="timeText" fx:id="timerText" fill="WHITE" layoutX="-7.0" scaleX="1.0" scaleY="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Time :" textAlignment="CENTER" wrappingWidth="110.1103515625" AnchorPane.leftAnchor="-7.0" AnchorPane.topAnchor="5.0">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font></Text>
+            <ProgressIndicator fx:id="progressIndicator" prefHeight="46.0" prefWidth="104.0" progress="-1.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="50.0" />
+          </children>
+          <VBox.margin>
+            <Insets top="5.0" />
+          </VBox.margin>
+        </AnchorPane>
+        <Button id="computeTourButton" fx:id="renderTourButton" mnemonicParsing="false" onAction="#renderTourAction" prefHeight="50.0" prefWidth="200.0" text="Render Tour" visible="false">
+          <VBox.margin>
+            <Insets bottom="15.0" top="20.0" fx:id="x1" />
+          </VBox.margin>
+        </Button>
       </children>
       <padding>
         <Insets top="40.0" />
