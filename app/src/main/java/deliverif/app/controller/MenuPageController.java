@@ -306,10 +306,10 @@ public class MenuPageController implements Observer {
     public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
         if (map == null) {
-            if(map == null){
+            if (map == null) {
                 showErrorAlert("Load a map", "You need to load a city map first");
                 return;
-            } 
+            }
             System.out.println("Il faut charger une map avant");
             return;
         }
@@ -318,16 +318,16 @@ public class MenuPageController implements Observer {
     }
 
     public void computeTour() {
-        
-        if(map == null){
+
+        if (map == null) {
             showErrorAlert("Load a map", "You need to load a city map first");
             return;
-        } 
-        if(this.planningRequest == null){
+        }
+        if (this.planningRequest == null) {
             showErrorAlert("Load a request", "You need to load a request first");
             return;
         }
-        
+
         addRequestMode();
         System.out.println("computeTourAction");
         //tour = graphProcessor.optimalTour(this.planningRequest);
@@ -549,7 +549,7 @@ public class MenuPageController implements Observer {
         this.addRequestMode();
         this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
-  
+
     public void startSwapRequest() {
         System.out.println("Start swap request");
         this.addRequestMode();
@@ -565,7 +565,7 @@ public class MenuPageController implements Observer {
         loc.addCommand(ar);
         this.defaultMode();
     }
-  
+
     public void swapRequest(String firstId, String secondId) {
         ArrayList<Long> requestIds = new ArrayList<>();
         for (Path p : tour.getPaths()) {
@@ -612,6 +612,7 @@ public class MenuPageController implements Observer {
         } else if (observed instanceof TourGenerator) {
             boolean isFinished = (boolean) arg;
             if (isFinished) {
+                defaultMode();
                 renderTourButton.setVisible(false);
                 this.renderTourButton.setVisible(false);
                 this.timerPane.setVisible(false);
