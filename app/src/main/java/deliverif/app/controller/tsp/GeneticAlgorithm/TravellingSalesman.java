@@ -46,8 +46,8 @@ public class TravellingSalesman {
         this.targetFitness = targetFitness;
         this.genomeSize = start.getAdj().size();
 
-        generationSize = 5000;
-        reproductionSize = 200;
+        generationSize = 1000;
+        reproductionSize = 750;
         this.maxIterations = maxIterations;
         mutationRate = 0.1f;
         tournamentSize = 40;
@@ -205,7 +205,10 @@ public class TravellingSalesman {
         for (int i = 0; i < maxIterations; i++) {
             List<SalesmanGenome> selected = selection(population);
             population = createGeneration(selected);
-            globalBestGenome = Collections.min(population);
+            SalesmanGenome popBest = Collections.min(population);
+            if (popBest.getFitness() < globalBestGenome.getFitness()) {
+                globalBestGenome = popBest;
+            }
         }
         globalBestGenome.getGenome().add(0, start);
         return globalBestGenome;

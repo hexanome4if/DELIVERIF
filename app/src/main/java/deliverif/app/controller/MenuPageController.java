@@ -13,14 +13,13 @@ import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
 import deliverif.app.controller.State.State;
+import deliverif.app.controller.thread.ComputeTourThread;
+import deliverif.app.controller.thread.TimerThread;
+import deliverif.app.controller.tsp.TourGenerator;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.map.Segment;
-import deliverif.app.controller.Observer.Observable;
-import deliverif.app.controller.Observer.Observer;
-import deliverif.app.controller.thread.ComputeTourThread;
-import deliverif.app.controller.thread.TimerThread;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -33,7 +32,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -332,6 +330,11 @@ public class MenuPageController implements Observer {
         
         addRequestMode();
         System.out.println("computeTourAction");
+        //tour = graphProcessor.optimalTour(this.planningRequest);
+        TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);
+        System.out.println("Optimal");
+        tourGenerator.addObserver(this);
+        renderTourButton.setVisible(true);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
@@ -378,7 +381,6 @@ public class MenuPageController implements Observer {
                 }
             }
             Long departId = p.getDeparture().getId();
-            System.out.println("Point: " + departId);
             String typePoint = tour.getPr().researchTypeIntersection(departId);
 
             if (typePoint != "") {
@@ -398,11 +400,9 @@ public class MenuPageController implements Observer {
         float distance = this.tour.getTotalDistance();
         int time = this.tour.getTotalDuration(); //seconds
 
-        System.out.println("getDuration/" + time);
         distance = distance / 1000;
 
         int duration = time / 60; //minutes
-        System.out.println("Duration/" + duration);
         int hours = duration / 60;
         int mins = duration - (60 * hours);
         //System.out.println("hours/" + duration + "/ min/" + min + "/ mins/" + mins);
@@ -413,7 +413,6 @@ public class MenuPageController implements Observer {
         this.infosTextTour1.setText("TOUR = " + String.format("%.03f", distance) + " km / " + hours + "h" + mins + "min");
         this.infosTextTour2.setText("from " + dtf.format(departure) + " to " + dtf.format(arrival));
 
-        System.out.println("compute tour done");
     }
 
     public void setSelectedSprite(String spriteId) {
@@ -566,7 +565,7 @@ public class MenuPageController implements Observer {
         loc.addCommand(ar);
         this.defaultMode();
     }
-
+  
     public void swapRequest(String firstId, String secondId) {
         ArrayList<Long> requestIds = new ArrayList<>();
         for (Path p : tour.getPaths()) {
@@ -603,12 +602,28 @@ public class MenuPageController implements Observer {
 
     @Override
     public void update(Observable observed, Object arg) {
-        Tour t = (Tour) observed;
-        if (t != tour) {
-            return;
+        if (observed instanceof Tour) {
+            Tour t = (Tour) observed;
+            if (t != tour) {
+                return;
+            }
+            this.planningRequest = t.getPr();
+            renderTour();
+        } else if (observed instanceof TourGenerator) {
+            boolean isFinished = (boolean) arg;
+            if (isFinished) {
+                renderTourButton.setVisible(false);
+                this.renderTourButton.setVisible(false);
+                this.timerPane.setVisible(false);
+                this.addRequestButton.setVisible(true);
+
+            }
+            TourGenerator tourGenerator = (TourGenerator) observed;
+            this.tour = tourGenerator.getTour();
+            this.tour.addObserver(this);
+            this.planningRequest = tour.getPr();
+            renderTour();
         }
-        this.planningRequest = t.getPr();
-        renderTour();
     }
 
     public void undo() {
@@ -723,8 +738,8 @@ public class MenuPageController implements Observer {
         defaultMode();
         this.renderTourButton.setVisible(false);
         this.timerPane.setVisible(false);
-        System.out.println("renderTourAction");
-        this.tour = computeTourThread.getTour();
+        System.out.println("cancel");
+        computeTourThread.stop();
         tour.addObserver(this);
         renderTour();
         this.addRequestButton.setVisible(true);

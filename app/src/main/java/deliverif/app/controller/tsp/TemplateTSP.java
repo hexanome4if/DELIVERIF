@@ -9,6 +9,7 @@ package deliverif.app.controller.tsp;
  *
  * @author zakaria
  */
+import deliverif.app.controller.Observer.Observable;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;
@@ -18,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class TemplateTSP implements TSP {
+public abstract class TemplateTSP extends Observable implements TSP {
 
     private Vertex[] bestSol;
     protected Graph g;
@@ -42,6 +43,7 @@ public abstract class TemplateTSP implements TSP {
         visited.add(start); // The first visited vertex is 0
         bestSolCost = Integer.MAX_VALUE;
         branchAndBound(start, unvisited, visited, 0, start, ordre);
+        this.notifiyObservers(true);
     }
 
     public Vertex[] getSolution() {
@@ -101,6 +103,7 @@ public abstract class TemplateTSP implements TSP {
                 if (currentCost + currentVertex.getCost(start) < bestSolCost) {
                     bestSol = visited.toArray(bestSol);
                     bestSolCost = currentCost + currentVertex.getCost(start);
+                    this.notifiyObservers(false);
                 }
             }
         } else if (currentCost + bound(currentVertex, unvisited) < bestSolCost) {

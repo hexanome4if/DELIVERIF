@@ -7,27 +7,26 @@ package deliverif.app.controller.thread;
 
 import deliverif.app.controller.MenuPageController;
 import deliverif.app.model.graph.Tour;
-import deliverif.app.model.request.Path;
 
 /**
  *
  * @author faouz
  */
 public class ComputeTourThread extends Thread {
-    
+
     private MenuPageController mpc;
     private volatile boolean continueRun = true;
     private volatile boolean isFinished = false;
     private Tour tour = null;
-    
+
     public ComputeTourThread(MenuPageController mpc) {
         this.mpc = mpc;
     }
-    
-     @Override
+
+    @Override
     public void run() {
         try {
-            tour = mpc.getGraphProcessor().optimalTour(mpc.getPlanningRequest());
+            mpc.getGraphProcessor().startAlgo();
             isFinished = true;
         } catch (Exception e) {
             System.err.println("ComputeTourThread error : " + e);
@@ -41,8 +40,8 @@ public class ComputeTourThread extends Thread {
 
     public boolean isIsFinished() {
         return isFinished;
-    }   
-    
+    }
+
     public Tour getTour() {
         return tour;
     }

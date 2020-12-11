@@ -94,7 +94,7 @@
             <Insets top="5.0" />
           </VBox.margin>
         </AnchorPane>
-        <Button id="computeTourButton" fx:id="renderTourButton" mnemonicParsing="false" onAction="#renderTourAction" prefHeight="50.0" prefWidth="200.0" text="Render Tour" visible="false">
+        <Button id="computeTourButton" fx:id="renderTourButton" mnemonicParsing="false" onAction="#renderTourAction" prefHeight="50.0" prefWidth="200.0" text="Stop research" visible="false">
           <VBox.margin>
             <Insets bottom="15.0" top="20.0" fx:id="x1" />
           </VBox.margin>
