@@ -9,6 +9,7 @@ import deliverif.app.controller.tsp.GeneticAlgorithm.SalesmanGenome;
 import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman;
 import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman.SelectionType;
 import deliverif.app.controller.tsp.TSP1;
+import deliverif.app.controller.tsp.TourGenerator;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Tour;
@@ -22,7 +23,6 @@ import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +36,9 @@ public class GraphProcessor {
     private Graph graph;
     private Map map;
     private HashMap<String, VertexPath> fullPath;
-    private List<Vertex> currentVertex;
+    public List<Vertex> currentVertex;
+    private TSP1 currentTsp;
+    private PlanningRequest pr;
 
     public GraphProcessor(Map m) {
         graph = new Graph();
@@ -144,15 +146,9 @@ public class GraphProcessor {
     }
 
     public TSP1 hamiltonianCircuit(PlanningRequest pr) {
-        Graph g = completeGraph(pr);
+
         TSP1 tsp = new TSP1();
 
-        List<Long> ordre = new ArrayList<>();
-        for (Request r : pr.getRequests()) {
-            ordre.add(r.getPickupAddress().getId());
-            ordre.add(r.getDeliveryAddress().getId());
-        }
-        tsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
         return tsp;
     }
 
@@ -185,62 +181,23 @@ public class GraphProcessor {
         return path;
     }
 
-    public Tour optimalTour(PlanningRequest pr) {
+    public TourGenerator optimalTour(PlanningRequest pr) {
         currentVertex.clear();
-        Tour tour = new Tour(pr);
+        this.pr = pr;
         fullPath.clear();
-        /*TSP1 tsp = hamiltonianCircuit(pr);
-        Vertex[] sol = tsp.getSolution();*/
-        Vertex[] sol = hamiltonianCircuit2(pr);
-        double velocity = 15 * 1000 / 3600;
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(pr.getDepot().getDepartureTime());
-        if (sol == null || sol[0] == null) {
-            return null;
-        }
-        for (int i = 0; i < sol.length; i++) {
-            System.out.println("Vertex " + i + ":" + sol[i].getId());
-            currentVertex.add(sol[i]);
-        }
-        HashMap<Long, Integer> pickups = new HashMap<>();
-        HashMap<Long, Integer> deliveries = new HashMap<>();
-        for (Request r : pr.getRequests()) {
-            pickups.put(r.getPickupAddress().getId(), r.getPickupDuration());
-            deliveries.put(r.getDeliveryAddress().getId(), r.getDeliveryDuration());
-        }
-        System.out.println("---------Tour Deets---------");
-        // Adding paths excluding warehouse
-        for (int i = 0; i < sol.length - 1; i++) {
-            Intersection curr = map.getIntersectionParId(sol[i].getId());
-            Intersection next = map.getIntersectionParId(sol[i + 1].getId());
-            System.out.println("Going from: " + curr.getId() + " to: " + next.getId());
-            Path path = shortestPathBetweenTwoIntersections(curr, next);
-            path.setDepatureTime(cal.getTime());
-            int commute = (int) (path.getLength() / velocity);
+        currentTsp = hamiltonianCircuit(pr);
+        TourGenerator tourGenerator = new TourGenerator(currentTsp, pr, this, map);
+        return tourGenerator;
+    }
 
-            cal.add(Calendar.SECOND, commute);
-            path.setArrivalTime(cal.getTime());
-            if (pickups.containsKey(next.getId())) {
-                commute = pickups.get(next.getId());
-            } else if (deliveries.containsKey(next.getId())) {
-                commute = deliveries.get(next.getId());
-            }
-            cal.add(Calendar.SECOND, commute);
-            //System.out.println("Path" + i + ":" + path + "\n");
-            tour.addPath(path);
+    public void startAlgo() {
+        Graph g = completeGraph(pr);
+        List<Long> ordre = new ArrayList<>();
+        for (Request r : pr.getRequests()) {
+            ordre.add(r.getPickupAddress().getId());
+            ordre.add(r.getDeliveryAddress().getId());
         }
-        // Adding path back to warehouse
-        Intersection last = map.getIntersectionParId(sol[sol.length - 1].getId());
-        Intersection warehouse = pr.getDepot().getAddress();
-        System.out.println("Going from: " + last + "to: " + warehouse.getId());
-        Path back = shortestPathBetweenTwoIntersections(last, warehouse);
-        back.setDepatureTime(cal.getTime());
-        int commute = (int) (back.getLength() / velocity);
-        cal.add(Calendar.SECOND, commute);
-        back.setArrivalTime(cal.getTime());
-        tour.addPath(back);
-        System.out.println("-----------End of Tour---------");
-        return tour;
+        currentTsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
     }
 
     public Tour changeOrder(Tour tour, List<Long> newOrder) {
@@ -420,9 +377,9 @@ public class GraphProcessor {
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp = new GraphProcessor(reader.getMap());
         PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
-        Tour tour = gp.optimalTour(pr);
+        // Tour tour = gp.optimalTour(pr);
         //System.out.println("Tour before deletion: " + tour);
-        System.out.println("Duration before deletion: " + tour.getTotalDuration());
+        /*System.out.println("Duration before deletion: " + tour.getTotalDuration());
         System.out.println("Distance before deletion: " + tour.getTotalDistance());
         System.out.println("Nb paths: " + tour.getPaths().size());
         //gp.removeRequestFromTour(tour, pr.getRequests().get(1));
@@ -440,6 +397,7 @@ public class GraphProcessor {
         System.out.println("Nb paths: " + tour.getPaths().size());
         //System.out.println("Tour after deletion: " + tour);
          */
+ /*
         List<Long> newOrder = new ArrayList<>();
         for (Path p : tour.getPaths()) {
             newOrder.add(p.getArrival().getId());
@@ -459,6 +417,6 @@ public class GraphProcessor {
 
         for (Path p : newTour.getPaths()) {
             System.out.println(p);
-        }
+        }*/
     }
 }

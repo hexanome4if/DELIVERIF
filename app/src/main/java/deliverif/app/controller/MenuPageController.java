@@ -12,14 +12,13 @@ import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
 import deliverif.app.controller.State.State;
+import deliverif.app.controller.thread.ComputeTourThread;
+import deliverif.app.controller.thread.TimerThread;
+import deliverif.app.controller.tsp.TourGenerator;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.map.Segment;
-import deliverif.app.controller.Observer.Observable;
-import deliverif.app.controller.Observer.Observer;
-import deliverif.app.controller.thread.ComputeTourThread;
-import deliverif.app.controller.thread.TimerThread;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -31,7 +30,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -109,20 +107,20 @@ public class MenuPageController implements Observer {
     private ListView<Text> pathList;
 
     @FXML
-    private ProgressIndicator progressIndicator; 
-    
+    private ProgressIndicator progressIndicator;
+
     @FXML
     private TitledPane streetsTitledPlane;
-    
+
     @FXML
     private ListView<String> streetsList;
-    
-    @FXML 
+
+    @FXML
     private AnchorPane timerPane;
-    
+
     @FXML
     private Text timerText;
-    
+
     @FXML
     private Button renderTourButton;
 
@@ -154,11 +152,10 @@ public class MenuPageController implements Observer {
     private final XmlReader xmlReader = new XmlReader();
 
     private static PathThread pathThread = null;
-    
+
     private static ComputeTourThread computeTourThread = null;
-    
+
     private static TimerThread timerThread = null;
-    
 
     // Instance (Singleton)
     private static MenuPageController instance = null;
@@ -313,6 +310,8 @@ public class MenuPageController implements Observer {
     public void computeTour() {
         System.out.println("computeTourAction");
         //tour = graphProcessor.optimalTour(this.planningRequest);
+        TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);
+        tourGenerator.addObserver(this);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
@@ -320,7 +319,7 @@ public class MenuPageController implements Observer {
         //while(!timerThread.isIsFinished()) {}
         //this.tour = computeTourThread.getTour();
         //tour.addObserver(this);
-        
+
         //renderTour();
         //this.addRequestButton.setVisible(true);
     }
@@ -365,7 +364,6 @@ public class MenuPageController implements Observer {
                 }
             }
             Long departId = p.getDeparture().getId();
-            System.out.println("Point: " + departId);
             String typePoint = tour.getPr().researchTypeIntersection(departId);
 
             if (typePoint != "") {
@@ -385,11 +383,9 @@ public class MenuPageController implements Observer {
         float distance = this.tour.getTotalDistance();
         int time = this.tour.getTotalDuration(); //seconds
 
-        System.out.println("getDuration/" + time);
         distance = distance / 1000;
 
         int duration = time / 60; //minutes
-        System.out.println("Duration/" + duration);
         int hours = duration / 60;
         int mins = duration - (60 * hours);
         //System.out.println("hours/" + duration + "/ min/" + min + "/ mins/" + mins);
@@ -400,7 +396,6 @@ public class MenuPageController implements Observer {
         this.infosTextTour1.setText("TOUR = " + String.format("%.03f", distance) + " km / " + hours + "h" + mins + "min");
         this.infosTextTour2.setText("from " + dtf.format(departure) + " to " + dtf.format(arrival));
 
-        System.out.println("compute tour done");
     }
 
     public void setSelectedSprite(String spriteId) {
@@ -546,14 +541,14 @@ public class MenuPageController implements Observer {
         loc.addCommand(ar);
         this.defaultMode();
     }
-    
+
     public void removeSpriteRequest(Request r) {
         String pickupId = r.getPickupAddress().getId().toString();
         String deliveryId = r.getDeliveryAddress().getId().toString();
         sman.removeSprite(pickupId);
         sman.removeSprite(deliveryId);
     }
-        
+
     public void displayRequest(Request r) {
         int[] rgb = randomColorSprite();
         String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
@@ -567,17 +562,25 @@ public class MenuPageController implements Observer {
         Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
         deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
         deliveryAdressSprite.setAttribute("ui.style", color);
-        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);  
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
     }
 
     @Override
     public void update(Observable observed, Object arg) {
-        Tour t = (Tour) observed;
-        if (t != tour) {
-            return;
+        if (observed instanceof Tour) {
+            Tour t = (Tour) observed;
+            if (t != tour) {
+                return;
+            }
+            this.planningRequest = t.getPr();
+            renderTour();
+        } else if (observed instanceof TourGenerator) {
+            TourGenerator tourGenerator = (TourGenerator) observed;
+            this.tour = tourGenerator.getTour();
+            this.tour.addObserver(this);
+            this.planningRequest = tour.getPr();
+            renderTour();
         }
-        this.planningRequest = t.getPr();
-        renderTour();
     }
 
     public void undo() {
@@ -623,11 +626,10 @@ public class MenuPageController implements Observer {
     public Text getTimerText() {
         return timerText;
     }
-    
+
     public void setSelectedNode(String selectedNode) {
         this.selectedNode = selectedNode;
     }
-
 
     public boolean isNodeOnTour(String nodeId) {
         Sprite sprite = sman.getSprite(nodeId);
@@ -687,7 +689,7 @@ public class MenuPageController implements Observer {
         this.currentState.removeRequest();
         this.deleteRequestButton.setVisible(false);
     }
-    
+
     @FXML
     private void renderTourAction() {
         this.renderTourButton.setVisible(false);
@@ -745,24 +747,25 @@ public class MenuPageController implements Observer {
         }
 
     }
-    
+
     private void completePathList(int num) {
         streetsList.getItems().clear();
-        Path p = tour.getPaths().get(num-1);
-        for(int i = p.getSegments().size()-1 ; i >= 0 ; i--) {
+        Path p = tour.getPaths().get(num - 1);
+        for (int i = p.getSegments().size() - 1; i >= 0; i--) {
             Segment s = p.getSegments().get(i);
-            if(!this.streetsList.getItems().contains(s.getName()) && (s.getName()!="") ) {
+            if (!this.streetsList.getItems().contains(s.getName()) && (s.getName() != "")) {
                 this.streetsList.getItems().add(s.getName());
             }
         }
     }
+
     private void chargerPlanningRequests() throws IOException {
         PlanningRequest pr = App.choseRequestFile(this.xmlReader);
-        if(pr == null) {
-            showErrorAlert("Bad file","FORMAT ERRORS ON REQUEST FILE \nLoad another file");
+        if (pr == null) {
+            showErrorAlert("Bad file", "FORMAT ERRORS ON REQUEST FILE \nLoad another file");
             return;
-        } else if (pr.isEmpty()){ 
-            showErrorAlert("Bad file","REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file");
+        } else if (pr.isEmpty()) {
+            showErrorAlert("Bad file", "REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file");
 
             return;
         }
@@ -796,7 +799,7 @@ public class MenuPageController implements Observer {
             cpt++;
         }
     }
-    
+
     private void displayRequestWithAddToListView(Request r, int cpt) {
         Text txt;
         int[] rgb = randomColorSprite();
@@ -819,7 +822,7 @@ public class MenuPageController implements Observer {
         txt = new Text("Delivery " + cpt);
         txt.setId(deliveryAdressSprite.getId());
         txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
-        this.requestList.getItems().add(txt);  
+        this.requestList.getItems().add(txt);
     }
 
     private void resetEdge(String edgeId) {
