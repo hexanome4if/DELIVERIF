@@ -7,6 +7,7 @@ package deliverif.app.model.map;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -72,11 +73,11 @@ public class Map {
      * @param destination second intersection
      * @return the segment between origine and destination or null
      */
-    public Segment getSegmentParExtremites(Intersection origine, Intersection destination) {
+    public Segment getSegmentParExtremites(Long origine, Long destination) {
         for (Segment s : segments) {
-            if (s.getOrigin() == origine && s.getDestination() == destination) {
+            if (Objects.equals(s.getOrigin().getId(), origine) && Objects.equals(s.getDestination().getId(), destination)) {
                 return s;
-            } else if (s.getOrigin() == destination && s.getDestination() == origine) {
+            } else if (Objects.equals(s.getOrigin().getId(), destination) && Objects.equals(s.getDestination().getId(), origine)) {
                 return s;
             }
         }
@@ -105,7 +106,12 @@ public class Map {
     public String toString() {
         return "Map{intersections=" + intersections + ", segments=" + segments + '}';
     }
-    
+
+    /**
+     * Return wether the map is empty or not
+     *
+     * @return wether the map is empty or not
+     */
     public boolean isEmpty() {
         return intersections == null || segments == null;
     }

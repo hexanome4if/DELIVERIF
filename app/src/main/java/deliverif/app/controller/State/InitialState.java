@@ -6,8 +6,6 @@
 package deliverif.app.controller.State;
 
 import deliverif.app.controller.MenuPageController;
-import deliverif.app.controller.State.MapLoadedState;
-import deliverif.app.controller.State.State;
 import java.io.IOException;
 
 /**
@@ -16,15 +14,19 @@ import java.io.IOException;
  */
 public class InitialState extends State {
 
+    /**
+     * Start the initial state with no map selected
+     *
+     * @param mpc the current view controller
+     */
     public InitialState(MenuPageController mpc) {
         super(mpc);
     }
 
-    
     @Override
     public void loadMap() throws IOException {
         mpc.loadMap();
         mpc.setCurrentState(new MapLoadedState(mpc));
     }
-    
+
 }

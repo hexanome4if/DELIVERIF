@@ -5,9 +5,11 @@
  */
 package deliverif.app.controller;
 
+import deliverif.app.controller.Command.AddRequestCommand;
 import deliverif.app.controller.Command.ListOfCommands;
 import deliverif.app.controller.Command.RemoveRequestCommand;
-import deliverif.app.controller.Command.AddRequestCommand;
+import deliverif.app.controller.Observer.Observable;
+import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
 import deliverif.app.controller.State.State;
 import deliverif.app.model.graph.Tour;
@@ -41,7 +43,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.PopupWindow;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.ElementNotFoundException;
@@ -106,7 +107,7 @@ public class MenuPageController implements Observer {
 
     @FXML
     private ListView<Text> pathList;
-    
+
     @FXML
     private ProgressIndicator progressIndicator; 
     
@@ -126,7 +127,6 @@ public class MenuPageController implements Observer {
     private Button renderTourButton;
 
     //PRIVATE ATTRIBUTES
-    
     private Map map;
 
     private PlanningRequest planningRequest = null;
@@ -201,9 +201,8 @@ public class MenuPageController implements Observer {
     public void updateSelection(GraphicElement element) {
 
         System.out.println("UPDATE SELECTION");
-        
+
         // EDGES
-        
         if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
             for (String id : this.graphEdges) {
@@ -245,7 +244,7 @@ public class MenuPageController implements Observer {
             return;
         }
         // NODE
-        
+
         if (this.planningRequest == null) {
             return;
         }
@@ -260,9 +259,8 @@ public class MenuPageController implements Observer {
         if (element.getSelectorType() != Selector.Type.SPRITE) {
             return;
         }
-        
-        // SPRITE
 
+        // SPRITE
         String idElement = element.getId();
         if (idElement.equals("segmentSprite")) {
             return;
@@ -273,18 +271,15 @@ public class MenuPageController implements Observer {
     public void loadMap() throws IOException {
         System.out.println("loadCityMapAction");
         Map m = App.choseMapFile(this.xmlReader);
-        
+
         if (m == null) {
-            showErrorAlert("Bad file","FORMAT ERRORS ON MAP FILE - Load another file");
+            showErrorAlert("Bad file", "FORMAT ERRORS ON MAP FILE - Load another file");
             return;
         } else if (m.isEmpty()) {
             return;
         } else {
             this.map = m;
         }
-        
-        
-        
 
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.styleSheet);
@@ -345,7 +340,6 @@ public class MenuPageController implements Observer {
         int[] rgb = randomColorSprite();
 
         for (Path p : tour.getPaths()) {
-
             String id = "";
             for (Segment s : p.getSegments()) {
                 String originId = s.getOrigin().getId().toString();
@@ -371,6 +365,7 @@ public class MenuPageController implements Observer {
                 }
             }
             Long departId = p.getDeparture().getId();
+            System.out.println("Point: " + departId);
             String typePoint = tour.getPr().researchTypeIntersection(departId);
 
             if (typePoint != "") {
@@ -395,8 +390,8 @@ public class MenuPageController implements Observer {
 
         int duration = time / 60; //minutes
         System.out.println("Duration/" + duration);
-        int hours = duration/60;
-        int mins = duration - (60*hours);
+        int hours = duration / 60;
+        int mins = duration - (60 * hours);
         //System.out.println("hours/" + duration + "/ min/" + min + "/ mins/" + mins);
 
         Date departure = this.tour.getDepartureTime();
@@ -497,6 +492,14 @@ public class MenuPageController implements Observer {
         }
         System.out.println("Node selected");
         Request selectedRequest = null;
+        if (this.planningRequest.getDepot().getAddress().getId().toString().equals(this.selectedNode)) {
+            showErrorAlert("Suppression error", "Impossible to remove the deposit");
+            return;
+        }
+        if (this.planningRequest.getRequests().size() == 1) {
+            showErrorAlert("Suppression error", "Impossible to remove the request because it's the last one");
+            return;
+        }
         for (Request r : this.planningRequest.getRequests()) {
             String idPickupAddress = r.getPickupAddress().getId().toString();
             String idDeliveryAdress = r.getDeliveryAddress().getId().toString();
@@ -510,23 +513,29 @@ public class MenuPageController implements Observer {
             }
         }
         if (selectedRequest == null) {
+            System.out.println("Request not found");
             return;
         }
         System.out.println("Found request");
         stopPathThread();
         RemoveRequestCommand rr = new RemoveRequestCommand(graphProcessor, tour, selectedRequest);
-        sman.removeSprite(selectedRequest.getDeliveryAddress().getId().toString());
-        sman.removeSprite(selectedRequest.getPickupAddress().getId().toString());
         sman.removeSprite("bigSprite");
         loc.addCommand(rr);
-        rr.doCommand();
 
+    }
+
+    public void schowInfoAlert(String title, String content) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     public void startAddRequest() {
         System.out.println("Start add request");
-        //SelectNodeThread selectNodeThread = new SelectNodeThread(this);
-        //selectNodeThread.start();
+        this.addRequestMode();
+        this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
 
     public void addRequest(String pickupId, String deliveryId) {
@@ -535,6 +544,30 @@ public class MenuPageController implements Observer {
         Request r = new Request(pickup, delivery, 120, 67);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
+        this.defaultMode();
+    }
+    
+    public void removeSpriteRequest(Request r) {
+        String pickupId = r.getPickupAddress().getId().toString();
+        String deliveryId = r.getDeliveryAddress().getId().toString();
+        sman.removeSprite(pickupId);
+        sman.removeSprite(deliveryId);
+    }
+        
+    public void displayRequest(Request r) {
+        int[] rgb = randomColorSprite();
+        String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
+        Intersection pickupAddress = r.getPickupAddress();
+        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
+        pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+        pickupAddressSprite.setAttribute("ui.style", color);
+        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+
+        Intersection deliveryAdress = r.getDeliveryAddress();
+        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
+        deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+        deliveryAdressSprite.setAttribute("ui.style", color);
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);  
     }
 
     @Override
@@ -543,6 +576,7 @@ public class MenuPageController implements Observer {
         if (t != tour) {
             return;
         }
+        this.planningRequest = t.getPr();
         renderTour();
     }
 
@@ -594,6 +628,11 @@ public class MenuPageController implements Observer {
         this.selectedNode = selectedNode;
     }
 
+
+    public boolean isNodeOnTour(String nodeId) {
+        Sprite sprite = sman.getSprite(nodeId);
+        return sprite != null;
+
     public Button getRenderTourButton() {
         return renderTourButton;
     }
@@ -638,7 +677,7 @@ public class MenuPageController implements Observer {
 
     @FXML
     private void addRequestAction() throws IOException {
-        System.out.println("addRequestAction");
+        currentState.startAddRequest();
     }
 
     @FXML
@@ -723,9 +762,10 @@ public class MenuPageController implements Observer {
             return;
         } else if (pr.isEmpty()){ 
             showErrorAlert("Bad file","REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file");
+
             return;
-        }        
-        
+        }
+
         if (planningRequest != null) {
             initUI();
 
@@ -737,7 +777,7 @@ public class MenuPageController implements Observer {
                 sman.removeSprite(id);
             }
         }
-        
+
         this.planningRequest = pr;
 
         Text txt;
@@ -751,30 +791,34 @@ public class MenuPageController implements Observer {
         this.requestList.getItems().add(txt);
         int cpt = 1;
         for (Request r : planningRequest.getRequests()) {
-
-            int[] rgb = randomColorSprite();
-            String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
-            Intersection pickupAddress = r.getPickupAddress();
-            Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
-            pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
-            pickupAddressSprite.setAttribute("ui.style", color);
-            pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
-            txt = new Text("Pickup " + cpt);
-            txt.setId(pickupAddressSprite.getId());
-            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
-            this.requestList.getItems().add(txt);
-
-            Intersection deliveryAdress = r.getDeliveryAddress();
-            Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
-            deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
-            deliveryAdressSprite.setAttribute("ui.style", color);
-            deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
-            txt = new Text("Delivery " + cpt);
-            txt.setId(deliveryAdressSprite.getId());
-            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
-            this.requestList.getItems().add(txt);
+            this.displayRequestWithAddToListView(r, cpt);
             cpt++;
         }
+    }
+    
+    private void displayRequestWithAddToListView(Request r, int cpt) {
+        Text txt;
+        int[] rgb = randomColorSprite();
+        String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
+        Intersection pickupAddress = r.getPickupAddress();
+        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());
+        pickupAddressSprite.setAttribute("ui.class", "pickupSprite");
+        pickupAddressSprite.setAttribute("ui.style", color);
+        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);
+        txt = new Text("Pickup " + cpt);
+        txt.setId(pickupAddressSprite.getId());
+        txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+        this.requestList.getItems().add(txt);
+
+        Intersection deliveryAdress = r.getDeliveryAddress();
+        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
+        deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
+        deliveryAdressSprite.setAttribute("ui.style", color);
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
+        txt = new Text("Delivery " + cpt);
+        txt.setId(deliveryAdressSprite.getId());
+        txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
+        this.requestList.getItems().add(txt);  
     }
 
     private void resetEdge(String edgeId) {
@@ -799,5 +843,24 @@ public class MenuPageController implements Observer {
         alert.setContentText(content);
 
         alert.showAndWait();
+    }
+
+    private void addRequestMode() {
+        this.loadCityMapButton.setVisible(false);
+        this.loadRequestButton.setVisible(false);
+        this.computeTourButton.setVisible(false);
+        this.addRequestButton.setVisible(false);
+        this.deleteRequestButton.setVisible(false);
+        this.requestList.setMouseTransparent(true);
+        this.requestList.setFocusTraversable(false);
+    }
+
+    private void defaultMode() {
+        this.loadCityMapButton.setVisible(true);
+        this.loadRequestButton.setVisible(true);
+        this.computeTourButton.setVisible(true);
+        this.addRequestButton.setVisible(true);
+        this.requestList.setMouseTransparent(false);
+        this.requestList.setFocusTraversable(true);
     }
 }

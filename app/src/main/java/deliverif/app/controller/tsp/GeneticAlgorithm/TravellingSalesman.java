@@ -19,45 +19,46 @@ import java.util.Random;
  * @author zakaria
  */
 public class TravellingSalesman {
+
     private int generationSize;
     private int genomeSize;
-    private int numberOfStops;
     private int reproductionSize;
     private int maxIterations;
     private float mutationRate;
     private HashMap<String, Float> costs;
     private Vertex start;
-    private int targetFitness;
+    private float targetFitness;
     private int tournamentSize;
     private SelectionType selectionType;
+    private List<Long> ordre;
+
     public enum SelectionType {
         TOURNAMENT,
         ROULETTE
     }
-    
-    
-    public TravellingSalesman (int numberOfStops, SelectionType selectionType, Graph g, Vertex start, int targetFitness){
-        this.numberOfStops = numberOfStops;
-        this.genomeSize = numberOfStops-1;
+
+    public TravellingSalesman(SelectionType selectionType, Graph g, Vertex start, List<Long> ordre, int maxIterations) {
         this.selectionType = selectionType;
-        onInit(g,start);
+        this.ordre = ordre;
+        this.costs = new HashMap<>();
+        onInit(g, start);
         this.start = start;
         this.targetFitness = targetFitness;
+        this.genomeSize = start.getAdj().size();
 
         generationSize = 5000;
         reproductionSize = 200;
-        maxIterations = 1000;
+        this.maxIterations = maxIterations;
         mutationRate = 0.1f;
         tournamentSize = 40;
     }
-    
-    
+
     protected void onInit(Graph g, Vertex start) {
         for (Vertex v : g.getVertexMap().values()) {
             for (Edge e : v.getAdj()) {
                 if (e.dest.getId() == start.getId()) {
                     System.out.println("Add: " + v.getId() + "-" + "0");
-                    costs.put(v.getId() + "-" + "0", e.cost);
+                    costs.put(v.getId() + "-" + e.dest.getId(), e.cost);
                 } else {
                     System.out.println("Add: " + v.getId() + "-" + e.dest.getId());
                     costs.put(v.getId() + "-" + e.dest.getId(), e.cost);
@@ -65,48 +66,50 @@ public class TravellingSalesman {
             }
         }
     }
-    
-    public List<SalesmanGenome> initialPopulation(){
-       List<SalesmanGenome> population = new ArrayList<>();
-       for(int i=0; i<generationSize; i++){
-           population.add(new SalesmanGenome(numberOfStops, costs, start));
-       }
-       return population;
+
+    public List<SalesmanGenome> initialPopulation() {
+        List<SalesmanGenome> population = new ArrayList<>();
+        for (int i = 0; i < generationSize; i++) {
+            population.add(new SalesmanGenome(costs, start, ordre));
+        }
+        return population;
     }
-    
+
     public List<SalesmanGenome> selection(List<SalesmanGenome> population) {
         List<SalesmanGenome> selected = new ArrayList<>();
         SalesmanGenome winner;
-        for (int i=0; i < reproductionSize; i++) {
+        for (int i = 0; i < reproductionSize; i++) {
             if (selectionType == SelectionType.ROULETTE) {
                 selected.add(rouletteSelection(population));
-            }
-            else if (selectionType == SelectionType.TOURNAMENT) {
+            } else if (selectionType == SelectionType.TOURNAMENT) {
                 selected.add(tournamentSelection(population));
             }
         }
 
         return selected;
     }
-    
+
     public SalesmanGenome rouletteSelection(List<SalesmanGenome> population) {
-        int totalFitness = population.stream().map(SalesmanGenome::getFitness).mapToInt(Integer::intValue).sum();
+        float totalFitness = 0;
+        for (SalesmanGenome gen : population) {
+            totalFitness += gen.getFitness();
+        }
 
         // We pick a random value - a point on our roulette wheel
         Random random = new Random();
-        int selectedValue = random.nextInt(totalFitness);
+        int selectedValue = random.nextInt((int) totalFitness);
 
         // Because we're doing minimization, we need to use reciprocal
         // value so the probability of selecting a genome would be
         // inversely proportional to its fitness - the smaller the fitness
         // the higher the probability
-        float recValue = (float) 1/selectedValue;
+        float recValue = (float) 1 / selectedValue;
 
         // We add up values until we reach out recValue, and we pick the
         // genome that crossed the threshold
         float currentSum = 0;
         for (SalesmanGenome genome : population) {
-            currentSum += (float) 1/genome.getFitness();
+            currentSum += (float) 1 / genome.getFitness();
             if (currentSum >= recValue) {
                 return genome;
             }
@@ -117,17 +120,19 @@ public class TravellingSalesman {
         int selectRandom = random.nextInt(generationSize);
         return population.get(selectRandom);
     }
-    
+
     // A helper function to pick n random elements from the population
     // so we could enter them into a tournament
     public static <E> List<E> pickNRandomElements(List<E> list, int n) {
         Random r = new Random();
         int length = list.size();
 
-        if (length < n) return null;
+        if (length < n) {
+            return null;
+        }
 
         for (int i = length - 1; i >= length - n; --i) {
-            Collections.swap(list, i , r.nextInt(i + 1));
+            Collections.swap(list, i, r.nextInt(i + 1));
         }
         return list.subList(length - n, length);
     }
@@ -138,7 +143,7 @@ public class TravellingSalesman {
         List<SalesmanGenome> selected = pickNRandomElements(population, tournamentSize);
         return Collections.min(selected);
     }
-    
+
     public List<SalesmanGenome> crossover(List<SalesmanGenome> parents) {
         // Housekeeping
         Random random = new Random();
@@ -156,7 +161,7 @@ public class TravellingSalesman {
             newVal = parent2Genome.get(i);
             Collections.swap(parent1Genome, parent1Genome.indexOf(newVal), i);
         }
-        children.add(new SalesmanGenome(parent1Genome, numberOfStops, costs, start));
+        children.add(new SalesmanGenome(parent1Genome, costs, start, ordre));
         parent1Genome = parents.get(0).getGenome(); // Reseting the edited parent
 
         // Creating child 2
@@ -164,22 +169,22 @@ public class TravellingSalesman {
             Vertex newVal = parent1Genome.get(i);
             Collections.swap(parent2Genome, parent2Genome.indexOf(newVal), i);
         }
-        children.add(new SalesmanGenome(parent2Genome, numberOfStops, costs, start));
+        children.add(new SalesmanGenome(parent2Genome, costs, start, ordre));
 
         return children;
     }
-    
+
     public SalesmanGenome mutate(SalesmanGenome salesman) {
         Random random = new Random();
         float mutate = random.nextFloat();
         if (mutate < mutationRate) {
             List<Vertex> genome = salesman.getGenome();
             Collections.swap(genome, random.nextInt(genomeSize), random.nextInt(genomeSize));
-            return new SalesmanGenome(genome, numberOfStops, costs, start);
+            return new SalesmanGenome(genome, costs, start, ordre);
         }
         return salesman;
     }
-    
+
     public List<SalesmanGenome> createGeneration(List<SalesmanGenome> population) {
         List<SalesmanGenome> generation = new ArrayList<>();
         int currentGenerationSize = 0;
@@ -193,7 +198,7 @@ public class TravellingSalesman {
         }
         return generation;
     }
-    
+
     public SalesmanGenome optimise() {
         List<SalesmanGenome> population = initialPopulation();
         SalesmanGenome globalBestGenome = population.get(0);
@@ -201,14 +206,13 @@ public class TravellingSalesman {
             List<SalesmanGenome> selected = selection(population);
             population = createGeneration(selected);
             globalBestGenome = Collections.min(population);
-            if (globalBestGenome.getFitness() < targetFitness)
-                break;
         }
+        globalBestGenome.getGenome().add(0, start);
         return globalBestGenome;
     }
-    
-    public void printGeneration(List<SalesmanGenome> generation ){
-        for( SalesmanGenome genome : generation){
+
+    public void printGeneration(List<SalesmanGenome> generation) {
+        for (SalesmanGenome genome : generation) {
             System.out.println(genome);
         }
     }

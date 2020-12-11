@@ -5,7 +5,6 @@
  */
 package deliverif.app.controller.Command;
 
-import deliverif.app.controller.Command.Command;
 import java.util.LinkedList;
 
 /**
@@ -13,25 +12,46 @@ import java.util.LinkedList;
  * @author zakaria
  */
 public class ListOfCommands {
+
     private LinkedList<Command> l;
     private int i;
+
+    /**
+     * Create a list of commands to perform undo and redo
+     */
     public ListOfCommands() {
-        i= -1;
-        l = new LinkedList<Command>();
+        i = -1;
+        l = new LinkedList<>();
     }
+
+    /**
+     * Add a command and execute it
+     *
+     * @param c
+     */
     public void addCommand(Command c) {
         i++;
-        l.add(i,c);
+        l.add(i, c);
         c.doCommand();
     }
+
+    /**
+     * Undo the last command
+     */
     public void undo() {
-        if (i>=0) {
+        if (i >= 0) {
             l.get(i).undoCommand();
             i--;
         }
     }
+
+    /**
+     * Redo the last command
+     */
     public void redo() {
-        i++;
-        l.get(i).doCommand();
+        if (i+1 < l.size()) {
+            i++;
+            l.get(i).doCommand();   
+        }
     }
 }

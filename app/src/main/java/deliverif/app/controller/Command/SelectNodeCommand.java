@@ -5,7 +5,6 @@
  */
 package deliverif.app.controller.Command;
 
-import deliverif.app.controller.Command.Command;
 import deliverif.app.controller.State.AddingRequestState;
 
 /**
@@ -14,21 +13,28 @@ import deliverif.app.controller.State.AddingRequestState;
  */
 public class SelectNodeCommand implements Command {
 
-    AddingRequestState ars;
-    boolean isDelivery;
-    String id; 
-    
-    public SelectNodeCommand (AddingRequestState ars, boolean isDelivery, String id) {
+    private AddingRequestState ars;
+    private boolean isDelivery;
+    private String id;
+
+    /**
+     * Create a select node command
+     *
+     * @param ars the current state
+     * @param isDelivery is the selected node a delivery or a pickup
+     * @param id the selected node id
+     */
+    public SelectNodeCommand(AddingRequestState ars, boolean isDelivery, String id) {
         this.ars = ars;
         this.isDelivery = isDelivery;
         this.id = id;
     }
-    
+
     @Override
     public void doCommand() {
         if (isDelivery) {
             ars.setDeliveryId(id);
-        }else{
+        } else {
             ars.setPickupId(id);
         }
     }
@@ -37,9 +43,9 @@ public class SelectNodeCommand implements Command {
     public void undoCommand() {
         if (isDelivery) {
             ars.setDeliveryId(null);
-        }else{
+        } else {
             ars.setPickupId(null);
         }
     }
-    
+
 }

@@ -5,8 +5,8 @@
  */
 package deliverif.app.controller.Command;
 
-import deliverif.app.controller.Command.Command;
 import deliverif.app.controller.GraphProcessor;
+import deliverif.app.controller.MenuPageController;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
 
@@ -15,11 +15,19 @@ import deliverif.app.model.request.Request;
  * @author zakaria
  */
 public class AddRequestCommand implements Command {
-    GraphProcessor gp;
-    Tour oldTour;
-    Tour tour;
-    Request request;
-    
+
+    private GraphProcessor gp;
+    private Tour oldTour;
+    private Tour tour;
+    private Request request;
+
+    /**
+     * Create an add request command
+     *
+     * @param gp the graphprocessor
+     * @param t the current tour
+     * @param r the request to add
+     */
     public AddRequestCommand(GraphProcessor gp, Tour t, Request r) {
         this.gp = gp;
         tour = t;
@@ -29,14 +37,19 @@ public class AddRequestCommand implements Command {
 
     @Override
     public void doCommand() {
+        MenuPageController mpc = MenuPageController.getInstance();
+        mpc.displayRequest(request);
         gp.addRequestToTour(tour, request);
         tour.notifiyObservers(null);
     }
 
     @Override
     public void undoCommand() {
+        MenuPageController mpc = MenuPageController.getInstance();
+        mpc.removeSpriteRequest(request);
+        tour.getPr().removeRequest(request);
         tour.copyTour(oldTour);
         tour.notifiyObservers(null);
     }
-    
+
 }

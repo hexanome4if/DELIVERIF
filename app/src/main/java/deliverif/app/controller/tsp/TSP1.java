@@ -23,7 +23,8 @@ public class TSP1 extends TemplateTSP {
     public float mindis;
     public HashMap<String, Float> costs = new HashMap<>();
 
-    protected float bound2(Vertex currentVertex, ArrayList<Vertex> unvisited) {
+    @Override
+    protected float bound(Vertex currentVertex, ArrayList<Vertex> unvisited) {
         float total1 = Float.MAX_VALUE;
         float total2 = 0;
         for (int i = 0; i < unvisited.size(); i++) {
@@ -32,7 +33,6 @@ public class TSP1 extends TemplateTSP {
                 total1 = current;
             }
             Long current2 = unvisited.get(i).getId();
-            System.out.println("Get: " + current2 + "-" + "0");
             float shortest = costs.get(current2 + "-" + "0");
             for (int j = 0; j < unvisited.size(); j++) {
                 if (i != j) {
@@ -47,19 +47,17 @@ public class TSP1 extends TemplateTSP {
         return total1 + total2;
     }
 
-    @Override
-    protected float bound(Vertex currentVertex, ArrayList<Vertex> unvisited) {
+    // @Override
+    protected float bound2(Vertex currentVertex, ArrayList<Vertex> unvisited) {
         return mindis * (unvisited.size() + 1);
     }
 
     protected void onInit(Graph g, Vertex start) {
         for (Vertex v : g.getVertexMap().values()) {
             for (Edge e : v.getAdj()) {
-                if (e.dest.getId() == start.getId()) {
-                    System.out.println("Add: " + v.getId() + "-" + "0");
+                if (e.dest.getId().equals(start.getId())) {
                     costs.put(v.getId() + "-" + "0", e.cost);
                 } else {
-                    System.out.println("Add: " + v.getId() + "-" + e.dest.getId());
                     costs.put(v.getId() + "-" + e.dest.getId(), e.cost);
                 }
             }
@@ -73,8 +71,8 @@ public class TSP1 extends TemplateTSP {
 
     @Override
     public void searchSolution(int timeLimit, Graph g, Vertex start, List<Long> ordre) {
-        // onInit(g, start);
-        mindis = g.getMinDis();
+        onInit(g, start);
+        // mindis = g.getMinDis();
         super.searchSolution(timeLimit, g, start, ordre);
     }
 
