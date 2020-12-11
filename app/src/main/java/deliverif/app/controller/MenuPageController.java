@@ -311,7 +311,9 @@ public class MenuPageController implements Observer {
         System.out.println("computeTourAction");
         //tour = graphProcessor.optimalTour(this.planningRequest);
         TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);
+        System.out.println("Optimal");
         tourGenerator.addObserver(this);
+        renderTourButton.setVisible(true);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
@@ -575,6 +577,14 @@ public class MenuPageController implements Observer {
             this.planningRequest = t.getPr();
             renderTour();
         } else if (observed instanceof TourGenerator) {
+            boolean isFinished = (boolean) arg;
+            if (isFinished) {
+                renderTourButton.setVisible(false);
+                this.renderTourButton.setVisible(false);
+                this.timerPane.setVisible(false);
+                this.addRequestButton.setVisible(true);
+
+            }
             TourGenerator tourGenerator = (TourGenerator) observed;
             this.tour = tourGenerator.getTour();
             this.tour.addObserver(this);
@@ -694,8 +704,8 @@ public class MenuPageController implements Observer {
     private void renderTourAction() {
         this.renderTourButton.setVisible(false);
         this.timerPane.setVisible(false);
-        System.out.println("renderTourAction");
-        this.tour = computeTourThread.getTour();
+        System.out.println("cancel");
+        computeTourThread.stop();
         tour.addObserver(this);
         renderTour();
         this.addRequestButton.setVisible(true);

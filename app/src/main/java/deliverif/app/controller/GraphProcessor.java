@@ -73,6 +73,7 @@ public class GraphProcessor {
             precedents.put(edg.dest.getId(), source.getId());
             gris.add(edg.dest);
         }
+        System.out.println("Before dijkstra loop");
         noir.add(source);
         List<Vertex> found = new ArrayList<>();
         while (!gris.isEmpty() && found.size() < goals.size()) {  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal
@@ -108,7 +109,7 @@ public class GraphProcessor {
                 found.add(vertex);
             }
         }
-
+        System.out.println("After dijkstra loop");
         for (Vertex v : goals) {
             if (!Objects.equals(v.getId(), source.getId())) {
                 completeGraph.addEdgeOneSide(source.getId(), v.getId(), dis.get(v.getId()));
@@ -138,10 +139,11 @@ public class GraphProcessor {
         for (Vertex v : vertices) {
             g.addVertex(v);
         }
-
+        System.out.println("Complete graph");
         for (Vertex v : vertices) {
             dijkstra(g, v, vertices);
         }
+        System.out.println("Ok");
         return g;
     }
 
@@ -182,21 +184,25 @@ public class GraphProcessor {
     }
 
     public TourGenerator optimalTour(PlanningRequest pr) {
+        System.out.println("Init");
         currentVertex.clear();
         this.pr = pr;
         fullPath.clear();
         currentTsp = hamiltonianCircuit(pr);
         TourGenerator tourGenerator = new TourGenerator(currentTsp, pr, this, map);
+        System.out.println("Init good");
         return tourGenerator;
     }
 
     public void startAlgo() {
+        System.out.println("Start");
         Graph g = completeGraph(pr);
         List<Long> ordre = new ArrayList<>();
         for (Request r : pr.getRequests()) {
             ordre.add(r.getPickupAddress().getId());
             ordre.add(r.getDeliveryAddress().getId());
         }
+        System.out.println("Ok");
         currentTsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
     }
 
