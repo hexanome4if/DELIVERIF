@@ -188,7 +188,7 @@ public class MenuPageController implements Observer {
         this.infosTextTour2.setText("");
         this.addRequestButton.setVisible(false);
         this.deleteRequestButton.setVisible(false);
-        stopThread();
+        stopPathThread();
         if (this.graphEdges != null) {
             for (String edgeId : graphEdges) {
                 graph.getEdge(edgeId).setAttribute("ui.class", "default");
@@ -482,7 +482,7 @@ public class MenuPageController implements Observer {
         return rgb;
     }
 
-    public static void stopThread() {
+    public static void stopPathThread() {
         if (pathThread != null) {
             pathThread.end();
             while (!pathThread.isIsFinished()) {
@@ -513,7 +513,7 @@ public class MenuPageController implements Observer {
             return;
         }
         System.out.println("Found request");
-        stopThread();
+        stopPathThread();
         RemoveRequestCommand rr = new RemoveRequestCommand(graphProcessor, tour, selectedRequest);
         sman.removeSprite(selectedRequest.getDeliveryAddress().getId().toString());
         sman.removeSprite(selectedRequest.getPickupAddress().getId().toString());
@@ -656,6 +656,7 @@ public class MenuPageController implements Observer {
         this.tour = computeTourThread.getTour();
         tour.addObserver(this);
         renderTour();
+        this.addRequestButton.setVisible(true);
     }
 
     //PRIVATE METHODS
@@ -696,7 +697,7 @@ public class MenuPageController implements Observer {
         // complete list
         completePathList(num);
         try {
-            stopThread();
+            stopPathThread();
             pathThread = new PathThread(this, num);
             pathThread.start();
         } catch (Exception e) {
