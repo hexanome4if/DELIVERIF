@@ -8,6 +8,7 @@ package deliverif.app.controller;
 import deliverif.app.controller.Command.AddRequestCommand;
 import deliverif.app.controller.Command.ListOfCommands;
 import deliverif.app.controller.Command.RemoveRequestCommand;
+import deliverif.app.controller.Command.SwapRequestCommand;
 import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
@@ -26,6 +27,7 @@ import deliverif.app.view.App;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -123,6 +125,9 @@ public class MenuPageController implements Observer {
 
     @FXML
     private Button renderTourButton;
+
+    @FXML
+    private Button swapRequestButton;
 
     //PRIVATE ATTRIBUTES
     private Map map;
@@ -262,6 +267,7 @@ public class MenuPageController implements Observer {
         if (idElement.equals("segmentSprite")) {
             return;
         }
+        this.currentState.selectSprite(element.getId());
         this.currentState.selectNode(element.getId());
     }
 
@@ -299,7 +305,11 @@ public class MenuPageController implements Observer {
 
     public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
-        if (this.xmlReader.getMap() == null) {
+        if (map == null) {
+            if(map == null){
+                showErrorAlert("Load a map", "You need to load a city map first");
+                return;
+            } 
             System.out.println("Il faut charger une map avant");
             return;
         }
@@ -308,6 +318,17 @@ public class MenuPageController implements Observer {
     }
 
     public void computeTour() {
+        
+        if(map == null){
+            showErrorAlert("Load a map", "You need to load a city map first");
+            return;
+        } 
+        if(this.planningRequest == null){
+            showErrorAlert("Load a request", "You need to load a request first");
+            return;
+        }
+        
+        addRequestMode();
         System.out.println("computeTourAction");
         //tour = graphProcessor.optimalTour(this.planningRequest);
         TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);
@@ -318,12 +339,6 @@ public class MenuPageController implements Observer {
         computeTourThread.start();
         timerThread = new TimerThread(this);
         timerThread.start();
-        //while(!timerThread.isIsFinished()) {}
-        //this.tour = computeTourThread.getTour();
-        //tour.addObserver(this);
-
-        //renderTour();
-        //this.addRequestButton.setVisible(true);
     }
 
     public void renderTour() {
@@ -534,13 +549,31 @@ public class MenuPageController implements Observer {
         this.addRequestMode();
         this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
+  
+    public void startSwapRequest() {
+        System.out.println("Start swap request");
+        this.addRequestMode();
+        this.schowInfoAlert("Select a first point to swap", "Please select a point on the tour");
+    }
 
-    public void addRequest(String pickupId, String deliveryId) {
+    public void addRequest(String pickupId, String deliveryId, int pickupDuration, int deliveryDuration) {
+
         Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
         Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
-        Request r = new Request(pickup, delivery, 120, 67);
+        Request r = new Request(pickup, delivery, pickupDuration, deliveryDuration);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
+        this.defaultMode();
+    }
+  
+    public void swapRequest(String firstId, String secondId) {
+        ArrayList<Long> requestIds = new ArrayList<>();
+        for (Path p : tour.getPaths()) {
+            requestIds.add(p.getDeparture().getId());
+        }
+        Collections.swap(requestIds, requestIds.indexOf(Long.parseLong(firstId)), requestIds.indexOf(Long.parseLong(secondId)));
+        SwapRequestCommand sr = new SwapRequestCommand(graphProcessor, tour, requestIds);
+        loc.addCommand(sr);
         this.defaultMode();
     }
 
@@ -702,6 +735,7 @@ public class MenuPageController implements Observer {
 
     @FXML
     private void renderTourAction() {
+        defaultMode();
         this.renderTourButton.setVisible(false);
         this.timerPane.setVisible(false);
         System.out.println("cancel");
@@ -709,6 +743,14 @@ public class MenuPageController implements Observer {
         tour.addObserver(this);
         renderTour();
         this.addRequestButton.setVisible(true);
+        this.swapRequestButton.setVisible(true);
+    }
+
+    @FXML
+    private void swapRequestAction() {
+        System.out.println("swapRequestAction");
+        currentState.startSwapRequest();
+
     }
 
     //PRIVATE METHODS
@@ -867,6 +909,8 @@ public class MenuPageController implements Observer {
         this.deleteRequestButton.setVisible(false);
         this.requestList.setMouseTransparent(true);
         this.requestList.setFocusTraversable(false);
+        this.swapRequestButton.setVisible(false);
+
     }
 
     private void defaultMode() {
@@ -876,5 +920,6 @@ public class MenuPageController implements Observer {
         this.addRequestButton.setVisible(true);
         this.requestList.setMouseTransparent(false);
         this.requestList.setFocusTraversable(true);
+        this.swapRequestButton.setVisible(true);
     }
 }
