@@ -8,6 +8,7 @@ package deliverif.app.controller;
 import deliverif.app.controller.Command.AddRequestCommand;
 import deliverif.app.controller.Command.ListOfCommands;
 import deliverif.app.controller.Command.RemoveRequestCommand;
+import deliverif.app.controller.Command.SwapRequestCommand;
 import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
@@ -27,6 +28,7 @@ import deliverif.app.view.App;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -109,22 +111,25 @@ public class MenuPageController implements Observer {
     private ListView<Text> pathList;
 
     @FXML
-    private ProgressIndicator progressIndicator; 
-    
+    private ProgressIndicator progressIndicator;
+
     @FXML
     private TitledPane streetsTitledPlane;
-    
+
     @FXML
     private ListView<String> streetsList;
-    
-    @FXML 
+
+    @FXML
     private AnchorPane timerPane;
-    
+
     @FXML
     private Text timerText;
-    
+
     @FXML
     private Button renderTourButton;
+
+    @FXML
+    private Button swapRequestButton;
 
     //PRIVATE ATTRIBUTES
     private Map map;
@@ -154,11 +159,10 @@ public class MenuPageController implements Observer {
     private final XmlReader xmlReader = new XmlReader();
 
     private static PathThread pathThread = null;
-    
+
     private static ComputeTourThread computeTourThread = null;
-    
+
     private static TimerThread timerThread = null;
-    
 
     // Instance (Singleton)
     private static MenuPageController instance = null;
@@ -265,6 +269,7 @@ public class MenuPageController implements Observer {
         if (idElement.equals("segmentSprite")) {
             return;
         }
+        this.currentState.selectSprite(element.getId());
         this.currentState.selectNode(element.getId());
     }
 
@@ -320,7 +325,7 @@ public class MenuPageController implements Observer {
         //while(!timerThread.isIsFinished()) {}
         //this.tour = computeTourThread.getTour();
         //tour.addObserver(this);
-        
+
         //renderTour();
         //this.addRequestButton.setVisible(true);
     }
@@ -538,6 +543,12 @@ public class MenuPageController implements Observer {
         this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
 
+    public void startSwapRequest() {
+        System.out.println("Start swap request");
+        this.addRequestMode();
+        this.schowInfoAlert("Select a first point to swap", "Please select a point on the tour");
+    }
+
     public void addRequest(String pickupId, String deliveryId) {
         Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
         Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
@@ -546,14 +557,25 @@ public class MenuPageController implements Observer {
         loc.addCommand(ar);
         this.defaultMode();
     }
-    
+
+    public void swapRequest(String firstId, String secondId) {
+        ArrayList<Long> requestIds = new ArrayList<>();
+        for (Path p : tour.getPaths()) {
+            requestIds.add(p.getDeparture().getId());
+        }
+        Collections.swap(requestIds, requestIds.indexOf(Long.parseLong(firstId)), requestIds.indexOf(Long.parseLong(secondId)));
+        SwapRequestCommand sr = new SwapRequestCommand(graphProcessor, tour, requestIds);
+        loc.addCommand(sr);
+        this.defaultMode();
+    }
+
     public void removeSpriteRequest(Request r) {
         String pickupId = r.getPickupAddress().getId().toString();
         String deliveryId = r.getDeliveryAddress().getId().toString();
         sman.removeSprite(pickupId);
         sman.removeSprite(deliveryId);
     }
-        
+
     public void displayRequest(Request r) {
         int[] rgb = randomColorSprite();
         String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
@@ -567,7 +589,7 @@ public class MenuPageController implements Observer {
         Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());
         deliveryAdressSprite.setAttribute("ui.class", "deliverySprite");
         deliveryAdressSprite.setAttribute("ui.style", color);
-        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);  
+        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);
     }
 
     @Override
@@ -623,11 +645,10 @@ public class MenuPageController implements Observer {
     public Text getTimerText() {
         return timerText;
     }
-    
+
     public void setSelectedNode(String selectedNode) {
         this.selectedNode = selectedNode;
     }
-
 
     public boolean isNodeOnTour(String nodeId) {
         Sprite sprite = sman.getSprite(nodeId);
@@ -687,7 +708,7 @@ public class MenuPageController implements Observer {
         this.currentState.removeRequest();
         this.deleteRequestButton.setVisible(false);
     }
-    
+
     @FXML
     private void renderTourAction() {
         this.renderTourButton.setVisible(false);
@@ -697,6 +718,14 @@ public class MenuPageController implements Observer {
         tour.addObserver(this);
         renderTour();
         this.addRequestButton.setVisible(true);
+        this.swapRequestButton.setVisible(true);
+    }
+
+    @FXML
+    private void swapRequestAction() {
+        System.out.println("swapRequestAction");
+        currentState.startSwapRequest();
+
     }
 
     //PRIVATE METHODS
@@ -745,24 +774,25 @@ public class MenuPageController implements Observer {
         }
 
     }
-    
+
     private void completePathList(int num) {
         streetsList.getItems().clear();
-        Path p = tour.getPaths().get(num-1);
-        for(int i = p.getSegments().size()-1 ; i >= 0 ; i--) {
+        Path p = tour.getPaths().get(num - 1);
+        for (int i = p.getSegments().size() - 1; i >= 0; i--) {
             Segment s = p.getSegments().get(i);
-            if(!this.streetsList.getItems().contains(s.getName()) && (s.getName()!="") ) {
+            if (!this.streetsList.getItems().contains(s.getName()) && (s.getName() != "")) {
                 this.streetsList.getItems().add(s.getName());
             }
         }
     }
+
     private void chargerPlanningRequests() throws IOException {
         PlanningRequest pr = App.choseRequestFile(this.xmlReader);
-        if(pr == null) {
-            showErrorAlert("Bad file","FORMAT ERRORS ON REQUEST FILE \nLoad another file");
+        if (pr == null) {
+            showErrorAlert("Bad file", "FORMAT ERRORS ON REQUEST FILE \nLoad another file");
             return;
-        } else if (pr.isEmpty()){ 
-            showErrorAlert("Bad file","REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file");
+        } else if (pr.isEmpty()) {
+            showErrorAlert("Bad file", "REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file");
 
             return;
         }
@@ -796,7 +826,7 @@ public class MenuPageController implements Observer {
             cpt++;
         }
     }
-    
+
     private void displayRequestWithAddToListView(Request r, int cpt) {
         Text txt;
         int[] rgb = randomColorSprite();
@@ -819,7 +849,7 @@ public class MenuPageController implements Observer {
         txt = new Text("Delivery " + cpt);
         txt.setId(deliveryAdressSprite.getId());
         txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));
-        this.requestList.getItems().add(txt);  
+        this.requestList.getItems().add(txt);
     }
 
     private void resetEdge(String edgeId) {
@@ -854,6 +884,7 @@ public class MenuPageController implements Observer {
         this.deleteRequestButton.setVisible(false);
         this.requestList.setMouseTransparent(true);
         this.requestList.setFocusTraversable(false);
+        this.swapRequestButton.setVisible(false);
     }
 
     private void defaultMode() {
@@ -863,5 +894,6 @@ public class MenuPageController implements Observer {
         this.addRequestButton.setVisible(true);
         this.requestList.setMouseTransparent(false);
         this.requestList.setFocusTraversable(true);
+        this.swapRequestButton.setVisible(true);
     }
 }

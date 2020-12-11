@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="1074.0" style="-fx-background-color: #1DBCEB;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="deliverif.app.controller.MenuPageController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="1074.0" style="-fx-background-color: #1DBCEB;" visible="true" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="deliverif.app.controller.MenuPageController">
   <bottom>
     <Text fx:id="segmentNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="" textAlignment="CENTER" BorderPane.alignment="CENTER">
       <font>
@@ -62,26 +62,32 @@
         <Button fx:id="loadCityMapButton" mnemonicParsing="false" onAction="#loadCityMapAction" prefHeight="50.0" prefWidth="200.0" text="Load City Map" />
         <Button fx:id="loadRequestButton" mnemonicParsing="false" onAction="#loadRequestAction" prefHeight="50.0" prefWidth="200.0" text="Load Request">
           <VBox.margin>
-            <Insets top="20.0" fx:id="x1" />
+            <Insets top="20.0" fx:id="x1_x0" />
           </VBox.margin>
         </Button>
         <Button fx:id="computeTourButton" mnemonicParsing="false" onAction="#computeTourAction" prefHeight="50.0" prefWidth="200.0" text="Compute Tour">
           <VBox.margin>
-            <Insets top="20.0" fx:id="x1" />
+            <Insets top="20.0" fx:id="x1_x0" />
           </VBox.margin>
         </Button>
         <Button id="computeTourButton" fx:id="addRequestButton" mnemonicParsing="false" onAction="#addRequestAction" prefHeight="50.0" prefWidth="200.0" text="Add request" visible="false">
           <VBox.margin>
-            <Insets top="20.0" fx:id="x1" />
+            <Insets top="20.0" fx:id="x1_x0" />
           </VBox.margin>
         </Button>
-        <Button id="computeTourButton" fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#deleteRequestAction" prefHeight="50.0" prefWidth="200.0" text="Delete Request" visible="false" VBox.margin="$x1" />
+        <Button id="computeTourButton" fx:id="deleteRequestButton" mnemonicParsing="false" onAction="#deleteRequestAction" prefHeight="50.0" prefWidth="200.0" text="Delete Request" visible="false" VBox.margin="$x1_x0" />
+        <Button id="loadRequestButton" fx:id="swapRequestButton" mnemonicParsing="false" onAction="#swapRequestAction" prefHeight="50.0" prefWidth="200.0" text="Swap Request" visible="false">
+          <VBox.margin>
+            <Insets top="20.0" fx:id="x1_x0" />
+          </VBox.margin>
+        </Button>
         <AnchorPane fx:id="timerPane" prefHeight="106.0" prefWidth="104.0" visible="false">
           <children>
-            <Text id="timeText" fx:id="timerText" fill="WHITE" layoutX="-7.0" scaleX="1.0" scaleY="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Time :" textAlignment="CENTER" wrappingWidth="110.1103515625" AnchorPane.leftAnchor="-7.0" AnchorPane.topAnchor="5.0">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font></Text>
+            <Text id="timeText" fx:id="timerText" fill="WHITE" scaleX="1.0" scaleY="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Time :" textAlignment="CENTER" wrappingWidth="110.1103515625" AnchorPane.leftAnchor="-7.0" AnchorPane.topAnchor="5.0">
+              <font>
+                <Font name="System Bold" size="13.0" />
+              </font>
+            </Text>
             <ProgressIndicator fx:id="progressIndicator" prefHeight="46.0" prefWidth="104.0" progress="-1.0" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="50.0" />
           </children>
           <VBox.margin>
