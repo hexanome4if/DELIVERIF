@@ -51,6 +51,12 @@ public class TourComputedState extends State {
         mpc.startAddRequest();
         mpc.setCurrentState(new AddingRequestState(mpc));
     }
+    
+    @Override
+    public void startSwapRequest() {
+        mpc.startSwapRequest();
+        mpc.setCurrentState(new SwapRequestState(mpc));
+    }
 
     @Override
     public void redo() {

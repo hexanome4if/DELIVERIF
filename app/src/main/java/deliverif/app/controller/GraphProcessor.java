@@ -251,11 +251,11 @@ public class GraphProcessor {
         Tour newTour = new Tour(tour);
         ArrayList<Path> newPaths = new ArrayList<>();
         for (int i = 0; i < newOrder.size() - 1; i++) {
-            newPaths.add(getNewPath(newOrder.get(i + 1), newOrder.get(i)));
+            newPaths.add(getNewPath(newOrder.get(i), newOrder.get(i+1)));
         }
         newTour.setPaths(newPaths);
         newTour.update();// synchroniser les horaires
-
+        
         return newTour;
     }
 

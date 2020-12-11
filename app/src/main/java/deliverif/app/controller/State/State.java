@@ -70,11 +70,23 @@ public abstract class State {
      */
     public void removeRequest() {
     }
+    
+    /**
+     * Try to swap a request from the current tour if possible
+     */
+    public void swapRequest() {
+    }
 
     /**
      * Start adding a request to the current tour if possible
      */
     public void startAddRequest() {
+    }
+    
+    /**
+     * Start swapping a request
+     */
+    public void startSwapRequest() {
     }
 
     /**
@@ -85,4 +97,10 @@ public abstract class State {
     public void selectNode(String nodeId) {
         mpc.setSelectedSprite(nodeId);
     }
+    
+    /**
+     * Select a sprite
+     * @param spriteId 
+     */
+    public void selectSprite(String spriteId) {}
 }
