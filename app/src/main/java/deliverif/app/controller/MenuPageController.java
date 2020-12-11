@@ -538,10 +538,10 @@ public class MenuPageController implements Observer {
         this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
 
-    public void addRequest(String pickupId, String deliveryId) {
+    public void addRequest(String pickupId, String deliveryId, int pickupDuration, int deliveryDuration) {
         Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
         Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));
-        Request r = new Request(pickup, delivery, 120, 67);
+        Request r = new Request(pickup, delivery, pickupDuration, deliveryDuration);
         AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);
         loc.addCommand(ar);
         this.defaultMode();
