@@ -189,9 +189,9 @@ public class GraphProcessor {
         currentVertex.clear();
         Tour tour = new Tour(pr);
         fullPath.clear();
-        /*TSP1 tsp = hamiltonianCircuit(pr);
-        Vertex[] sol = tsp.getSolution();*/
-        Vertex[] sol = hamiltonianCircuit2(pr);
+        TSP1 tsp = hamiltonianCircuit(pr);
+        Vertex[] sol = tsp.getSolution();
+        //Vertex[] sol = hamiltonianCircuit2(pr);
         double velocity = 15 * 1000 / 3600;
         Calendar cal = Calendar.getInstance();
         cal.setTime(pr.getDepot().getDepartureTime());

@@ -302,7 +302,11 @@ public class MenuPageController implements Observer {
 
     public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
-        if (this.xmlReader.getMap() == null) {
+        if (map == null) {
+            if(map == null){
+                showErrorAlert("Load a map", "You need to load a city map first");
+                return;
+            } 
             System.out.println("Il faut charger une map avant");
             return;
         }
@@ -311,18 +315,22 @@ public class MenuPageController implements Observer {
     }
 
     public void computeTour() {
+        
+        if(map == null){
+            showErrorAlert("Load a map", "You need to load a city map first");
+            return;
+        } 
+        if(this.planningRequest == null){
+            showErrorAlert("Load a request", "You need to load a request first");
+            return;
+        }
+        
+        addRequestMode();
         System.out.println("computeTourAction");
-        //tour = graphProcessor.optimalTour(this.planningRequest);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
         timerThread.start();
-        //while(!timerThread.isIsFinished()) {}
-        //this.tour = computeTourThread.getTour();
-        //tour.addObserver(this);
-        
-        //renderTour();
-        //this.addRequestButton.setVisible(true);
     }
 
     public void renderTour() {
@@ -690,6 +698,7 @@ public class MenuPageController implements Observer {
     
     @FXML
     private void renderTourAction() {
+        defaultMode();
         this.renderTourButton.setVisible(false);
         this.timerPane.setVisible(false);
         System.out.println("renderTourAction");
@@ -854,6 +863,7 @@ public class MenuPageController implements Observer {
         this.deleteRequestButton.setVisible(false);
         this.requestList.setMouseTransparent(true);
         this.requestList.setFocusTraversable(false);
+        
     }
 
     private void defaultMode() {
