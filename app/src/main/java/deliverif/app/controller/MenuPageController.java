@@ -611,12 +611,14 @@ public class MenuPageController implements Observer {
             renderTour();
         } else if (observed instanceof TourGenerator) {
             boolean isFinished = (boolean) arg;
+            this.requestList.getItems().clear();
             if (isFinished) {
                 defaultMode();
                 renderTourButton.setVisible(false);
                 this.renderTourButton.setVisible(false);
                 this.timerPane.setVisible(false);
                 this.addRequestButton.setVisible(true);
+                this.swapRequestButton.setVisible(true);
 
             }
             TourGenerator tourGenerator = (TourGenerator) observed;

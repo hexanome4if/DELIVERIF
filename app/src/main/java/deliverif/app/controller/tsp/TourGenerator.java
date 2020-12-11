@@ -50,10 +50,10 @@ public class TourGenerator extends Observable implements Observer {
             return;
         }
         lastRender = System.currentTimeMillis();
-        this.tour = new Tour(this.pr);
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                tour = new Tour(pr);
                 Vertex[] sol = ((TSP1) observed).getSolution();
                 double velocity = 15 * 1000 / 3600;
                 Calendar cal = Calendar.getInstance();
