@@ -632,6 +632,7 @@ public class MenuPageController implements Observer {
     public boolean isNodeOnTour(String nodeId) {
         Sprite sprite = sman.getSprite(nodeId);
         return sprite != null;
+    }
 
     public Button getRenderTourButton() {
         return renderTourButton;
