@@ -163,7 +163,7 @@ public class GraphProcessor {
             ordre.add(r.getPickupAddress().getId());
             ordre.add(r.getDeliveryAddress().getId());
         }
-        TravellingSalesman tsp = new TravellingSalesman(SelectionType.ROULETTE, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre, 4000);
+        TravellingSalesman tsp = new TravellingSalesman(SelectionType.ROULETTE, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre, 8000);
         SalesmanGenome genome = tsp.optimise();
         List<Vertex> listResult = genome.getGenome();
         Vertex[] result = new Vertex[listResult.size()];
