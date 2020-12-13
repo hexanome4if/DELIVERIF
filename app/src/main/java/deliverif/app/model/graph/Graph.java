@@ -133,7 +133,7 @@ public class Graph {
         String res = "Graph{\n";
         for(Long id : vertexMap.keySet()){
             for(Edge e : vertexMap.get(id).getAdj()){
-                res += "Vertex " + id.toString() + " to Vertex " + e.dest.getId() + " costs " + e.cost +",\n";
+                res += "Vertex " + id.toString() + " to Vertex " + e.dest.getId() + " costs " + String.format("%.3f", e.cost) +",\n";
             }
         }
         return res + "}";

@@ -206,7 +206,7 @@ public class Path {
 
     @Override
     public String toString() {
-        return "Departure: " + departure + "\nArrival: " + arrival;
+        return "Departure: " + departure + "\nArrival: " + arrival + "\nLength: " + length;
     }
 
 }

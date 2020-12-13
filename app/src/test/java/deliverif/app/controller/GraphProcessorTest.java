@@ -68,10 +68,16 @@ public class GraphProcessorTest {
         XmlReader reader = new XmlReader();
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor instance = new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
-        String expResult = readTxt("src/test/resources/deliverif/app/testDocuments/GraphProcessorTestDoc/testCompleteGraph.txt");
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
         Graph result = instance.completeGraph(pr);
-        assertEquals(expResult, result.toString());
+        Graph expResult = new Graph();
+        expResult.addVertex(new Vertex(Long.valueOf(342873658)));
+        expResult.addVertex(new Vertex(Long.valueOf(208769039)));
+        expResult.addVertex(new Vertex(Long.valueOf(25173820)));
+        expResult.addEdge(Long.valueOf(342873658), Long.valueOf(208769039), (float) 231.60083);
+        expResult.addEdge(Long.valueOf(342873658), Long.valueOf(25173820), (float) 2330.1206);
+        expResult.addEdge(Long.valueOf(25173820), Long.valueOf(208769039), (float) 2202.1833);
+        assertEquals(expResult.toString(), result.toString());
     }
 
     /**
@@ -84,30 +90,62 @@ public class GraphProcessorTest {
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp = new GraphProcessor(reader.getMap());
         Graph graphVide = new Graph();
+        Graph graphExp = new Graph();
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
+        Tour tour = new Tour(pr);
+        
         Vertex source = new Vertex(Long.valueOf("208769457"));
-        Vertex dest1 = new Vertex(Long.valueOf("2835339774"));
-        Vertex dest2 = new Vertex(Long.valueOf("1679901320"));
-        Vertex dest3 = new Vertex(Long.valueOf("208769120"));
-        Vertex dest4 = new Vertex(Long.valueOf("25336179"));
+        Vertex dest1 = new Vertex(Long.valueOf("1679901320"));
+        Vertex dest2 = new Vertex(Long.valueOf("208769120"));
+        Vertex dest3 = new Vertex(Long.valueOf("25336179"));
+        Vertex dest4 = new Vertex(Long.valueOf("208769039"));
         List<Vertex> goals = new ArrayList<>();
         goals.add(dest1);
         goals.add(dest2);
         goals.add(dest3);
         goals.add(dest4);
+        
         graphVide.addVertex(source);
+        graphExp.addVertex(source);
         for(Vertex v : goals){
             graphVide.addVertex(v);
+            graphExp.addVertex(v);
         }
         gp.dijkstra(graphVide, source, goals);
-        String result = graphVide.toString();
-        for(Vertex v : goals){
-            result += (gp.fullPath.get(source.getId()+"-"+v.getId()).convertToPath(reader.getMap()).toString());
-        }
-        result = result.replaceAll("\r|\n","");
-        String expResult = readTxt("src/test/resources/deliverif/app/testDocuments/GraphProcessorTestDoc/testDijkstra.txt");
-        expResult = expResult.replaceAll("\r|\n","");
         
-        assertEquals(expResult.trim(), result.trim());
+        graphExp.addEdgeOneSide(source.getId(), dest1.getId(), (float) 411.126);
+        graphExp.addEdgeOneSide(source.getId(), dest2.getId(), (float) 691.148);
+        graphExp.addEdgeOneSide(source.getId(), dest3.getId(), (float) 1539.744);
+        graphExp.addEdgeOneSide(source.getId(), dest4.getId(), (float) 207.214);
+        assertEquals(graphVide.toString(),graphExp.toString());
+        
+        Path p1 = new Path();
+        p1.setDeparture(reader.getMap().getIntersectionParId(source.getId()));
+        p1.setArrival(reader.getMap().getIntersectionParId(dest1.getId()));
+        p1.setLength((float)411.12595);
+        Path p2 = new Path(p1);
+        p2.setArrival(reader.getMap().getIntersectionParId(dest2.getId()));
+        p2.setLength((float)691.1477);
+        Path p3 = new Path(p1);
+        p3.setArrival(reader.getMap().getIntersectionParId(dest3.getId()));
+        p3.setLength((float)1539.7443);
+        Path p4 = new Path(p1);
+        p4.setArrival(reader.getMap().getIntersectionParId(dest4.getId()));
+        p4.setLength((float)207.21445);
+        tour.addPath(p1);
+        tour.addPath(p2);
+        tour.addPath(p3);
+        tour.addPath(p4);
+        
+        for(VertexPath vp : gp.fullPath.values()){
+            Path p = vp.convertToPath(reader.getMap());
+            for(Path expPath : tour.getPaths()){
+                if(expPath.getDeparture() == p.getDeparture()
+                        && expPath.getArrival() == p.getArrival()){
+                    assertEquals(p.toString(),expPath.toString());
+                }
+            }
+        }
     }
 
     /**
