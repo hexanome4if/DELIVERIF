@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package deliverif.app.controller;
 
 import deliverif.app.controller.Command.AddRequestCommand;
@@ -37,7 +32,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TitledPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -60,111 +54,218 @@ import org.graphstream.ui.view.util.InteractiveElement;
 
 /**
  *
- * @author fabien
+ * @author H4314
  */
 public class MenuPageController implements Observer {
 
     //PRIVATE FXML ATTRIBUTES
+    
+    /**
+    * Button used to load an xml map
+    */
     @FXML
     private Button loadCityMapButton;
 
+    /**
+    * Button used to load an xml request
+    */
     @FXML
     private Button loadRequestButton;
 
+    /**
+    * Button used to compute a tour
+    */
     @FXML
     private Button computeTourButton;
 
+    /**
+    * Button used to add a request in an existing tour
+    */
     @FXML
     private Button addRequestButton;
 
+    /**
+    * Button used to delete a request in an existing tour
+    */
     @FXML
     private Button deleteRequestButton;
 
+    /**
+    * Button used to swap 2 requests
+    */
+    @FXML
+    private Button swapRequestButton;
+    
+    /**
+    * Button used to stop the algorithm
+    */
+    @FXML
+    private Button stopResearchButton;
+
+    /**
+    * Panel of the map
+    */
     @FXML
     private AnchorPane mapPane;
 
+    /**
+    * Text inside the map panel
+    */
     @FXML
     private Text loadMapText;
 
+    /**
+    * Text "Selection :"
+    */
     @FXML
     private Text selectionText;
 
+    /**
+    * Text under "Selection", information of the selected element
+    */
     @FXML
     private Text infosText;
 
+    /**
+    * Text "Tour infos"
+    */
     @FXML
     private Text infosTextTour1;
 
+    /**
+    * Text under "Tour infos", information about the current tour
+    */
     @FXML
     private Text infosTextTour2;
 
+    /**
+    * Text informations about the selected segment
+    */
     @FXML
     private Text segmentNameText;
 
+    /**
+    * List of requests
+    */
     @FXML
     private ListView<Text> requestList;
 
+    /**
+    * Streets list of the selected path
+    */
     @FXML
-    private ListView<Text> pathList;
-
+    private ListView<String> streetsList;
+        
+    /**
+    * Indicator about the progression of the tour compute
+    */
     @FXML
     private ProgressIndicator progressIndicator;
 
-    @FXML
-    private TitledPane streetsTitledPlane;
-
-    @FXML
-    private ListView<String> streetsList;
-
+    /**
+    * Panel of the progression and compute time
+    */
     @FXML
     private AnchorPane timerPane;
 
+    /**
+    * Text of the time
+    */
     @FXML
     private Text timerText;
 
-    @FXML
-    private Button renderTourButton;
-
-    @FXML
-    private Button swapRequestButton;
-
     //PRIVATE ATTRIBUTES
+    
+    /**
+    * Map
+    */
     private Map map;
 
+    /**
+    * Planning request loaded
+    */
     private PlanningRequest planningRequest = null;
 
+    /**
+    * Graph loaded
+    */
     private Graph graph = null;
 
+    /**
+    * From GraphStream to display the map on a panel
+    */
     private FxViewPanel panel;
 
+    /**
+    * Sprite manager (requests points)
+    */
     private SpriteManager sman;
 
+    /**
+    * Graph processor
+    */
     private GraphProcessor graphProcessor;
 
+    /**
+    * Tour loaded
+    */
     private Tour tour = null;
 
-    private String[] selectedEdges = null;
+    /**
+    * Edges currently selected
+    */
+    private final String[] selectedEdges = null;
 
+    /**
+    * Edges of the graph
+    */
     private List<String> graphEdges = new ArrayList<>();
 
+    /**
+    * Node currently selected
+    */
     private volatile String selectedNode = null;
 
+    /**
+    * List of commands
+    */
     private ListOfCommands loc = null;
 
+    /**
+    * CUrrent state of the Application
+    */
     private State currentState;
 
+    /**
+    * Used to read xml files
+    */
     private final XmlReader xmlReader = new XmlReader();
 
+    /**
+    * Thread to display the selected path
+    */
     private static PathThread pathThread = null;
 
+    /**
+    * Thread to compute the tour
+    */
     private static ComputeTourThread computeTourThread = null;
 
+    /**
+    * Thread to display the timer and progression
+    */
     private static TimerThread timerThread = null;
 
-    // Instance (Singleton)
+    /**
+    * Instance (singleton)
+    */
     private static MenuPageController instance = null;
 
     //CONSTRUCTOR
+
+    /**
+     * Constructor of the MenuPageController, used only when we lauched the app (Singleton pattern)
+     */
     public MenuPageController() {
         loc = new ListOfCommands();
         instance = this;
@@ -172,14 +273,26 @@ public class MenuPageController implements Observer {
     }
 
     //PUBLIC METHODS
+
+    /**
+     * Return the instance of MenuPageController (Singleton pattern)
+     * @return MenuPageCntroller instance
+     */
     public static MenuPageController getInstance() {
         return instance;
     }
 
+    /**
+     * Set current state
+     * @param s State we want to set
+     */
     public void setCurrentState(State s) {
         currentState = s;
     }
 
+    /**
+     * Init the UI
+     */
     public void initUI() {
         this.planningRequest = null;
         this.tour = null;
@@ -199,11 +312,15 @@ public class MenuPageController implements Observer {
 
     }
 
+    /**
+     * Update the selection, called by the MouseOverMouseManager
+     * @param element GraphicElement Element that was clicked.
+     */
     public void updateSelection(GraphicElement element) {
 
         System.out.println("UPDATE SELECTION");
 
-        // EDGES
+        // EDGES, when we click on an edge
         if (element.getSelectorType() == Selector.Type.EDGE) {
             Edge edge = graph.getEdge(element.getId());
             for (String id : this.graphEdges) {
@@ -216,7 +333,7 @@ public class MenuPageController implements Observer {
                             int endNum = t.getText().indexOf("]", 2);
                             String numString = t.getText().substring(1, endNum);
                             int num = Integer.parseInt(numString);
-                            this.setSelectedPath(num);
+                            this.setSelectedPath(num); //Select the good path
                             setBigSprite(tour.getPaths().get(num - 1).getDeparture().getId().toString());
                             break;
                         }
@@ -228,11 +345,10 @@ public class MenuPageController implements Observer {
             String name = (String) edge.getAttribute("segment.name");
             System.out.println(name);
             if (name != null) {
-                segmentNameText.setText(name);
+                segmentNameText.setText(name); //Set the segment selected
                 sman.removeSprite("segmentSprite");
 
                 Sprite segmentSprite = sman.addSprite("segmentSprite");
-                double x, y, z;
 
                 segmentSprite.setAttribute("ui.class", "segmentSprite");
                 segmentSprite.setAttribute("ui.style", "fill-color: green;");
@@ -244,13 +360,14 @@ public class MenuPageController implements Observer {
             }
             return;
         }
+        
         // NODE
 
-        if (this.planningRequest == null) {
+        if (this.planningRequest == null) { // We need a loaded planning request
             return;
         }
 
-        if (element.getSelectorType() == Selector.Type.NODE) {
+        if (element.getSelectorType() == Selector.Type.NODE) { //Update the selected node
             this.currentState.selectNode(element.getId());
             this.selectedNode = element.getId();
             System.out.println("CHANGE : " + this.selectedNode);
@@ -266,10 +383,14 @@ public class MenuPageController implements Observer {
         if (idElement.equals("segmentSprite")) {
             return;
         }
-        this.currentState.selectSprite(element.getId());
+        this.currentState.selectSprite(element.getId()); //Update the selected sprite
         this.currentState.selectNode(element.getId());
     }
 
+    /**
+     * Load a map using XML reader
+     * @throws IOException
+     */
     public void loadMap() throws IOException {
         System.out.println("loadCityMapAction");
         Map m = App.choseMapFile(this.xmlReader);
@@ -302,6 +423,10 @@ public class MenuPageController implements Observer {
         sman = new SpriteManager(this.graph);
     }
 
+    /**
+     * Load a Request using XML reader
+     * @throws IOException
+     */
     public void loadRequest() throws IOException {
         System.out.println("loadRequestAction");
         if (map == null) {
@@ -316,6 +441,9 @@ public class MenuPageController implements Observer {
         //System.out.println(this.planningRequest);
     }
 
+    /**
+     * COmpute a tour
+     */
     public void computeTour() {
 
         if (map == null) {
@@ -333,13 +461,16 @@ public class MenuPageController implements Observer {
         TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);
         System.out.println("Optimal");
         tourGenerator.addObserver(this);
-        renderTourButton.setVisible(true);
+        stopResearchButton.setVisible(true);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
         timerThread.start();
     }
 
+    /**
+     * Render a tour
+     */
     public void renderTour() {
 
         for (String edgeId : graphEdges) {
@@ -414,6 +545,10 @@ public class MenuPageController implements Observer {
 
     }
 
+    /**
+     * Set the selected sprite
+     * @param spriteId new sprite selected
+     */
     public void setSelectedSprite(String spriteId) {
         selectedNode = spriteId;
         Sprite sprite = sman.getSprite(spriteId);
@@ -426,8 +561,6 @@ public class MenuPageController implements Observer {
         }
         this.setBigSprite(spriteId);
 
-        String longitude = "Longitude = ";
-        String latitude = "Latitude = ";
         if (spriteType.equals("depotSprite")) {
             SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
             String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());
@@ -472,6 +605,10 @@ public class MenuPageController implements Observer {
 
     }
 
+    /**
+     * Return a random color
+     * @return an RGB color --> index 0 = RED, index 1 = Green, index 2 = Blue
+     */
     public int[] randomColorSprite() {
 
         Random rand = new Random();
@@ -488,6 +625,9 @@ public class MenuPageController implements Observer {
         return rgb;
     }
 
+    /**
+     * Stop the path thread
+     */
     public static void stopPathThread() {
         if (pathThread != null) {
             pathThread.end();
@@ -496,6 +636,9 @@ public class MenuPageController implements Observer {
         }
     }
 
+    /**
+     * Remove the selected request
+     */
     public void removeRequest() {
         System.out.println("Try to remove");
         if (selectedNode == null) {
@@ -535,6 +678,11 @@ public class MenuPageController implements Observer {
 
     }
 
+    /**
+     * Show an info alert
+     * @param title title of the info
+     * @param content content of the info
+     */
     public void schowInfoAlert(String title, String content) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setHeaderText(null);
@@ -543,18 +691,31 @@ public class MenuPageController implements Observer {
         alert.showAndWait();
     }
 
+    /**
+     * Start adding a request
+     */
     public void startAddRequest() {
         System.out.println("Start add request");
         this.addRequestMode();
         this.schowInfoAlert("Select Pickup point", "Please select a pickup point on the map");
     }
 
+    /**
+     * Start swap 2 requests
+     */
     public void startSwapRequest() {
         System.out.println("Start swap request");
         this.addRequestMode();
         this.schowInfoAlert("Select a first point to swap", "Please select a point on the tour");
     }
 
+    /**
+     * Add a request to the current tour
+     * @param pickupId
+     * @param deliveryId
+     * @param pickupDuration
+     * @param deliveryDuration
+     */
     public void addRequest(String pickupId, String deliveryId, int pickupDuration, int deliveryDuration) {
 
         Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));
@@ -565,6 +726,11 @@ public class MenuPageController implements Observer {
         this.defaultMode();
     }
 
+    /**
+     * Swap 2 requests
+     * @param firstId First request, ID of the departure
+     * @param secondId Second request, ID of the departure
+     */
     public void swapRequest(String firstId, String secondId) {
         ArrayList<Long> requestIds = new ArrayList<>();
         for (Path p : tour.getPaths()) {
@@ -576,6 +742,10 @@ public class MenuPageController implements Observer {
         this.defaultMode();
     }
 
+    /**
+     * Remove the sprite of a request
+     * @param r Request removed
+     */
     public void removeSpriteRequest(Request r) {
         String pickupId = r.getPickupAddress().getId().toString();
         String deliveryId = r.getDeliveryAddress().getId().toString();
@@ -583,6 +753,10 @@ public class MenuPageController implements Observer {
         sman.removeSprite(deliveryId);
     }
 
+    /**
+     * Display a request on the map
+     * @param r
+     */
     public void displayRequest(Request r) {
         int[] rgb = randomColorSprite();
         String color = "fill-color: rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ");";
@@ -613,8 +787,7 @@ public class MenuPageController implements Observer {
             this.requestList.getItems().clear();
             if (isFinished) {
                 defaultMode();
-                renderTourButton.setVisible(false);
-                this.renderTourButton.setVisible(false);
+                stopResearchButton.setVisible(false);
                 this.timerPane.setVisible(false);
                 this.addRequestButton.setVisible(true);
                 this.swapRequestButton.setVisible(true);
@@ -628,68 +801,129 @@ public class MenuPageController implements Observer {
         }
     }
 
+    /**
+     * Undo an action
+     */
     public void undo() {
         loc.undo();
     }
 
+    /**
+     * Redo an action
+     */
     public void redo() {
         loc.redo();
     }
 
+    /**
+     * Get the current state
+     * @return current state
+     */
     public State getCurrentState() {
         return currentState;
     }
 
+    /**
+     * Get the current graph
+     * @return graph
+     */
     public Graph getGraph() {
         return graph;
     }
 
+    /**
+     * Get the current tour
+     * @return tour
+     */
     public Tour getTour() {
         return tour;
     }
 
+    /**
+     * Get the current Compute tour thread
+     * @return compute tour thread
+     */
     public static ComputeTourThread getComputeTourThread() {
         return computeTourThread;
     }
 
+    /**
+     * Get the current graph processor
+     * @return graph processor
+     */
     public GraphProcessor getGraphProcessor() {
         return graphProcessor;
     }
 
+    /**
+     * Get the current selected node
+     * @return selected node
+     */
     public String getSelectedNode() {
         return selectedNode;
     }
 
+    /**
+     * Get the current selected planning request
+     * @return planning request
+     */
     public PlanningRequest getPlanningRequest() {
         return planningRequest;
     }
 
+    /**
+     * Get the timer pane
+     * @return timer pane
+     */
     public AnchorPane getTimerPane() {
         return timerPane;
     }
 
+    /**
+     * Get the timer text
+     * @return timer text
+     */
     public Text getTimerText() {
         return timerText;
     }
+        
+    /**
+     * Get the progress indicator
+     * @return progress indicator
+     */
+    public ProgressIndicator getProgressIndicator() {
+        return progressIndicator;
+    }
+    
+    public Button getStopResearchButton() {
+        return stopResearchButton;
+    }
+    
 
+    /**
+     * Set the selected node
+     * @param selectedNode id of the node
+     */
     public void setSelectedNode(String selectedNode) {
         this.selectedNode = selectedNode;
     }
 
+    /**
+     * Check if the node is on the tour
+     * @param nodeId
+     * @return true if the node is on the tour
+     */
     public boolean isNodeOnTour(String nodeId) {
         Sprite sprite = sman.getSprite(nodeId);
         return sprite != null;
     }
 
-    public Button getRenderTourButton() {
-        return renderTourButton;
-    }
-
-    public ProgressIndicator getProgressIndicator() {
-        return progressIndicator;
-    }
-
     //PUBLIC FXML METHODS
+
+    /**
+     * Action when we click on remove request
+     * @param arg0
+     */
     @FXML
     public void requestListClick(MouseEvent arg0) {
 
@@ -708,26 +942,47 @@ public class MenuPageController implements Observer {
     }
 
     //PRIVATE FXML METHODS
+    
+    /**
+     * Action when we click on load a map
+     * @throws IOException
+     */
     @FXML
     private void loadCityMapAction() throws IOException {
         currentState.loadMap();
     }
 
+    /**
+     * Action when we click on load a request
+     * @throws IOException
+     */
     @FXML
     private void loadRequestAction() throws IOException {
         currentState.loadRequest();
     }
 
+    /**
+     * Action when we click on compute a tour
+     * @throws IOException
+     */
     @FXML
     private void computeTourAction() throws IOException {
         currentState.computeTour();
     }
 
+    /**
+     * Action when we click on add a request
+     * @throws IOException
+     */
     @FXML
     private void addRequestAction() throws IOException {
         currentState.startAddRequest();
     }
 
+    /**
+     * Action when we click on delete a request
+     * @throws IOException
+     */
     @FXML
     private void deleteRequestAction() throws IOException {
         System.out.println("deleteRequestAction");
@@ -735,10 +990,13 @@ public class MenuPageController implements Observer {
         this.deleteRequestButton.setVisible(false);
     }
 
+    /**
+     * Action when we want to render a tour
+     */
     @FXML
     private void renderTourAction() {
         defaultMode();
-        this.renderTourButton.setVisible(false);
+        this.stopResearchButton.setVisible(false);
         this.timerPane.setVisible(false);
         System.out.println("cancel");
         computeTourThread.stop();
@@ -748,6 +1006,9 @@ public class MenuPageController implements Observer {
         this.swapRequestButton.setVisible(true);
     }
 
+    /**
+     * Action when we click on swap requests
+     */
     @FXML
     private void swapRequestAction() {
         System.out.println("swapRequestAction");
@@ -756,6 +1017,11 @@ public class MenuPageController implements Observer {
     }
 
     //PRIVATE METHODS
+    
+    /**
+     * Load a graph
+     * @param map current map
+     */
     private void chargerGraph(Map map) {
         if (graph != null) {
             initUI();
@@ -789,6 +1055,10 @@ public class MenuPageController implements Observer {
         });
     }
 
+    /**
+     * Set the selected path
+     * @param num position of the path in the tour (start at 1)
+     */
     private void setSelectedPath(int num) {
         // complete list
         completePathList(num);
@@ -802,6 +1072,10 @@ public class MenuPageController implements Observer {
 
     }
 
+    /**
+     * Complete the path list
+     * @param num position of the path in the tour (start at 1)
+     */
     private void completePathList(int num) {
         streetsList.getItems().clear();
         Path p = tour.getPaths().get(num - 1);
@@ -813,6 +1087,10 @@ public class MenuPageController implements Observer {
         }
     }
 
+    /**
+     * Load a planning request
+     * @throws IOException
+     */
     private void chargerPlanningRequests() throws IOException {
         PlanningRequest pr = App.choseRequestFile(this.xmlReader);
         if (pr == null) {
@@ -854,6 +1132,11 @@ public class MenuPageController implements Observer {
         }
     }
 
+    /**
+     * Display a request on the map and add the request to the list view
+     * @param r request to display
+     * @param cpt position on the list view
+     */
     private void displayRequestWithAddToListView(Request r, int cpt) {
         Text txt;
         int[] rgb = randomColorSprite();
@@ -879,10 +1162,18 @@ public class MenuPageController implements Observer {
         this.requestList.getItems().add(txt);
     }
 
+    /**
+     * Reset the appearance of the edge
+     * @param edgeId
+     */
     private void resetEdge(String edgeId) {
         graph.getEdge(edgeId).setAttribute("ui.class", "default");
     }
 
+    /**
+     * Set sprite appearance as a selected sprite
+     * @param spriteId
+     */
     private void setBigSprite(String spriteId) {
         for (Sprite s : sman.sprites()) {
             if (((String) s.getAttribute("ui.class")).contains("Selected")) {
@@ -893,7 +1184,11 @@ public class MenuPageController implements Observer {
         sprite.setAttribute("ui.class", ((String) sprite.getAttribute("ui.class")) + "Selected");
     }
 
-    // Show a Information Alert
+    /**
+     * Show an error alert
+     * @param title title of the error
+     * @param content content of the error
+     */
     private void showErrorAlert(String title, String content) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setHeaderText(null);
@@ -903,6 +1198,9 @@ public class MenuPageController implements Observer {
         alert.showAndWait();
     }
 
+    /**
+     * Currently adding a request, all button aren't visible and the list view is not selectable
+     */
     private void addRequestMode() {
         this.loadCityMapButton.setVisible(false);
         this.loadRequestButton.setVisible(false);
@@ -915,6 +1213,9 @@ public class MenuPageController implements Observer {
 
     }
 
+    /**
+     * Default appearence mode of the application
+     */
     private void defaultMode() {
         this.loadCityMapButton.setVisible(true);
         this.loadRequestButton.setVisible(true);

@@ -41,7 +41,7 @@ public class TimerThread extends Thread {
            
             mpc.getTimerText().setText("Tour computed \n(" + diff + "s)");
             mpc.getProgressIndicator().setVisible(false);
-            mpc.getRenderTourButton().setVisible(true);
+            mpc.getStopResearchButton().setVisible(true);
             isFinished = true;
         } catch (Exception e) {
             System.out.println("Path Thread crash : " + e);
