@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package deliverif.app.controller;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.event.EventHandler;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import org.graphstream.graph.Edge;
 import org.graphstream.ui.fx_viewer.util.FxMouseManager;
@@ -20,150 +14,91 @@ import org.graphstream.ui.graphicGraph.GraphicNode;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.util.InteractiveElement;
 
+
 /**
- *
- * @author faouz
- */
+ * Custom MouseManager to manage mouse events on the map.
+ */ 
 public class MouseOverMouseManager extends FxMouseManager {
-
+    
+    /**
+     * Controller of the scene.
+     */
     private final MenuPageController menuPageController;
-
-    /*
-        Construction
+    
+    /**
+     * Constructor.
+     * @param of Set of element types that can respond to mouse events (Node or/and Edge or/and Sprite)
+     * @param mpc Controller of the scene
      */
     public MouseOverMouseManager(EnumSet<InteractiveElement> of, MenuPageController mpc) {
         super(of);
         this.menuPageController = mpc;
     }
-
+    
+    /**
+     * Initialize the mouse manager, add the listeners to the view. 
+     * @param gg Graph
+     * @param view View of the graph
+     */
     @Override
     public void init(GraphicGraph gg, View view) {
-        System.out.println("init"); //To change body of generated methods, choose Tools | Templates.
         super.init(gg, view);
         super.release();
         view.addListener(MouseEvent.MOUSE_PRESSED, mousePressed);
-        view.addListener(MouseEvent.MOUSE_DRAGGED, mouseDragged);
-        view.addListener(MouseEvent.MOUSE_RELEASED, mouseRelease);
     }
 
-    /*
-        Command
+    /**
+     * Does nothing but overrides the inherited method to
+     * keep the nodes from moving.
+     * @param element GraphicElement moving with the mouse
+     * @param event MouseEvent 
      */
     @Override
     protected void elementMoving(GraphicElement element, MouseEvent event) {
-        //Empecher les noeuds de bouger
-        //view.moveElementAtPx(element, event.getX(), event.getY());
-        //System.out.println("elementMoving");
     }
-
-    @Override
-    protected void mouseButtonRelease(MouseEvent event,
-            Iterable<GraphicElement> elementsInArea) {
-        for (GraphicElement element : elementsInArea) {
-            if (!element.hasAttribute("ui.selected")) {
-                element.setAttribute("ui.selected");
-            }
-        }
-    }
-
+    
+    /**
+     * Called when an element is pressed on.
+     * Update selection by calling the menuPageController method "updateSelection".
+     * @param element GraphicElement Element that was clicked.
+     * @param event MouseEvent
+     */
     @Override
     protected void mouseButtonPressOnElement(GraphicElement element,
             MouseEvent event) {
         view.freezeElement(element, true);
-        if (event.getButton() == MouseButton.SECONDARY) {
-            element.setAttribute("ui.selected");
-        } else {
-            element.setAttribute("ui.clicked");
-        }
-        System.out.println("Press on " + element.getSelectorType() + " id=" + element.getId());
         this.menuPageController.updateSelection(element);
     }
 
-    @Override
-    protected void mouseButtonPress(MouseEvent event) {
-        view.requireFocus();
-        float value = 0;
-        float val = (float) 0.5;
-        // Unselect all.
-        if (!event.isShiftDown()) {
-            graph.nodes().filter(n -> n.hasAttribute("ui.selected")).forEach(n -> {
-                n.removeAttribute("ui.selected");
-                n.setAttribute("ui.color", value);
-            });
-            graph.sprites().filter(s -> s.hasAttribute("ui.selected")).forEach(s -> s.removeAttribute("ui.selected"));
-            graph.edges().filter(e -> e.hasAttribute("ui.selected")).forEach(e -> {
-                e.removeAttribute("ui.selected");
-                e.setAttribute("ui.color", val);
-            });
-        }
-    }
-
-    /*
-        Mouse Listener
+    /**
+     * Handle a press on the mouse.
+     * Update curElement with the element clicked if there is one
      */
-    EventHandler<MouseEvent> mouseRelease = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-            if (curElement != null) {
-                mouseButtonReleaseOffElement(curElement, event);
-                curElement = null;
-            } else {
-                double x2 = event.getX();
-                double y2 = event.getY();
-                double t;
-
-                if (x1 > x2) {
-                    t = x1;
-                    x1 = x2;
-                    x2 = t;
-                }
-                if (y1 > y2) {
-                    t = y1;
-                    y1 = y2;
-                    y2 = t;
-                }
-                view.endSelectionAt(x2, y2);
-                //view.getCamera().setViewPercent(0.50);
-            }
-        }
-    };
-
-    EventHandler<MouseEvent> mousePressed = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent e) {
-            curElement = view.findGraphicElementAt(getManagedTypes(), e.getX(), e.getY());
-            if (curElement != null) {
+    private final EventHandler<MouseEvent> mousePressed = (MouseEvent e) -> {
+        curElement = view.findGraphicElementAt(getManagedTypes(), e.getX(), e.getY());
+        if (curElement != null) {
+            mouseButtonPressOnElement(curElement, e);
+        } else {
+            // Edge click
+            Edge edge = selectEdge(e.getX(), e.getY());
+            if (edge != null) {
+                curElement = (GraphicElement) edge;
                 mouseButtonPressOnElement(curElement, e);
             } else {
-                /*
-                    Reconnaissance des segments
-                 */
-                Edge edge = selectEdge(e.getX(), e.getY());
-                if (edge != null) {
-                    curElement = (GraphicElement) edge;
-                    mouseButtonPressOnElement(curElement, e);
-                } else {
-                    x1 = e.getX();
-                    y1 = e.getY();
-                    mouseButtonPress(e);
-                    view.beginSelectionAt(x1, y1);
-                }
-
-            }
+                x1 = e.getX();
+                y1 = e.getY();
+                mouseButtonPress(e);
+                view.beginSelectionAt(x1, y1);
+            }   
         }
     };
-
-    EventHandler<MouseEvent> mouseDragged = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-            if (curElement != null) {
-                elementMoving(curElement, event);
-            } else {
-                view.selectionGrowsAt(event.getX(), event.getY());
-            }
-        }
-    };
-
+    
+    /**
+     * Finds and returns the edge on the position (px,py). 
+     * @param px 
+     * @param py 
+     * @return The Edge on the position (px,py) or null if there is not.
+     */
     private Edge selectEdge(double px, double py) {
         double ld = 5; // Max distance mouse click can be from line to be a click
         Edge se = null; // Current closest edge to mouse click that is withing max distance
@@ -207,17 +142,12 @@ public class MouseOverMouseManager extends FxMouseManager {
         }
         return null;
     }
-
+    
+    /**
+     * Remove the listener from the view.
+     */
     @Override
     public void release() {
         view.removeListener(MouseEvent.MOUSE_PRESSED, mousePressed);
-        view.removeListener(MouseEvent.MOUSE_DRAGGED, mouseDragged);
-        view.removeListener(MouseEvent.MOUSE_RELEASED, mouseRelease);
     }
-
-    @Override
-    public EnumSet<InteractiveElement> getManagedTypes() {
-        return super.getManagedTypes();
-    }
-
 }
