@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -27,25 +28,39 @@ public class XmlReaderTest {
     //smallMap.xml 
     
     /**
+     * Test of readMap method, of class XmlReader.
+     * @throws java.text.ParseException
+     */
+    @org.junit.jupiter.api.Test
+    public void testReadMap() throws ParseException {
+        System.out.println("readRequest");
+
+        XmlReader instance = new XmlReader();
+        instance.readMap("./src/main/resources/deliverif/app/fichiersXML2020/wrongMediumMap.xml");
+        
+        Map expResult = null;
+        Map result = (Map) instance.getMap();
+        
+        assertEquals(expResult, result);   
+    }
+    
+    
+    /**
      * Test of readRequest method, of class XmlReader.
      * @throws java.text.ParseException
      */
     @org.junit.jupiter.api.Test
     public void testReadRequest() throws ParseException {
         System.out.println("readRequest");
-        String filename = "C:\\Users\\loue0\\Documents\\NetBeansProjects\\DELIVERIF\\app\\src\\main\\"
-                + "resources\\deliverif\\app\\fichiersXML2020\\requestsSmall1.xml";
+        String filename = "./src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml";
         
         XmlReader instance = new XmlReader();
-        instance.readMap("C:\\Users\\loue0\\Documents\\NetBeansProjects\\DELIVERIF\\app\\src\\main\\"
-                + "resources\\deliverif\\app\\fichiersXML2020\\smallMap.xml");
+        instance.readMap("./src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         //Depot
-        Long id = Long.parseLong("342873658");
-        float lat = Float.parseFloat("45.76038");
-        float lon = Float.parseFloat("4.8775625");   
+        Long id = Long.parseLong("342873658");  
         
-        Intersection adr = new Intersection(id, lat, lon);
-        SimpleDateFormat hourFormat =new SimpleDateFormat("HH:mm:ss");
+        Intersection adr = instance.getMap().getIntersections().get(id);
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
         Date time = hourFormat.parse("8:0:0");
         Depot depot = new Depot(adr, time);
         
@@ -53,16 +68,10 @@ public class XmlReaderTest {
         List<Request> requests = new ArrayList<>();
         
         id = Long.parseLong("208769039");
-        lat = Float.parseFloat("45.76069");
-        lon = Float.parseFloat("4.8749375"); 
+        Intersection pkAdr = instance.getMap().getIntersections().get(id);
         
-        Intersection pkAdr = new Intersection(id, lat, lon);
-         
         id = Long.parseLong("25173820");
-        lat = Float.parseFloat("45.749996");
-        lon = Float.parseFloat("4.858258");
-        
-        Intersection dlAdr = new Intersection(id, lat, lon);
+        Intersection dlAdr = instance.getMap().getIntersections().get(id);
         
         Integer pkD = Integer.parseInt("180");
         Integer dlD = Integer.parseInt("240");
@@ -77,9 +86,9 @@ public class XmlReaderTest {
         System.out.println(expResult);
         System.out.println("-----------------res");
         System.out.println(result);
-        assertEquals(expResult, result);
         System.out.println("--------------------");
 
+        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }

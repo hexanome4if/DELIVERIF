@@ -30,14 +30,26 @@ public class XmlReader {
     
     private Map map;
     
+    /**
+     * XmlReader constructor
+     */
     public XmlReader(){
         this.map = null;
     }
 
+    /**
+     * Getter
+     * @return Map
+     */
     public Map getMap() {
         return map;
     }
     
+    /**
+     * Read a xml file to create a instance of the Map class
+     * @param filename
+     * @return boolean
+     */
     public boolean readMap(String filename){
 
         List<Segment> segments = new ArrayList<>(); 
@@ -55,19 +67,13 @@ public class XmlReader {
 
             Document doc = db.parse(file);  
             doc.getDocumentElement().normalize();  
-
-            //System.out.println("Root element: " + doc.getDocumentElement().getNodeName());  
             if(!doc.getDocumentElement().getNodeName().equals("map")) return false;
             
-            NodeList nodeList = doc.getElementsByTagName("intersection");  
-            // nodeList is not iterable, so we are using for loop  
-
-
+            NodeList nodeList = doc.getElementsByTagName("intersection");
 
             for (int itr = 0; itr < nodeList.getLength(); itr++) { 
 
                 Node node = nodeList.item(itr);  
-                //System.out.println("Node Name :" + node.getNodeName());
 
                 if (node.getNodeType() == Node.ELEMENT_NODE){  
                     Element eElement = (Element) node;  
@@ -75,11 +81,8 @@ public class XmlReader {
                     float lat = Float.parseFloat(eElement.getAttribute("latitude"));
                     float lon = Float.parseFloat(eElement.getAttribute("longitude"));
 
-                    //System.out.println("Request id : " + eElement.getAttribute("id")); 
-
                     Intersection inter = new Intersection(id, lat, lon);
                     intersections.put(id, inter);
-
                 }
             }
 
@@ -88,8 +91,6 @@ public class XmlReader {
             for (int itr = 0; itr < nodeList.getLength(); itr++) { 
 
                 Node node = nodeList.item(itr);  
-                //System.out.println("\nNode Name :" + node.getNodeName());
-
                 if (node.getNodeType() == Node.ELEMENT_NODE){  
 
                     Element eElement = (Element) node;
@@ -98,9 +99,6 @@ public class XmlReader {
                     float len = Float.parseFloat(eElement.getAttribute("length"));
                     String name = eElement.getAttribute("name");
 
-                    //System.out.println("Request addres : " + eElement.getAttribute("name")); 
-
-                    //destination length name origin
                     Segment  seg = new Segment(intersections.get(origin),intersections.get(dest), len, name);
                     segments.add(seg);
 
@@ -117,6 +115,11 @@ public class XmlReader {
         return this.map != null;
    }
 
+    /**
+     * Read a xml file to create an instance of PlanningRequest class
+     * @param filename
+     * @return
+     */
     public PlanningRequest readRequest(String filename){
         
         PlanningRequest pr = null;
@@ -149,9 +152,6 @@ public class XmlReader {
 
                     if (node.getNodeType() == Node.ELEMENT_NODE){  
                         Element eElement = (Element) node;  
-                        //System.out.println("address : " + eElement.getAttribute("address"));
-                        //System.out.println("departureTime : " + eElement.getAttribute("departureTime"));
-                        
                         Long adrId = Long.parseLong(eElement.getAttribute("address"));
                         Intersection adr = map.getIntersections().get(adrId);
                         
@@ -164,23 +164,15 @@ public class XmlReader {
                     }  
             } 
             
-
             nodeList = doc.getElementsByTagName("request");  
-            // nodeList is not iterable, so we are using for loop  
+            
             for (int itr = 0; itr < nodeList.getLength(); itr++) { 
 
                 Node node = nodeList.item(itr);  
 
                 if (node.getNodeType() == Node.ELEMENT_NODE){  
                     Element eElement = (Element) node;  
-                    /*System.out.println("pickupAddress :" + eElement.getAttribute("pickupAddress")); 
-                    System.out.println("deliveryAddress :" + eElement.getAttribute("deliveryAddress"));
-                    System.out.println("pickupDuration :" + eElement.getAttribute("pickupDuration")); 
-                    System.out.println("deliveryDuration :" + eElement.getAttribute("deliveryDuration"));*/
-                    
                     Long pkId = Long.parseLong(eElement.getAttribute("pickupAddress"));
-                    
-                    
                     Long dlId;
                     
                     if(!"".equals(eElement.getAttribute("deliveryAddress")))
