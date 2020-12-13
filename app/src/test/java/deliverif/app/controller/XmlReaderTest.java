@@ -33,10 +33,8 @@ public class XmlReaderTest {
      */
     @org.junit.jupiter.api.Test
     public void testReadMap() throws ParseException {
-        System.out.println("readRequest");
-
         XmlReader instance = new XmlReader();
-        instance.readMap("./src/main/resources/deliverif/app/fichiersXML2020/wrongMediumMap.xml");
+        instance.readMap("C:/Users/sana/Documents/NetBeansProjects/agile/fichiersXML2020/wrongSmallMap.xml");
         
         Map expResult = null;
         Map result = (Map) instance.getMap();
@@ -48,14 +46,13 @@ public class XmlReaderTest {
     /**
      * Test of readRequest method, of class XmlReader.
      * @throws java.text.ParseException
-     */
+    */
     @org.junit.jupiter.api.Test
     public void testReadRequest() throws ParseException {
-        System.out.println("readRequest");
-        String filename = "./src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml";
+        String filename = "C:/Users/sana/Documents/NetBeansProjects/agile/fichiersXML2020/requestsSmall1.xml";
         
         XmlReader instance = new XmlReader();
-        instance.readMap("./src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        instance.readMap("C:/Users/sana/Documents/NetBeansProjects/agile/fichiersXML2020/smallMap.xml");
         //Depot
         Long id = Long.parseLong("342873658");  
         
@@ -81,14 +78,8 @@ public class XmlReaderTest {
 
         PlanningRequest expResult = new PlanningRequest(depot, requests);
         PlanningRequest result = instance.readRequest(filename);
+        assertEquals(expResult.toString(),result.toString());
         
-        System.out.println("-----------------exp");
-        System.out.println(expResult);
-        System.out.println("-----------------res");
-        System.out.println(result);
-        System.out.println("--------------------");
-
-        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
