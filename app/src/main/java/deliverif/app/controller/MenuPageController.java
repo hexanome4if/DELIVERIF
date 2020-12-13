@@ -13,8 +13,7 @@ import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;
 import deliverif.app.controller.State.InitialState;
 import deliverif.app.controller.State.State;
-import deliverif.app.controller.thread.ComputeTourThread;
-import deliverif.app.controller.thread.TimerThread;
+import deliverif.app.controller.thread.*;
 import deliverif.app.controller.tsp.TourGenerator;
 import deliverif.app.model.graph.Tour;
 import deliverif.app.model.map.Intersection;
@@ -285,7 +284,7 @@ public class MenuPageController implements Observer {
         }
 
         this.chargerGraph(this.map);
-        this.graph.setAttribute("ui.stylesheet", App.styleSheet);
+        this.graph.setAttribute("ui.stylesheet", App.STYLESHEET);
         //this.graph.setAutoCreate(true);
         //this.graph.setStrict(false);
 

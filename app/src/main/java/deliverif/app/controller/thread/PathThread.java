@@ -9,7 +9,6 @@ import deliverif.app.controller.MenuPageController;
 import deliverif.app.model.map.Segment;
 import deliverif.app.model.request.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import org.graphstream.graph.Edge;
 
 /**
