@@ -40,6 +40,11 @@ public class GraphProcessor {
     private TSP1 currentTsp;
     private PlanningRequest pr;
 
+    /**
+     * Create a new Graph Processor
+     *
+     * @param m the main map
+     */
     public GraphProcessor(Map m) {
         graph = new Graph();
         map = m;
@@ -54,10 +59,14 @@ public class GraphProcessor {
     }
 
     /**
-     *
-     * @param completeGraph
-     * @param source
-     * @param goals
+     * Calculate the shortest paths from {@code source} to every vertices 
+     * in {@code goals} using Dijkstra's algorithm.
+     * 
+     * @param completeGraph the graph that stores the results
+     * @param source the vertex of departure, in type of {@code Vertex}
+     * @param goals a list of {@code Vertex} containing all targets
+     * @see Graph
+     * @see Vertex
      */
     public void dijkstra(Graph completeGraph, Vertex source, List<Vertex> goals) {
         // Strutures
@@ -128,6 +137,16 @@ public class GraphProcessor {
         }
     }
 
+    /**
+     * Create a complete graph with a planning request
+     * <p> The returning graph is complete and includes every 
+     * {@code Intersection} mentioned in the given 
+     * {@code PlanningRequest}, in the form of {@code Vertex}.
+     * @param pr the planning request
+     * @return the object {@code Graph} after calculating with Dijkstra's Algo
+     * @see PlanningRequest
+     * @see Graph
+     */
     public Graph completeGraph(PlanningRequest pr) {
         Graph g = new Graph();
         List<Vertex> vertices = new ArrayList<>();
@@ -147,6 +166,12 @@ public class GraphProcessor {
         return g;
     }
 
+    /**
+     * Create a template to resolve the Travelling Salesman Problem
+     * @param pr the planning request
+     * @return the template {@code TSP1}
+     * @see TSP1
+     */
     public TSP1 hamiltonianCircuit(PlanningRequest pr) {
 
         TSP1 tsp = new TSP1();
@@ -154,6 +179,13 @@ public class GraphProcessor {
         return tsp;
     }
 
+    /**
+     * Create a template of TSP which uses genomic algorithms
+     * @param pr the planning request
+     * @return the list of result
+     * @see TravellingSalesman
+     * @see SalesmanGenome
+     */
     public Vertex[] hamiltonianCircuit2(PlanningRequest pr) {
         Graph g = completeGraph(pr);
         List<Long> ordre = new ArrayList<>();
@@ -172,6 +204,15 @@ public class GraphProcessor {
         return result;
     }
 
+    /**
+     * Get the shortest path between two intersections
+     * <p> Get the path registered in the HashMap {@code fullPath},
+     * it's different from {@code getNewPath}.
+     * @param v1 the starting intersection
+     * @param v2 the ending intersection
+     * @return the object {@code Path} which is the shortest and links these
+     * two intersection
+     */
     public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2) {
         Vertex source = graph.getVertexById(v1.getId());
         Vertex destination = graph.getVertexById(v2.getId());
@@ -183,6 +224,12 @@ public class GraphProcessor {
         return path;
     }
 
+    /**
+     * Generate the optimal tour
+     * @param pr the planning request
+     * @return the tour generator
+     * @see TourGenerator
+     */
     public TourGenerator optimalTour(PlanningRequest pr) {
         System.out.println("Init");
         currentVertex.clear();
@@ -194,6 +241,10 @@ public class GraphProcessor {
         return tourGenerator;
     }
 
+    /**
+     * Start the TSP algorithm
+     * @see TSP1
+     */
     public void startAlgo() {
         System.out.println("Start");
         Graph g = completeGraph(pr);
@@ -206,6 +257,18 @@ public class GraphProcessor {
         currentTsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
     }
 
+    /**
+     * Rearrange an existing request with a given order 
+     * <p> The new order is a list of identity in type of {@code Long}, 
+     * it should be starting and ending with the ID of the intersection
+     * of {@code Depot}, and its length has to be the same as the 
+     * original length of {@code Tour.paths}.
+     * @param tour the original tour
+     * @param newOrder the order of intersections that will be applied
+     * @return the object {@code Tour} after changing, {@code null} if the
+     * rules above are not respected.
+     * @see Tour
+     */
     public Tour changeOrder(Tour tour, List<Long> newOrder) {
         //newOrder === depot -> nodes -> depot
         if (newOrder.size() != tour.getOrder().size()) {
@@ -223,6 +286,16 @@ public class GraphProcessor {
         return newTour;
     }
 
+    /**
+     * Get the shortest path between two intersections
+     * <p> A sub-method of {@code changeOrder}, it's different from 
+     * {@code shortestPathBetweenTwoIntersections} because it uses the
+     * method {@code dijkstra}.
+     * @param idStart the identity of the starting intersection
+     * @param idStop the identity of the ending intersection
+     * @return the object {@code Path} which is the shortest and links these
+     * two intersection
+     */
     public Path getNewPath(Long idStart, Long idStop) {
         Graph g = new Graph();
         Vertex start = graph.getVertexById(idStart);
@@ -233,6 +306,15 @@ public class GraphProcessor {
         return fullPath.get(idStart + "-" + idStop).convertToPath(map);
     }
 
+    /**
+     * Add a new request to the circuit after the delivery begins
+     * <p> The added one will be placed at the last of the tour 
+     * in order to keep the agreed arrangements.
+     * @param tour the original tour
+     * @param rqst the request that will be added
+     * @return the object {@code Tour} after inserting
+     * @see Tour
+     */
     public Tour addRequestToTour(Tour tour, Request rqst) {
         tour.getPr().addRequest(rqst);
         tour.removePath(tour.getPaths().get(tour.getPaths().size() - 1));
@@ -306,6 +388,13 @@ public class GraphProcessor {
         return tour;
     }
 
+    /**
+     * Remove an existing request from the circuit
+     * @param t the original tour
+     * @param r the request that will be cancelled
+     * @return the object {@code Tour} after cancelling
+     * @see Tour
+     */
     public Tour removeRequestFromTour(Tour t, Request r) {
         t.getPr().removeRequest(r);
         Intersection pickup = r.getPickupAddress();

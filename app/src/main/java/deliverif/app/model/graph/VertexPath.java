@@ -8,7 +8,6 @@ package deliverif.app.model.graph;
 import deliverif.app.model.map.Map;
 import deliverif.app.model.request.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,16 +27,6 @@ public class VertexPath {
         path.add(v);
     }
 
-    public void reverse(){
-        Collections.reverse(path);
-    }
-    
-    public void affiche(){
-        System.out.println("---listing---");
-        for(Vertex v : path)
-            System.out.println(v.getId());
-    }
-    
     /**
      * Convert the vertex path to a path composed of segments
      *

@@ -90,6 +90,14 @@ public class PlanningRequest {
         this.requests.remove(r);
     }
 
+    /**
+     * Find out the {@code Request} which contains the intersection 
+     * having the same identity of its parameter
+     *
+     * @param idItsc the identity of the intersection
+     * @return the object Request containing the specific intersection, 
+     * {@code null} if the demanding request wasn't found
+     */
     public Request findRequestByAddress(Long idItsc){
         for(Request rq : requests){
             if(Objects.equals(rq.getDeliveryAddress().getId(), idItsc) 
@@ -100,6 +108,14 @@ public class PlanningRequest {
         return null;
     }
     
+    /**
+     * Get the duration corresponding to the request which contains 
+     * the intersection having the same identity of its parameter
+     *
+     * @param idItsc the identity of the intersection
+     * @return the integer time in second, 
+     * {@code -1} if the demanding request wasn't found
+     */
     public int getDuration(Long idItsc){
         for(Request rq : requests){
             if(Objects.equals(rq.getPickupAddress().getId(), idItsc)){

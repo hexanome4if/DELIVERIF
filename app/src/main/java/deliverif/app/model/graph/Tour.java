@@ -45,6 +45,9 @@ public class Tour extends Observable {
         }
     }
     
+    /**
+     * update the timestamps of {@code Path} using the data of the planning request
+     */
     public void update(){
         ArrayList<Path> newPaths = new ArrayList<>();
         double velocity = 15 * 1000 / 60;
