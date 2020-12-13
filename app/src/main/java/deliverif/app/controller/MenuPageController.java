@@ -285,7 +285,7 @@ public class MenuPageController implements Observer {
         }
 
         this.chargerGraph(this.map);
-        this.graph.setAttribute("ui.stylesheet", App.styleSheet);
+        this.graph.setAttribute("ui.stylesheet", App.STYLESHEET);
         //this.graph.setAutoCreate(true);
         //this.graph.setStrict(false);
 
