@@ -1,0 +1,44 @@
+@startuml
+annotation java.lang.Override
+class deliverif.app.controller.Command.AddRequestCommand
+class deliverif.app.controller.Command.ListOfCommands
+class deliverif.app.controller.Command.RemoveRequestCommand
+class deliverif.app.controller.Command.SelectNodeCommand
+class deliverif.app.controller.Command.SelectSpriteCommand
+class deliverif.app.controller.Command.SwapRequestCommand
+class deliverif.app.controller.GraphProcessor
+class deliverif.app.controller.MenuPageController
+class deliverif.app.controller.State.AddingRequestState
+class deliverif.app.controller.State.SwapRequestState
+class deliverif.app.model.graph.Tour
+class deliverif.app.model.request.Request
+class java.util.LinkedList
+class java.util.List
+interface deliverif.app.controller.Command.Command
+deliverif.app.controller.Command.AddRequestCommand ..> java.lang.Override
+deliverif.app.controller.Command.AddRequestCommand ..> deliverif.app.controller.GraphProcessor
+deliverif.app.controller.Command.AddRequestCommand ..> deliverif.app.controller.MenuPageController
+deliverif.app.controller.Command.AddRequestCommand ..> deliverif.app.model.graph.Tour
+deliverif.app.controller.Command.AddRequestCommand ..> deliverif.app.model.request.Request
+deliverif.app.controller.Command.AddRequestCommand --|> deliverif.app.controller.Command.Command
+deliverif.app.controller.Command.ListOfCommands ..> java.util.LinkedList
+deliverif.app.controller.Command.RemoveRequestCommand ..> java.lang.Override
+deliverif.app.controller.Command.RemoveRequestCommand ..> deliverif.app.controller.GraphProcessor
+deliverif.app.controller.Command.RemoveRequestCommand ..> deliverif.app.controller.MenuPageController
+deliverif.app.controller.Command.RemoveRequestCommand ..> deliverif.app.model.graph.Tour
+deliverif.app.controller.Command.RemoveRequestCommand ..> deliverif.app.model.request.Request
+deliverif.app.controller.Command.RemoveRequestCommand --|> deliverif.app.controller.Command.Command
+deliverif.app.controller.Command.SelectNodeCommand ..> java.lang.Override
+deliverif.app.controller.Command.SelectNodeCommand ..> deliverif.app.controller.State.AddingRequestState
+deliverif.app.controller.Command.SelectNodeCommand --|> deliverif.app.controller.Command.Command
+deliverif.app.controller.Command.SelectSpriteCommand ..> java.lang.Override
+deliverif.app.controller.Command.SelectSpriteCommand ..> deliverif.app.controller.State.SwapRequestState
+deliverif.app.controller.Command.SelectSpriteCommand --|> deliverif.app.controller.Command.Command
+deliverif.app.controller.Command.SwapRequestCommand ..> java.lang.Override
+deliverif.app.controller.Command.SwapRequestCommand ..> deliverif.app.controller.GraphProcessor
+deliverif.app.controller.Command.SwapRequestCommand ..> deliverif.app.controller.MenuPageController
+deliverif.app.controller.Command.SwapRequestCommand ..> deliverif.app.model.graph.Tour
+deliverif.app.controller.Command.SwapRequestCommand ..> deliverif.app.model.request.Request
+deliverif.app.controller.Command.SwapRequestCommand ..> java.util.List
+deliverif.app.controller.Command.SwapRequestCommand --|> deliverif.app.controller.Command.Command
+@enduml

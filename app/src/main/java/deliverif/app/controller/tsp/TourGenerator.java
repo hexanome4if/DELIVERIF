@@ -5,6 +5,7 @@
  */
 package deliverif.app.controller.tsp;
 
+import deliverif.app.controller.tsp.BranchAndBound.TSP1;
 import deliverif.app.controller.GraphProcessor;
 import deliverif.app.controller.Observer.Observable;
 import deliverif.app.controller.Observer.Observer;

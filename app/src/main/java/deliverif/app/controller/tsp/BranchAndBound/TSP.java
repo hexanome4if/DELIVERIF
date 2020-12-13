@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package deliverif.app.controller.tsp;
+package deliverif.app.controller.tsp.BranchAndBound;
 
 import deliverif.app.model.graph.Graph;
 import deliverif.app.model.graph.Vertex;

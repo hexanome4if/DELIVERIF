@@ -8,7 +8,7 @@ package deliverif.app.controller;
 import deliverif.app.controller.tsp.GeneticAlgorithm.SalesmanGenome;
 import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman;
 import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman.SelectionType;
-import deliverif.app.controller.tsp.TSP1;
+import deliverif.app.controller.tsp.BranchAndBound.TSP1;
 import deliverif.app.controller.tsp.TourGenerator;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
