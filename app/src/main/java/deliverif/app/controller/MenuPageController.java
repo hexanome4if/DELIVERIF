@@ -95,6 +95,12 @@ public class MenuPageController implements Observer {
     */
     @FXML
     private Button swapRequestButton;
+    
+    /**
+    * Button used to stop the algorithm
+    */
+    @FXML
+    private Button stopResearchButton;
 
     /**
     * Panel of the map
@@ -455,6 +461,7 @@ public class MenuPageController implements Observer {
         TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);
         System.out.println("Optimal");
         tourGenerator.addObserver(this);
+        stopResearchButton.setVisible(true);
         computeTourThread = new ComputeTourThread(this);
         computeTourThread.start();
         timerThread = new TimerThread(this);
@@ -780,6 +787,7 @@ public class MenuPageController implements Observer {
             this.requestList.getItems().clear();
             if (isFinished) {
                 defaultMode();
+                stopResearchButton.setVisible(false);
                 this.timerPane.setVisible(false);
                 this.addRequestButton.setVisible(true);
                 this.swapRequestButton.setVisible(true);
@@ -887,6 +895,10 @@ public class MenuPageController implements Observer {
         return progressIndicator;
     }
     
+    public Button getStopResearchButton() {
+        return stopResearchButton;
+    }
+    
 
     /**
      * Set the selected node
@@ -984,6 +996,7 @@ public class MenuPageController implements Observer {
     @FXML
     private void renderTourAction() {
         defaultMode();
+        this.stopResearchButton.setVisible(false);
         this.timerPane.setVisible(false);
         System.out.println("cancel");
         computeTourThread.stop();
