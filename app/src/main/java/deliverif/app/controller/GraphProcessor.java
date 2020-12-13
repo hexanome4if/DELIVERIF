@@ -35,13 +35,13 @@ public class GraphProcessor {
 
     private Graph graph;
     private Map map;
-    private HashMap<String, VertexPath> fullPath;
+    protected HashMap<String, VertexPath> fullPath;
     public List<Vertex> currentVertex;
     private TSP1 currentTsp;
     private PlanningRequest pr;
 
     /**
-     * Create a new Graph Processor
+     * Constructor of GraphProcessor
      *
      * @param m the main map
      */
@@ -180,7 +180,7 @@ public class GraphProcessor {
     }
 
     /**
-     * Create a template of TSP which uses genomic algorithms
+     * Create a template of TSP which uses genetic algorithms
      * @param pr the planning request
      * @return the list of result
      * @see TravellingSalesman

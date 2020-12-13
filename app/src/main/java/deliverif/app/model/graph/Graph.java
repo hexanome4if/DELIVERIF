@@ -127,5 +127,16 @@ public class Graph {
         source.getAdj().add(new Edge(dest, cost));
         dest.getAdj().add(new Edge(source, cost));
     }
+    
+    @Override
+    public String toString() {
+        String res = "Graph{\n";
+        for(Long id : vertexMap.keySet()){
+            for(Edge e : vertexMap.get(id).getAdj()){
+                res += "Vertex " + id.toString() + " to Vertex " + e.dest.getId() + " costs " + e.cost +",\n";
+            }
+        }
+        return res + "}";
+    }
 
 }

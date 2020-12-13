@@ -15,6 +15,12 @@ import deliverif.app.model.map.Intersection;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -49,6 +55,7 @@ public class GraphProcessorTest {
     
     @AfterEach
     public void tearDown() {
+        fullPath.clear();
     }
     
     
@@ -58,13 +65,13 @@ public class GraphProcessorTest {
     @Test
     public void testCompleteGraph() {
         System.out.println("completeGraph");
-        PlanningRequest pr = null;
-        GraphProcessor instance = null;
-        Graph expResult = null;
+        XmlReader reader = new XmlReader();
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        GraphProcessor instance = new GraphProcessor(reader.getMap());
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
+        String expResult = readTxt("src/test/resources/deliverif/app/testDocuments/GraphProcessorTestDoc/testCompleteGraph.txt");
         Graph result = instance.completeGraph(pr);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult, result.toString());
     }
 
     /**
@@ -73,13 +80,34 @@ public class GraphProcessorTest {
     @Test
     public void testDijkstra() {
         System.out.println("dijkstra");
-        Graph completeGraph = null;
-        Vertex source = null;
-        List<Vertex> goals = null;
-        GraphProcessor instance = null;
-        instance.dijkstra(completeGraph, source, goals);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        XmlReader reader = new XmlReader();
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        GraphProcessor gp = new GraphProcessor(reader.getMap());
+        Graph graphVide = new Graph();
+        Vertex source = new Vertex(Long.valueOf("208769457"));
+        Vertex dest1 = new Vertex(Long.valueOf("2835339774"));
+        Vertex dest2 = new Vertex(Long.valueOf("1679901320"));
+        Vertex dest3 = new Vertex(Long.valueOf("208769120"));
+        Vertex dest4 = new Vertex(Long.valueOf("25336179"));
+        List<Vertex> goals = new ArrayList<>();
+        goals.add(dest1);
+        goals.add(dest2);
+        goals.add(dest3);
+        goals.add(dest4);
+        graphVide.addVertex(source);
+        for(Vertex v : goals){
+            graphVide.addVertex(v);
+        }
+        gp.dijkstra(graphVide, source, goals);
+        String result = graphVide.toString();
+        for(Vertex v : goals){
+            result += (gp.fullPath.get(source.getId()+"-"+v.getId()).convertToPath(reader.getMap()).toString());
+        }
+        result = result.replaceAll("\r|\n","");
+        String expResult = readTxt("src/test/resources/deliverif/app/testDocuments/GraphProcessorTestDoc/testDijkstra.txt");
+        expResult = expResult.replaceAll("\r|\n","");
+        
+        assertEquals(expResult.trim(), result.trim());
     }
 
     /**
@@ -219,16 +247,30 @@ public class GraphProcessorTest {
         fail("The test case is a prototype.");
     }
 
-    /**
-     * Test of main method, of class GraphProcessor.
-     */
-    @Test
-    public void testMain() {
-        System.out.println("main");
-        String[] args = null;
-        GraphProcessor.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
     
+    /**Load text from .txt
+     * @param txtPath
+     * @return content in type of String
+     */
+    public static String readTxt(String txtPath) {
+        File file = new File(txtPath);
+        if(file.isFile() && file.exists()){
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                 
+                StringBuilder sb = new StringBuilder();
+                String text = null;
+                while((text = bufferedReader.readLine()) != null){
+                    text += "\n";
+                    sb.append(text);
+                }
+                return sb.toString().substring(0, sb.toString().length()-1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }
