@@ -25,7 +25,6 @@ public class XmlReaderTest {
     
     public XmlReaderTest() {
     }
-    //smallMap.xml 
     
     /**
      * Test of readMap method, of class XmlReader.
