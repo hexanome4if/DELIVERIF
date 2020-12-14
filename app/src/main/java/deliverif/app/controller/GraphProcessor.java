@@ -475,4 +475,12 @@ public class GraphProcessor {
 
         return t;
     }
+
+    /**
+     * Get the current map
+     * @return current map
+     */
+    public Map getMap() {
+        return map;
+    }
 }

@@ -12,6 +12,7 @@ import deliverif.app.model.graph.Tour;
 import deliverif.app.model.graph.Vertex;
 import deliverif.app.model.graph.VertexPath;
 import deliverif.app.model.map.Intersection;
+import deliverif.app.model.map.Map;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -56,7 +57,7 @@ public class GraphProcessorTest {
     
     @AfterEach
     public void tearDown() {
-        fullPath.clear();
+        if (fullPath != null)  fullPath.clear();
     }
     
     
@@ -219,21 +220,45 @@ public class GraphProcessorTest {
     }
 
     /**
-     * Test of optimalTour method, of class GraphProcessor.
+     * Test get the optimal tour for a given PlanningRequest
      */
     @Test
     public void testOptimalTour() {
         System.out.println("optimalTour");
+
+        // First let's load a map
         XmlReader reader = new XmlReader();
-        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
-        GraphProcessor instance = new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
-        TourGenerator expResult = null;
-        TourGenerator result = instance.optimalTour(pr);
-        System.out.println(result);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        boolean mapLoaded = reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        assertTrue(mapLoaded);
+        Map map = reader.getMap();
+        assertNotEquals(map, null);
+
+        // Then let's load a planning request
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
+        assertNotEquals(pr, null);
+
+        // Init the graph processor controller
+        GraphProcessor instance = new GraphProcessor(map);
+
+        // Start the algorithm to find the best path
+        TourGenerator tourGenerator = instance.optimalTour(pr);
+        assertNotEquals(tourGenerator, null);
+        instance.startAlgo();
+
+        // Get the computed tour
+        Tour computedTour = tourGenerator.getTour();
+        assertNotEquals(computedTour, null);
+
+        // Get the tour as a list of points id
+        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];
+        int i = 0;
+        for(Path path : computedTour.getPaths()) {
+            computedTourPointsId[i] = path.getDeparture().getId();
+            ++i;
+        }
+
+        // Check if the list is good
+        assertArrayEquals(computedTourPointsId, new Long[]{2835339774L, 208769120L, 1679901320L, 208769457L, 25336179L});
     }
 
     
@@ -241,7 +266,7 @@ public class GraphProcessorTest {
     /**
      * Test of changeOrder method, of class GraphProcessor.
      */
-    @Test
+    // @Test
     public void testChangeOrder() {
         System.out.println("changeOrder");
         Tour tour = null;
@@ -257,7 +282,7 @@ public class GraphProcessorTest {
     /**
      * Test of addRequestToTour method, of class GraphProcessor.
      */
-    @Test
+    // @Test
     public void testAddRequestToTour() {
         System.out.println("addRequestToTour");
         Tour tour = null;
@@ -273,7 +298,7 @@ public class GraphProcessorTest {
     /**
      * Test of removeRequestFromTour method, of class GraphProcessor.
      */
-    @Test
+    // @Test
     public void testRemoveRequestFromTour() {
         System.out.println("removeRequestFromTour");
         Tour t = null;

@@ -47,4 +47,12 @@ public abstract class Observable {
             o.update(this, arg);
         }
     }
+
+    /**
+     * Check if the object has any observers
+     * @return whether the object has at least one observer or not
+     */
+    protected boolean hasObservers() {
+        return obs.size() != 0;
+    }
 }
