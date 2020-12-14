@@ -95,8 +95,8 @@ public class MouseOverMouseManager extends FxMouseManager {
     
     /**
      * Finds and returns the edge on the position (px,py). 
-     * @param px 
-     * @param py 
+     * @param px x position on screen
+     * @param py y position screen
      * @return The Edge on the position (px,py) or null if there is not.
      */
     private Edge selectEdge(double px, double py) {

@@ -9,7 +9,7 @@ import deliverif.app.controller.MenuPageController;
 import java.io.IOException;
 
 /**
- *
+ * State when only a map is loaded
  * @author zakaria
  */
 public class MapLoadedState extends State {

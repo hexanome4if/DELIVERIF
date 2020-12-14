@@ -9,12 +9,17 @@ import deliverif.app.model.map.Intersection;
 import java.util.Date;
 
 /**
- *
+ * Represents the deposit point on the map
  * @author zakaria
  */
 public class Depot {
-
+    /**
+     * The intersection point where the deposit is placed
+     */
     private Intersection address;
+    /**
+     * The time at which we should start the tour from the deposit
+     */
     private Date departureTime;
 
     /**

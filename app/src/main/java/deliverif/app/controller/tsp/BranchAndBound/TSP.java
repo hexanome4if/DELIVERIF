@@ -15,24 +15,24 @@ import java.util.List;
  */
 public interface TSP {
     /**
-     * Search for a shortest cost hamiltonian circuit in <code>g</code> within <code>timeLimit</code> milliseconds
+     * Search for a shortest cost hamiltonian circuit in g within timeLimit milliseconds
      * (returns the best found tour whenever the time limit is reached)
-     * Warning: The computed tour always start from vertex 0
-     * @param limitTime
-     * @param g
+     * @param timeLimit the maximum time in milliseconds the algorithm can take
+     * @param g the complete graph in which to execute the algorithm
+     * @param start the starting vertex
+     * @param ordre the order constraint
      */
     public void searchSolution(int timeLimit, Graph g, Vertex start, List<Long> ordre);
 
     /**
-     * @param i
-     * @return the ith visited vertex in the solution computed by <code>searchSolution</code> 
-     * (-1 if <code>searcheSolution</code> has not been called yet, or if i < 0 or i >= g.getNbSommets())
+     * Get the current best solution found by the TSP algorithm
+     * @return the best tour as a list of Vertex
      */
     public Vertex[] getSolution();
 
-    /** 
-     * @return the total cost of the solution computed by <code>searchSolution</code> 
-     * (-1 if <code>searcheSolution</code> has not been called yet).
+    /**
+     * Get the current best solution cost
+     * @return current best solution cost
      */
     public float getSolutionCost();
 

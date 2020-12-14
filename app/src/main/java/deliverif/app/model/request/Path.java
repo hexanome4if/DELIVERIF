@@ -11,24 +11,47 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- *
+ * Represents a path of segments between two points on the map
  * @author zakaria
  */
 public class Path {
-
+    /**
+     * List of segments to go from departure to arrival
+     */
     private ArrayList<Segment> segments;
+    /**
+     * Departure point
+     */
     private Intersection departure;
+    /**
+     * Arrival point
+     */
     private Intersection arrival;
+    /**
+     * Length of the path
+     */
     private float length;
+    /**
+     * Departure time from departure point
+     */
     private Date depatureTime;
+    /**
+     * Arrival time to arrival point
+     */
     private Date arrivalTime;
+    /**
+     * THe request containing the departure point
+     */
     private Request request;
+    /**
+     * The type of the path
+     */
     private Type type;
 
     public enum Type {
         PICKUP,
         DELIVERY,
-        WAREHOUSE;
+        WAREHOUSE
     }
 
     /**

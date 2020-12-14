@@ -9,11 +9,14 @@ import deliverif.app.controller.MenuPageController;
 import java.io.IOException;
 
 /**
- *
+ * State abstract class which defines the different user actions
  * @author zakaria
  */
 public abstract class State {
 
+    /**
+     * Current view controller
+     */
     protected MenuPageController mpc;
 
     /**
@@ -100,7 +103,7 @@ public abstract class State {
     
     /**
      * Select a sprite
-     * @param spriteId 
+     * @param spriteId the sprite id to select
      */
     public void selectSprite(String spriteId) {}
 }

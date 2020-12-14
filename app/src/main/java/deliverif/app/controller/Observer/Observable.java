@@ -9,12 +9,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- *
+ * Allow an object to notify it's subscribers whenever an event occurred
  * @author zakaria
  */
 public abstract class Observable {
 
-    private Collection<Observer> obs;
+    /**
+     * The different observers of the object
+     */
+    private final Collection<Observer> obs;
 
     /**
      * Create an observable

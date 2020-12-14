@@ -6,7 +6,7 @@
 package deliverif.app.controller.Observer;
 
 /**
- *
+ * An object implementing this interface will be able to receive notifications when an Observable object is updated
  * @author zakaria
  */
 public interface Observer {
@@ -17,5 +17,5 @@ public interface Observer {
      * @param observed the observed object
      * @param arg some data about the update
      */
-    public void update(Observable observed, Object arg);
+    void update(Observable observed, Object arg);
 }

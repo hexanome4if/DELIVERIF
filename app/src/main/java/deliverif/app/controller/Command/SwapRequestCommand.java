@@ -12,22 +12,32 @@ import deliverif.app.model.request.Request;
 import java.util.List;
 
 /**
- *
+ * Command to swap two points in the current tour
  * @author zakaria
  */
 public class SwapRequestCommand implements Command {
-
-    private GraphProcessor gp;
-    private Tour oldTour;
-    private Tour tour;
-    private List<Long> newOrder;
+    /**
+     * Current graph processor controller
+     */
+    private final GraphProcessor gp;
+    /**
+     * The tour before the command has been executed
+     */
+    private final Tour oldTour;
+    /**
+     * The current tour rendered by the view
+     */
+    private final Tour tour;
+    /**
+     * The new order of points on the tour
+     */
+    private final List<Long> newOrder;
 
     /**
-     * Create an add request command
-     *
-     * @param gp the graphprocessor
-     * @param t the current tour
-     * @param r the request to add
+     * Create a swap request
+     * @param gp the graph processor
+     * @param t the tour to update
+     * @param newOrder the new request order
      */
     public SwapRequestCommand(GraphProcessor gp, Tour t, List<Long> newOrder) {
         this.gp = gp;

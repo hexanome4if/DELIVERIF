@@ -33,8 +33,8 @@ import java.util.Objects;
  */
 public class GraphProcessor {
 
-    private Graph graph;
-    private Map map;
+    private final Graph graph;
+    private final Map map;
     protected HashMap<String, VertexPath> fullPath;
     public List<Vertex> currentVertex;
     private TSP1 currentTsp;
@@ -466,53 +466,5 @@ public class GraphProcessor {
         t.removePath(afterDelivery);
 
         return t;
-    }
-
-    public static void main(String[] args) {
-        XmlReader reader = new XmlReader();
-        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
-        GraphProcessor gp = new GraphProcessor(reader.getMap());
-        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
-        // Tour tour = gp.optimalTour(pr);
-        //System.out.println("Tour before deletion: " + tour);
-        /*System.out.println("Duration before deletion: " + tour.getTotalDuration());
-        System.out.println("Distance before deletion: " + tour.getTotalDistance());
-        System.out.println("Nb paths: " + tour.getPaths().size());
-        //gp.removeRequestFromTour(tour, pr.getRequests().get(1));
-
-        //RemoveRequestCommand rr = new RemoveRequestCommand(gp, tour, pr.getRequests().get(1));
-        /*
-        RemoveRequest rr = new RemoveRequest(gp, tour, pr.getRequests().get(1));
-        rr.doCommand();
-        System.out.println("Duration after deletion: " + tour.getTotalDuration());
-        System.out.println("Distance after deletion: " + tour.getTotalDistance());
-        System.out.println("Nb paths: " + tour.getPaths().size());
-        rr.undoCommand();
-        System.out.println("Duration after undo: " + tour.getTotalDuration());
-        System.out.println("Distance after undo: " + tour.getTotalDistance());
-        System.out.println("Nb paths: " + tour.getPaths().size());
-        //System.out.println("Tour after deletion: " + tour);
-         */
- /*
-        List<Long> newOrder = new ArrayList<>();
-        for (Path p : tour.getPaths()) {
-            newOrder.add(p.getArrival().getId());
-        }
-        newOrder.remove(newOrder.size() - 1);
-        Collections.shuffle(newOrder);
-        newOrder.add(0, tour.getPr().getDepot().getAddress().getId());
-        newOrder.add(tour.getPr().getDepot().getAddress().getId());
-        for (int i = 1; i <= newOrder.size(); i++) {
-            System.out.println("Node " + i + ": " + newOrder.get(i - 1).toString());
-        }
-
-        Tour newTour = gp.changeOrder(tour, newOrder);
-        System.out.println("Duration after change: " + newTour.getTotalDuration());
-        System.out.println("Distance after change: " + newTour.getTotalDistance());
-        System.out.println("Nb paths: " + newTour.getPaths().size());
-
-        for (Path p : newTour.getPaths()) {
-            System.out.println(p);
-        }*/
     }
 }

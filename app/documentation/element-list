@@ -1,0 +1,13 @@
+module:deliverif.app
+deliverif.app.controller
+deliverif.app.controller.Command
+deliverif.app.controller.Observer
+deliverif.app.controller.State
+deliverif.app.controller.thread
+deliverif.app.controller.tsp
+deliverif.app.controller.tsp.BranchAndBound
+deliverif.app.controller.tsp.GeneticAlgorithm
+deliverif.app.model.graph
+deliverif.app.model.map
+deliverif.app.model.request
+deliverif.app.view

@@ -22,25 +22,45 @@ import java.util.concurrent.Semaphore;
 import javafx.application.Platform;
 
 /**
- *
+ * Handles TSP updates of the best tour found
  * @author polo
  */
 public class TourGenerator extends Observable implements Observer {
 
-    private PlanningRequest pr;
-    private GraphProcessor gp;
+    /**
+     * Planning request that we are trying to compute the tour
+     */
+    private final PlanningRequest pr;
+    /**
+     * Current graph processor controller
+     */
+    private final GraphProcessor gp;
+    /**
+     * Current map
+     */
+    private final Map map;
+    /**
+     * Current best tour found by the TSP
+     */
     private Tour tour;
-    private Map map;
-    private Semaphore sem;
+    /**
+     * Time at which the last render occurred
+     */
     private long lastRender = 0;
 
+    /**
+     * Create a tour generator used to be notified whenever a new best tour is found by the algorithm
+     * @param tsp the travelling salesman algorithm running
+     * @param pr the planning request of the current computed tour
+     * @param gp the graph processor processing the current t
+     * @param map the current map
+     */
     public TourGenerator(TSP1 tsp, PlanningRequest pr, GraphProcessor gp, Map map) {
         super();
         this.pr = pr;
         this.gp = gp;
         this.tour = null;
         this.map = map;
-        this.sem = new Semaphore(1);
         tsp.addObserver(this);
     }
 
@@ -109,12 +129,11 @@ public class TourGenerator extends Observable implements Observer {
 
     }
 
+    /**
+     * Get the current best tour
+     * @return current best tour
+     */
     public Tour getTour() {
         return tour;
     }
-
-    public Semaphore getSemaphore() {
-        return sem;
-    }
-
 }

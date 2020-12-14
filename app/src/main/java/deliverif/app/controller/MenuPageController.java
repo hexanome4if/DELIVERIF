@@ -406,8 +406,6 @@ public class MenuPageController implements Observer {
 
         this.chargerGraph(this.map);
         this.graph.setAttribute("ui.stylesheet", App.STYLESHEET);
-        //this.graph.setAutoCreate(true);
-        //this.graph.setStrict(false);
 
         Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         panel = (FxViewPanel) viewer.addDefaultView(false);

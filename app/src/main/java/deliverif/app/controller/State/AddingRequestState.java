@@ -12,16 +12,30 @@ import java.util.Optional;
 import javafx.scene.control.TextInputDialog;
 
 /**
- *
+ * State in which the user is adding a request to the current tour
  * @author zakaria
  */
 public class AddingRequestState extends State {
-
+    /**
+     * List of commands to be able to undo and redo
+     */
+    private final ListOfCommands loc;
+    /**
+     * Pickup intersection id to add
+     */
     private String pickupId;
+    /**
+     * Delivery intersection id to add
+     */
     private String deliveryId;
+    /**
+     * Pickup duration to add (in seconds)
+     */
     private int pickupDuration;
+    /**
+     * Delivery duration to add (in seconds)
+     */
     private int deliveryDuration;
-    private ListOfCommands loc;
 
     /**
      * Start a state to add a request to the current tour
@@ -121,16 +135,20 @@ public class AddingRequestState extends State {
     public void setDeliveryId(String id) {
         deliveryId = id;
     }
-    
+
+    /**
+     * Check if a string is parsable in int
+     *
+     * @param input the string to check
+     * @return whether the string is parsable or not
+     */
     private boolean isParsable(String input) {
-    try {
-        System.out.println(input);
-        Integer.parseInt(input);
-        System.out.println("OK");
-        return true;
-    } catch (final NumberFormatException e) {
-        return false;
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (final NumberFormatException e) {
+            return false;
+        }
     }
-}
 
 }

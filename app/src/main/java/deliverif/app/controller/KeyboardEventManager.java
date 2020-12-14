@@ -12,18 +12,20 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**
- *
+ * Handles keyboard events on the view
  * @author zakaria
  */
 public class KeyboardEventManager implements EventHandler<KeyEvent> {
 
-    private final Scene scene;
+    /**
+     * Current view controller
+     */
     private final MenuPageController mpc;
 
     public KeyboardEventManager() {
         this.mpc = MenuPageController.getInstance();
-        this.scene = App.getScene();
-        this.scene.setOnKeyPressed(this);
+        Scene scene = App.getScene();
+        scene.setOnKeyPressed(this);
     }
 
     @Override
@@ -48,10 +50,6 @@ public class KeyboardEventManager implements EventHandler<KeyEvent> {
             MenuPageController.stopPathThread();
             mpc.getCurrentState().startAddRequest();
         }
-        
-        /*if (kc == KeyCode.ENTER) {
-            mpc.getCurrentState().addRequest();
-        }*/
         
     }
 }

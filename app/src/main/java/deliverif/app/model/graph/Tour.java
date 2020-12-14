@@ -14,12 +14,17 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- *
+ * Represents a tour between different points of the map
  * @author zakaria
  */
 public class Tour extends Observable {
-
+    /**
+     * List of paths to go from a point to the next one
+     */
     private ArrayList<Path> paths;
+    /**
+     * Planning request represented by the Tour
+     */
     private PlanningRequest pr;
 
     /**

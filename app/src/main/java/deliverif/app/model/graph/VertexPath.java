@@ -11,17 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Represents a path composed of Vertexes
  * @author polo
  */
 public class VertexPath {
-
+    /**
+     * List of vertex composing the path
+     */
     private final List<Vertex> path = new ArrayList<>();
 
     /**
      * Add a vertex to the vertex path
      *
-     * @param v
+     * @param v the vertex to add to the path
      */
     public void addVertex(Vertex v) {
         path.add(v);

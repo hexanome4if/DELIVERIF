@@ -8,14 +8,25 @@ package deliverif.app.model.request;
 import deliverif.app.model.map.Intersection;
 
 /**
- *
+ * An object representing a request of a client
  * @author zakaria
  */
 public class Request {
-
+    /**
+     * Pickup address point
+     */
     private Intersection pickupAddress;
+    /**
+     * Delivery address point
+     */
     private Intersection deliveryAddress;
+    /**
+     * Time needed to pickup
+     */
     private Integer pickupDuration;
+    /**
+     * Time needed to delivery
+     */
     private Integer deliveryDuration;
 
     /**

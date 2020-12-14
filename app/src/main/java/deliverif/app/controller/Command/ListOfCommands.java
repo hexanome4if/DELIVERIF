@@ -8,12 +8,18 @@ package deliverif.app.controller.Command;
 import java.util.LinkedList;
 
 /**
- *
+ * List the commands executed by the user to apply undo and redo
  * @author zakaria
  */
 public class ListOfCommands {
 
-    private LinkedList<Command> l;
+    /**
+     * The list of commands executed by the user
+     */
+    private final LinkedList<Command> l;
+    /**
+     * The current index in the list of commands where the user is now
+     */
     private int i;
 
     /**
@@ -27,7 +33,7 @@ public class ListOfCommands {
     /**
      * Add a command and execute it
      *
-     * @param c
+     * @param c the command to add
      */
     public void addCommand(Command c) {
         i++;

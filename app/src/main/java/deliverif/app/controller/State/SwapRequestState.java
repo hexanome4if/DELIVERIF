@@ -11,16 +11,28 @@ import deliverif.app.controller.Command.SelectSpriteCommand;
 import deliverif.app.controller.MenuPageController;
 
 /**
- *
+ * State in which the user is swapping two point of the current tour
  * @author faouz
  */
 public class SwapRequestState extends State {
-    
+    /**
+     * List of commands to perform undo and redo
+     */
+    private final ListOfCommands loc;
+    /**
+     * First request intersection id
+     */
     private String firstRequestId;
+    /**
+     * Second request intersection id
+     */
     private String secondRequestId;
-    private ListOfCommands loc;
 
-    
+
+    /**
+     * Start a swap request state
+     * @param mpc the view controller
+     */
     public SwapRequestState(MenuPageController mpc) {
         super(mpc);
         loc = new ListOfCommands();
@@ -72,18 +84,18 @@ public class SwapRequestState extends State {
     }
 
     /**
-     * Set the pickup node id
+     * Set the first request node id
      *
-     * @param id pickup node id
+     * @param id first request node id
      */
     public void setFirstId(String id) {
         firstRequestId = id;
     }
 
     /**
-     * Set the delivery node id
+     * Set the second request node id
      *
-     * @param id delivery node id
+     * @param id second request node id
      */
     public void setSecondId(String id) {
         secondRequestId = id;

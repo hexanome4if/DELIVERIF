@@ -8,14 +8,22 @@ package deliverif.app.controller.Command;
 import deliverif.app.controller.State.AddingRequestState;
 
 /**
- *
+ * Command to select a node on the map
  * @author zakaria
  */
 public class SelectNodeCommand implements Command {
-
-    private AddingRequestState ars;
-    private boolean isDelivery;
-    private String id;
+    /**
+     * Current state which must be an AddingRequestState
+     */
+    private final AddingRequestState ars;
+    /**
+     * Whether the selected node will be a delivery point or a pickup point
+     */
+    private final boolean isDelivery;
+    /**
+     * The selected node id
+     */
+    private final String id;
 
     /**
      * Create a select node command

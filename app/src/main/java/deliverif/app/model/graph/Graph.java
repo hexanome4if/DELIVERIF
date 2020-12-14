@@ -8,12 +8,13 @@ package deliverif.app.model.graph;
 import java.util.HashMap;
 
 /**
- *
+ * Represents a Graph composed of Vertexes and Edges
  * @author zakaria
  */
 public class Graph {
-
-    // Maps vertex name to number
+    /**
+     * Maps vertex name to number
+     */
     private final HashMap<Long, Vertex> vertexMap;
 
     /**
@@ -81,9 +82,8 @@ public class Graph {
         Vertex dstVex = vertexMap.get(dest);
         if (srcVex != null && dstVex != null) {
             internalAddEdge(srcVex, dstVex, cost);
-        } else {
-            //System.out.println("source is " + srcVex + ", destination is " + dstVex);
         }
+
     }
 
     /**
@@ -98,8 +98,6 @@ public class Graph {
         Vertex dstVex = vertexMap.get(dest);
         if (srcVex != null && dstVex != null) {
             srcVex.getAdj().add(new Edge(dstVex, cost));
-        } else {
-            //System.out.println("source is " + srcVex + ", destination is " + dstVex);
         }
     }
 

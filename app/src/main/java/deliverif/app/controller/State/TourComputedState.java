@@ -9,7 +9,7 @@ import deliverif.app.controller.MenuPageController;
 import java.io.IOException;
 
 /**
- *
+ * State when a tour has been computed
  * @author zakaria
  */
 public class TourComputedState extends State {

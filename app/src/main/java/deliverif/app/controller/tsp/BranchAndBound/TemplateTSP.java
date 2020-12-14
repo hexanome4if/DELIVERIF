@@ -4,11 +4,6 @@
  * and open the template in the editor.
  */
 package deliverif.app.controller.tsp.BranchAndBound;
-
-/**
- *
- * @author zakaria
- */
 import deliverif.app.controller.Observer.Observable;
 import deliverif.app.model.graph.Edge;
 import deliverif.app.model.graph.Graph;
@@ -19,6 +14,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ *
+ * @author zakaria
+ */
 public abstract class TemplateTSP extends Observable implements TSP {
 
     private Vertex[] bestSol;
@@ -27,6 +26,13 @@ public abstract class TemplateTSP extends Observable implements TSP {
     private int timeLimit;
     private long startTime;
 
+    /**
+     * Execute the algorithm to find the best tour
+     * @param timeLimit the maximum time in milliseconds the algorithm can take
+     * @param g the complete graph in which to execute the algorithm
+     * @param start the starting vertex
+     * @param ordre the order constraint
+     */
     public void searchSolution(int timeLimit, Graph g, Vertex start, List<Long> ordre) {
         if (timeLimit <= 0) {
             return;
@@ -46,10 +52,12 @@ public abstract class TemplateTSP extends Observable implements TSP {
         this.notifiyObservers(true);
     }
 
+    @Override
     public Vertex[] getSolution() {
         return bestSol;
     }
 
+    @Override
     public float getSolutionCost() {
         if (g != null) {
             return bestSolCost;
@@ -60,29 +68,29 @@ public abstract class TemplateTSP extends Observable implements TSP {
     /**
      * Method that must be defined in TemplateTSP subclasses
      *
-     * @param currentVertex
-     * @param unvisited
-     * @return a lower bound of the cost of paths in <code>g</code> starting
-     * from <code>currentVertex</code>, visiting every vertex in
-     * <code>unvisited</code> exactly once, and returning back to vertex
-     * <code>0</code>.
+     * @param currentVertex the current vertex treated by the algorithm
+     * @param unvisited list of unvisited vertexes
+     * @return a lower bound of the cost of paths in g starting
+     * from currentVertex, visiting every vertex in
+     * unvisited exactly once, and returning back to vertex
+     * 0.
      */
     protected abstract float bound(Vertex currentVertex, ArrayList<Vertex> unvisited);
 
     /**
      * Method that must be defined in TemplateTSP subclasses
      *
-     * @param currentVertex
-     * @param unvisited
-     * @param g
-     * @return an iterator for visiting all vertices in <code>unvisited</code>
-     * which are successors of <code>currentVertex</code>
+     * @param currentVertex the current vertex treated by the algorithm
+     * @param unvisited list of unvisited vertexes
+     * @param g the graph in which the algorithm is executed
+     * @return an iterator for visiting all vertices in unvisited
+     * which are successors of currentVertex
      */
     protected abstract Iterator<Vertex> iterator(Vertex currentVertex, Collection<Vertex> unvisited, Graph g);
 
     /**
      * Template method of a branch and bound algorithm for solving the TSP in
-     * <code>g</code>.
+     * g.
      *
      * @param currentVertex the last visited vertex
      * @param unvisited the set of vertex that have not yet been visited

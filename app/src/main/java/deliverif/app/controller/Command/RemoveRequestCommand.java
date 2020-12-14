@@ -11,15 +11,27 @@ import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
 
 /**
- *
+ * Command to remove a request from the current tour
  * @author zakaria
  */
 public class RemoveRequestCommand implements Command {
 
-    private GraphProcessor gp;
-    private Tour oldTour;
-    private Tour tour;
-    private Request request;
+    /**
+     * The graph processor controller
+     */
+    private final GraphProcessor gp;
+    /**
+     * The tour before the command has been executed
+     */
+    private final Tour oldTour;
+    /**
+     * The current tour rendered by the view
+     */
+    private final Tour tour;
+    /**
+     * The request removed from the tour
+     */
+    private final Request request;
 
     /**
      * Create a remove request command

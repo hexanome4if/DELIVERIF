@@ -11,15 +11,26 @@ import deliverif.app.model.graph.Tour;
 import deliverif.app.model.request.Request;
 
 /**
- *
+ * Command to add a request in the current tour
  * @author zakaria
  */
 public class AddRequestCommand implements Command {
-
-    private GraphProcessor gp;
-    private Tour oldTour;
-    private Tour tour;
-    private Request request;
+    /**
+     * The current graph processor controller
+     */
+    private final GraphProcessor gp;
+    /**
+     * The tour before the command has been executed
+     */
+    private final Tour oldTour;
+    /**
+     * The current tour object rendered by the view
+     */
+    private final Tour tour;
+    /**
+     * The request added by the command
+     */
+    private final Request request;
 
     /**
      * Create an add request command

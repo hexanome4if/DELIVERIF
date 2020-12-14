@@ -8,14 +8,22 @@ package deliverif.app.controller.Command;
 import deliverif.app.controller.State.SwapRequestState;
 
 /**
- *
+ * Command to select a sprite on the map
  * @author zakaria
  */
 public class SelectSpriteCommand implements Command {
-
-    private SwapRequestState srs;
-    private boolean isFirst;
-    private String id;
+    /**
+     * The current state which must be a SwapRequestState
+     */
+    private final SwapRequestState srs;
+    /**
+     * Whether the selected node is the first or the second
+     */
+    private final boolean isFirst;
+    /**
+     * The selected node id
+     */
+    private final String id;
 
     /**
      * Create a select node command

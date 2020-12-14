@@ -6,14 +6,25 @@
 package deliverif.app.model.map;
 
 /**
- *
+ * Represents a segment between two intersections on a map
  * @author zakaria
  */
 public class Segment {
-
+    /**
+     * The origin intersection
+     */
     private Intersection origin;
+    /**
+     * The destination intersection
+     */
     private Intersection destination;
+    /**
+     * Segment's length
+     */
     private float length;
+    /**
+     * Segment's name representing street name
+     */
     private String name;
 
     /**

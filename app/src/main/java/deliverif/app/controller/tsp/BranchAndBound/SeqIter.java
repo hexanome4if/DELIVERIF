@@ -21,13 +21,13 @@ public class SeqIter implements Iterator<Vertex> {
 
     /**
      * Create an iterator to traverse the set of vertices in
-     * <code>unvisited</code> which are successors of <code>currentVertex</code>
-     * in <code>g</code> Vertices are traversed in the same order as in
-     * <code>unvisited</code>
+     * unvisited which are successors of currentVertex
+     * in g Vertices are traversed in the same order as in
+     * unvisited
      *
-     * @param unvisited
-     * @param currentVertex
-     * @param g
+     * @param unvisited list of unvisited vertexes
+     * @param currentVertex current vertex treated by the algorithm
+     * @param g the graph used by the algorithm
      */
     public SeqIter(Collection<Vertex> unvisited, Vertex currentVertex, Graph g) {
         this.candidates = new Vertex[unvisited.size()];

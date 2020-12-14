@@ -9,7 +9,7 @@ import deliverif.app.controller.MenuPageController;
 import java.io.IOException;
 
 /**
- *
+ * Initial state when we start the application
  * @author zakaria
  */
 public class InitialState extends State {

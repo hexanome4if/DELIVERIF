@@ -9,17 +9,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * Represents a vertex in a graph
  * @author zakaria
  */
 public class Vertex {
 
-    private Long id;        // The name of this Vertex
-    private List<Edge> adj;    // The adjacency list for this Vertex
-
-    private int dist;      // variable for use by algorithms
-    private int prev;      // variable for use by algorithms
-    private int scratch;   // variable for use by algorithms
+    /**
+     * Vertex unique id
+     */
+    private final Long id;
+    /**
+     * Edges starting from this vertex
+     */
+    private final List<Edge> adj;
 
     /**
      * Create a vertex with an id
@@ -53,7 +55,7 @@ public class Vertex {
      * Check if there is an edge between the current vertex and a given vertex
      *
      * @param v the vertex to check
-     * @return wether an edge exists between the current edge and v
+     * @return whether an edge exists between the current edge and v
      */
     public boolean isEdge(Vertex v) {
         for (Edge e : adj) {
@@ -66,6 +68,7 @@ public class Vertex {
 
     @Override
     public boolean equals(Object o) {
+        if (!(o instanceof Vertex)) return false;
         Vertex v = (Vertex) o;
         return v.getId().equals(id);
     }

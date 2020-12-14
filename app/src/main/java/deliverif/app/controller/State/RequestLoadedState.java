@@ -9,7 +9,7 @@ import deliverif.app.controller.MenuPageController;
 import java.io.IOException;
 
 /**
- *
+ * State when only a map and a request has been loaded but no tour was computed
  * @author zakaria
  */
 public class RequestLoadedState extends State {

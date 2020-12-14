@@ -6,13 +6,21 @@
 package deliverif.app.model.map;
 
 /**
- *
+ * Represents an intersection on the map
  * @author zakaria
  */
 public class Intersection {
-
+    /**
+     * Intersection unique id
+     */
     private Long id;
+    /**
+     * Latitude position
+     */
     private float latitude;
+    /**
+     * Longitude position
+     */
     private float longitude;
 
     /**

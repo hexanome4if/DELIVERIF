@@ -10,12 +10,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Represent a map composed by intersections and segments
  * @author zakaria
  */
 public class Map {
-
+    /**
+     * Intersections of the map
+     */
     private HashMap<Long, Intersection> intersections;
+    /**
+     * Segments between the intersections of the map
+     */
     private List<Segment> segments;
 
     /**

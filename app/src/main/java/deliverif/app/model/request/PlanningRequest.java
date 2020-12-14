@@ -10,12 +10,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * An object representing a tour information before it's computation
  * @author zakaria
  */
 public class PlanningRequest {
-
+    /**
+     * Deposit point
+     */
     private Depot depot;
+    /**
+     * Requests of the tour
+     */
     private List<Request> requests;
 
     /**
