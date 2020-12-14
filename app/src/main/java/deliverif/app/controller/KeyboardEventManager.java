@@ -27,7 +27,11 @@ public class KeyboardEventManager implements EventHandler<KeyEvent> {
         Scene scene = App.getScene();
         scene.setOnKeyPressed(this);
     }
-
+    
+    /**
+     * Overrides handle method of EventHandler interface
+     * @param t the event to handle
+     */
     @Override
     public void handle(KeyEvent t) {
         KeyCode kc = t.getCode();
