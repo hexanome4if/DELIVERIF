@@ -47,7 +47,7 @@ public class XmlReader {
     
     /**
      * Read a xml file to create a instance of the Map class
-     * @param filename
+     * @param filename path of a xml file
      * @return boolean
      */
     public boolean readMap(String filename){
@@ -117,7 +117,7 @@ public class XmlReader {
 
     /**
      * Read a xml file to create an instance of PlanningRequest class
-     * @param filename
+     * @param filename path of a xml file
      * @return
      */
     public PlanningRequest readRequest(String filename){
