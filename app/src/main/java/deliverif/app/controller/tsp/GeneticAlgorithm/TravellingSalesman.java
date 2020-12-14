@@ -17,6 +17,8 @@ import java.util.Random;
 /**
  *
  * @author zakaria
+ * Adapted from the implementation provided by Darinka Zobenica: https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
+
  */
 public class TravellingSalesman {
 
@@ -52,7 +54,11 @@ public class TravellingSalesman {
         mutationRate = 0.1f;
         tournamentSize = 40;
     }
-
+    /**
+     * A method to call on initialisation to fill the cost map.
+     * @param g the complete graph from previous processing (see GraphProcessor)
+     * @param start the starting point, usually the warehouse
+     */
     protected void onInit(Graph g, Vertex start) {
         for (Vertex v : g.getVertexMap().values()) {
             for (Edge e : v.getAdj()) {
@@ -66,7 +72,10 @@ public class TravellingSalesman {
             }
         }
     }
-
+    /**
+     * Generates a first solution candidate
+     * @return the random population to start the algorithm with
+     */
     public List<SalesmanGenome> initialPopulation() {
         List<SalesmanGenome> population = new ArrayList<>();
         for (int i = 0; i < generationSize; i++) {
@@ -74,7 +83,12 @@ public class TravellingSalesman {
         }
         return population;
     }
-
+    
+    /**
+     * Select reproductionSize genomes based on the method predefined in the selectionType attribute
+     * @param population a list of genomes
+     * @return a list of selected genomes
+     */
     public List<SalesmanGenome> selection(List<SalesmanGenome> population) {
         List<SalesmanGenome> selected = new ArrayList<>();
         SalesmanGenome winner;
@@ -89,6 +103,11 @@ public class TravellingSalesman {
         return selected;
     }
 
+    /**
+     * Implements the roulette selection approach
+     * @param population a generation of genomes
+     * @return 
+     */
     public SalesmanGenome rouletteSelection(List<SalesmanGenome> population) {
         float totalFitness = 0;
         for (SalesmanGenome gen : population) {
@@ -120,9 +139,14 @@ public class TravellingSalesman {
         int selectRandom = random.nextInt(generationSize);
         return population.get(selectRandom);
     }
-
-    // A helper function to pick n random elements from the population
-    // so we could enter them into a tournament
+    /**
+     * A helper function to pick n random elements from the population
+     * so we could enter them into a tournament
+     * @param <E> Generic output type
+     * @param list list of generic type
+     * @param n number of elements in list
+     * @return a list of randomly picked elements
+     */
     public static <E> List<E> pickNRandomElements(List<E> list, int n) {
         Random r = new Random();
         int length = list.size();
@@ -137,13 +161,25 @@ public class TravellingSalesman {
         return list.subList(length - n, length);
     }
 
-    // A simple implementation of the deterministic tournament - the best genome
-    // always wins
+    
+    /**
+     * A simple implementation of the deterministic tournament - the best genome
+     * always wins
+     * @param population a generation of genomes
+     * @return a genome instance (candidate solution)
+     */
     public SalesmanGenome tournamentSelection(List<SalesmanGenome> population) {
         List<SalesmanGenome> selected = pickNRandomElements(population, tournamentSize);
         return Collections.min(selected);
     }
 
+    /**
+     * The technique used is called Partially Mapped Crossover (PMX)
+     * PMX randomly picks one crossover point, but unlike one-point crossover,
+     *  it doesn't just swap elements from two parents, but instead swaps the elements within them. 
+     * @param parents a list of genomes to participate in reproduction
+     * @return list of genomes after crossover
+     */
     public List<SalesmanGenome> crossover(List<SalesmanGenome> parents) {
         // Housekeeping
         Random random = new Random();
@@ -174,6 +210,12 @@ public class TravellingSalesman {
         return children;
     }
 
+    /**
+     * If we pass a probability check we mutate by swapping two cities in the genome. 
+     * Otherwise, we just return the original genome
+     * @param salesman a genome to mutate
+     * @return either the original genome or after swapping
+     */
     public SalesmanGenome mutate(SalesmanGenome salesman) {
         Random random = new Random();
         float mutate = random.nextFloat();
@@ -185,6 +227,11 @@ public class TravellingSalesman {
         return salesman;
     }
 
+    /**
+     * This is generational algorithm, so we make an entirely new population of children
+     * @param population a generation of genomes
+     * @return a new population of children
+     */
     public List<SalesmanGenome> createGeneration(List<SalesmanGenome> population) {
         List<SalesmanGenome> generation = new ArrayList<>();
         int currentGenerationSize = 0;
@@ -199,6 +246,11 @@ public class TravellingSalesman {
         return generation;
     }
 
+    /**
+     * This method orchestrates the computations and  terminates if 
+     * the number of generations has reached maxIterations
+     * @return the best solution found by the algorithm
+     */
     public SalesmanGenome optimise() {
         List<SalesmanGenome> population = initialPopulation();
         SalesmanGenome globalBestGenome = population.get(0);

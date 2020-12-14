@@ -15,15 +15,24 @@ import java.util.List;
 /**
  *
  * @author zakaria
+ * Adapted from the implementation provided by Darinka Zobenica: https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
  */
 public class SalesmanGenome implements Comparable {
-
+    // The list of stops in the order in which they should be visited.
+    // A genome represents a potential solution to the problem.
     List<Vertex> genome;
+    // Travel costs between two vertices, used to calculate fitness.
     public HashMap<String, Float> costs = new HashMap<>();
     Vertex start;
     float fitness;
     private List<Long> ordre;
 
+    /**
+     * Generates a random Salesman
+     * @param costs maps a pair of two vertices to the travel distance between them
+     * @param start the starting point, usually the warehouse
+     * @param ordre the precedence constraint for visiting vertices, pickup prior to delivery
+     */
     public SalesmanGenome(HashMap<String, Float> costs, Vertex start, List<Long> ordre) {
         this.costs = costs;
         this.start = start;
@@ -31,7 +40,14 @@ public class SalesmanGenome implements Comparable {
         this.genome = randomSalesman();
         this.fitness = this.calculateFitness();
     }
-
+    
+    /**
+     * Creates a random Salesman with a user-defined genome
+     * @param permutationOfStops user-defined genome
+     * @param costs maps a pair of two vertices to the travel distance between them
+     * @param start the starting point, usually the warehouse
+     * @param ordre the precedence constraint for visiting vertices, pickup prior to delivery
+     */
     public SalesmanGenome(List<Vertex> permutationOfStops, HashMap<String, Float> costs, Vertex start, List<Long> ordre) {
         this.genome = permutationOfStops;
         this.costs = costs;
@@ -39,7 +55,12 @@ public class SalesmanGenome implements Comparable {
         this.ordre = ordre;
         this.fitness = this.calculateFitness();
     }
-
+    
+    /**
+     * Generates a random genome
+     * Genomes are permutations of the list of stops to visit
+     * @return a genome
+     */
     private List<Vertex> randomSalesman() {
         List<Vertex> result = new ArrayList<Vertex>();
         for (Edge e : start.getAdj()) {
@@ -48,7 +69,11 @@ public class SalesmanGenome implements Comparable {
         Collections.shuffle(result);
         return result;
     }
-
+    
+    /**
+     * Calculates the actual cost of taking certain path that we want to minimise
+     * @return the computed cost
+     */
     public float calculateFitness() {
         float fitness = 0;
         Vertex currentStop = start;
