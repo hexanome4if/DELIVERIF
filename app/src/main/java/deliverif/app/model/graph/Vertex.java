@@ -88,4 +88,8 @@ public class Vertex {
         return -1;
     }
 
+    @Override
+    public String toString() {
+        return "Vertex{" + "id=" + id + '}';
+    }
 }

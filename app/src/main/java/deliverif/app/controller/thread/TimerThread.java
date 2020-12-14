@@ -1,30 +1,39 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package deliverif.app.controller.thread;
 
 import deliverif.app.controller.MenuPageController;
-import deliverif.app.model.request.Path;
 import java.util.Date;
 
 /**
- *
- * @author faouz
+ * Thread that display the timer and the progress indicator when a tour is computing
+ * @author H4314
  */
 public class TimerThread extends Thread {
 
+    /**
+     * MenuPageController instance
+     */
     private MenuPageController mpc;
-
-    private volatile boolean continueRun = true;
     
+    /**
+     * Boolean to check if the thread must continue to run or stop
+     */
+    private volatile boolean continueRun = true;
+    /**
+     * Boolean to check if the thread execution is finished
+     */
     private volatile boolean isFinished = false;
 
+    /**
+     * Constructor
+     * @param mpc
+     */
     public TimerThread(MenuPageController mpc) {
         this.mpc = mpc;
     }
 
+    /**
+     * Run the thread
+     */
     @Override
     public void run() {
         try {
@@ -49,10 +58,17 @@ public class TimerThread extends Thread {
         }
     }
     
+    /**
+     * Check if the thread execution is finished
+     * @return true if the thread is finished
+     */
     public boolean isIsFinished() {
         return isFinished;
     }   
     
+    /**
+     * Stop the thread
+     */
     public void end() {
         this.continueRun = false;
     }

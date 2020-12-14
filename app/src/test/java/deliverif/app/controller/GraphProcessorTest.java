@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -154,29 +155,37 @@ public class GraphProcessorTest {
     @Test
     public void testHamiltonianCircuit() {
         System.out.println("hamiltonianCircuit");
-        PlanningRequest pr = null;
-        GraphProcessor instance = null;
-        TSP1 expResult = null;
-        TSP1 result = instance.hamiltonianCircuit(pr);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        XmlReader reader = new XmlReader();
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        GraphProcessor instance = new GraphProcessor(reader.getMap());
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
+        Vertex [] expResult = null;
+        TSP1 tsp1 = instance.hamiltonianCircuit(pr);
+        Graph g = instance.completeGraph(pr);
+        List<Long> ordre = new ArrayList<>();
+        for (Request r : pr.getRequests()) {
+            ordre.add(r.getPickupAddress().getId());
+            ordre.add(r.getDeliveryAddress().getId());
+        }
+        System.out.println("Ok");
+        tsp1.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);
+        Vertex [] result = tsp1.getSolution();
+        System.out.println("Printing result");
+        if (result == null) System.out.println("Result is null");
+        System.out.println(result.length);
+        for (Vertex v : result){
+            System.out.println(v.toString());
+        }
+        expResult = new Vertex [3];
+        
+        expResult[0] = new Vertex((long) 342873658);
+        expResult[1] = new Vertex((long) 208769039);
+        expResult[2] = new Vertex((long) 25173820);
+        
+        assertEquals(Arrays.toString(expResult), Arrays.toString(result));
     }
 
-    /**
-     * Test of hamiltonianCircuit2 method, of class GraphProcessor.
-     */
-    @Test
-    public void testHamiltonianCircuit2() {
-        System.out.println("hamiltonianCircuit2");
-        PlanningRequest pr = null;
-        GraphProcessor instance = null;
-        Vertex[] expResult = null;
-        Vertex[] result = instance.hamiltonianCircuit2(pr);
-        assertArrayEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
     /**
      * Test of shortestPathBetweenTwoIntersections method, of class GraphProcessor.
@@ -184,14 +193,29 @@ public class GraphProcessorTest {
     @Test
     public void testShortestPathBetweenTwoIntersections() {
         System.out.println("shortestPathBetweenTwoIntersections");
-        Intersection v1 = null;
-        Intersection v2 = null;
-        GraphProcessor instance = null;
-        Path expResult = null;
+        XmlReader reader = new XmlReader();
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        GraphProcessor instance = new GraphProcessor(reader.getMap());
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
+        for (Intersection i : instance.getMap().getIntersections().values()){
+            System.out.println(i.toString());
+        }
+        Intersection v1 = instance.getMap().getIntersectionParId((long)208769039);
+        Intersection v2 = instance.getMap().getIntersectionParId((long)25173820);
+        Graph completeGr = instance.completeGraph(pr);
+        for (String s : instance.fullPath.keySet()){
+            System.out.println(s);
+        }
+        Path expResult = new Path();
+        expResult.setDeparture(instance.getMap().getIntersectionParId((long)208769039));
+        expResult.setArrival(instance.getMap().getIntersectionParId((long)25173820));
+        expResult.setLength((float) 2202.1833);
+        System.out.println("Before call");
+        
         Path result = instance.shortestPathBetweenTwoIntersections(v1, v2);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("Printing path");
+        System.out.println(result.toString());
+        assertEquals(expResult.toString(), result.toString());
     }
 
     /**
@@ -200,26 +224,19 @@ public class GraphProcessorTest {
     @Test
     public void testOptimalTour() {
         System.out.println("optimalTour");
-        PlanningRequest pr = null;
-        GraphProcessor instance = null;
+        XmlReader reader = new XmlReader();
+        reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        GraphProcessor instance = new GraphProcessor(reader.getMap());
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
         TourGenerator expResult = null;
         TourGenerator result = instance.optimalTour(pr);
+        System.out.println(result);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
-    /**
-     * Test of startAlgo method, of class GraphProcessor.
-     */
-    @Test
-    public void testStartAlgo() {
-        System.out.println("startAlgo");
-        GraphProcessor instance = null;
-        instance.startAlgo();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
     /**
      * Test of changeOrder method, of class GraphProcessor.
@@ -232,22 +249,6 @@ public class GraphProcessorTest {
         GraphProcessor instance = null;
         Tour expResult = null;
         Tour result = instance.changeOrder(tour, newOrder);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getNewPath method, of class GraphProcessor.
-     */
-    @Test
-    public void testGetNewPath() {
-        System.out.println("getNewPath");
-        Long idStart = null;
-        Long idStop = null;
-        GraphProcessor instance = null;
-        Path expResult = null;
-        Path result = instance.getNewPath(idStart, idStop);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

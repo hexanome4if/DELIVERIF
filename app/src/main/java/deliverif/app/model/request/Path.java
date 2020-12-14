@@ -77,7 +77,9 @@ public class Path {
         this.request = p.getRequest();
         this.type = p.getType();
     }
+   
 
+    
     /**
      * Get path's segments
      *

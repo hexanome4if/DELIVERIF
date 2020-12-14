@@ -46,4 +46,10 @@ public class VertexPath {
         }
         return p;
     }
+
+    public List<Vertex> getPath() {
+        return path;
+    }
+    
+    
 }

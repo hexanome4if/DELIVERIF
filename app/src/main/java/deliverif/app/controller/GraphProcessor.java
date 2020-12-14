@@ -216,9 +216,17 @@ public class GraphProcessor {
     public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2) {
         Vertex source = graph.getVertexById(v1.getId());
         Vertex destination = graph.getVertexById(v2.getId());
-
+        System.out.println("source:" + source.getId());
+        System.out.println("dest:" + destination.getId());
         VertexPath vertexPath = fullPath.get(source.getId().toString() + "-" + destination.getId().toString());
+        
+        if(vertexPath == null){
+            System.out.println("VP null");
+        }
+        
+        System.out.println("Made it past vertextPath");
         Path path = vertexPath.convertToPath(map);
+        System.out.println("Conversion réussie");
         path.setDeparture(v1);
         path.setArrival(v2);
         return path;

@@ -34,7 +34,7 @@ public class XmlReaderTest {
     @org.junit.jupiter.api.Test
     public void testReadMap() throws ParseException {
         XmlReader instance = new XmlReader();
-        instance.readMap("C:/Users/sana/Documents/NetBeansProjects/agile/fichiersXML2020/wrongSmallMap.xml");
+        instance.readMap("src/main/resources/deliverif/app/fichiersXML2020/wrongSmallMap.xml");
         
         Map expResult = null;
         Map result = (Map) instance.getMap();
@@ -49,10 +49,10 @@ public class XmlReaderTest {
     */
     @org.junit.jupiter.api.Test
     public void testReadRequest() throws ParseException {
-        String filename = "C:/Users/sana/Documents/NetBeansProjects/agile/fichiersXML2020/requestsSmall1.xml";
+        String filename = "src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml";
         
         XmlReader instance = new XmlReader();
-        instance.readMap("C:/Users/sana/Documents/NetBeansProjects/agile/fichiersXML2020/smallMap.xml");
+        instance.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         //Depot
         Long id = Long.parseLong("342873658");  
         
