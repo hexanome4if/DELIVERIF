@@ -6,6 +6,7 @@
 package deliverif.app.model.graph;
 
 import deliverif.app.controller.Observer.Observable;
+import deliverif.app.model.map.Intersection;
 import deliverif.app.model.request.Path;
 import deliverif.app.model.request.PlanningRequest;
 import deliverif.app.model.request.Request;
@@ -54,6 +55,13 @@ public class Tour extends Observable {
      * update the timestamps of {@code Path} using the data of the planning request
      */
     public void update(){
+        //reverse the departure and the arrival to make the UI more logical
+        for(Path p : paths){
+            Intersection temp = p.getArrival();
+            p.setArrival(p.getDeparture());
+            p.setDeparture(temp);
+        }
+        
         ArrayList<Path> newPaths = new ArrayList<>();
         double velocity = 15 * 1000 / 60;
         for(Path p : paths){
@@ -118,6 +126,11 @@ public class Tour extends Observable {
         return total;
     }
     
+    /**
+     * Get the order of paths
+     *
+     * @return list of paths' ID
+     */
     public ArrayList<Long> getOrder(){
         ArrayList<Long> order = new ArrayList<>();
         order.add(paths.get(0).getDeparture().getId());

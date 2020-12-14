@@ -71,14 +71,19 @@ public class GraphProcessorTest {
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor instance = new GraphProcessor(reader.getMap());
         PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
+        
+        assertNotEquals(pr, null);
+        assertNotEquals(reader.getMap(), null);
+        assertNotEquals(instance, null);
+        
         Graph result = instance.completeGraph(pr);
         Graph expResult = new Graph();
-        expResult.addVertex(new Vertex(Long.valueOf(342873658)));
-        expResult.addVertex(new Vertex(Long.valueOf(208769039)));
-        expResult.addVertex(new Vertex(Long.valueOf(25173820)));
-        expResult.addEdge(Long.valueOf(342873658), Long.valueOf(208769039), (float) 231.60083);
-        expResult.addEdge(Long.valueOf(342873658), Long.valueOf(25173820), (float) 2330.1206);
-        expResult.addEdge(Long.valueOf(25173820), Long.valueOf(208769039), (float) 2202.1833);
+        expResult.addVertex(new Vertex(342873658L));
+        expResult.addVertex(new Vertex(208769039L));
+        expResult.addVertex(new Vertex(25173820L));
+        expResult.addEdge(342873658L, 208769039L, (float) 231.60083);
+        expResult.addEdge(342873658L, 25173820L, (float) 2330.1206);
+        expResult.addEdge(25173820L, 208769039L, (float) 2202.1833);
         assertEquals(expResult.toString(), result.toString());
     }
 
@@ -88,6 +93,7 @@ public class GraphProcessorTest {
     @Test
     public void testDijkstra() {
         System.out.println("dijkstra");
+        // Load map and requests
         XmlReader reader = new XmlReader();
         reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
         GraphProcessor gp = new GraphProcessor(reader.getMap());
@@ -96,11 +102,16 @@ public class GraphProcessorTest {
         PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml");
         Tour tour = new Tour(pr);
         
-        Vertex source = new Vertex(Long.valueOf("208769457"));
-        Vertex dest1 = new Vertex(Long.valueOf("1679901320"));
-        Vertex dest2 = new Vertex(Long.valueOf("208769120"));
-        Vertex dest3 = new Vertex(Long.valueOf("25336179"));
-        Vertex dest4 = new Vertex(Long.valueOf("208769039"));
+        assertNotEquals(pr, null);
+        assertNotEquals(reader.getMap(), null);
+        assertNotEquals(gp, null);
+        
+        // Initialize entry data and the expected object
+        Vertex source = new Vertex(208769457L);
+        Vertex dest1 = new Vertex(1679901320L);
+        Vertex dest2 = new Vertex(208769120L);
+        Vertex dest3 = new Vertex(25336179L);
+        Vertex dest4 = new Vertex(208769039L);
         List<Vertex> goals = new ArrayList<>();
         goals.add(dest1);
         goals.add(dest2);
@@ -113,14 +124,17 @@ public class GraphProcessorTest {
             graphVide.addVertex(v);
             graphExp.addVertex(v);
         }
-        gp.dijkstra(graphVide, source, goals);
         
         graphExp.addEdgeOneSide(source.getId(), dest1.getId(), (float) 411.126);
         graphExp.addEdgeOneSide(source.getId(), dest2.getId(), (float) 691.148);
         graphExp.addEdgeOneSide(source.getId(), dest3.getId(), (float) 1539.744);
         graphExp.addEdgeOneSide(source.getId(), dest4.getId(), (float) 207.214);
+        
+        // Run dijkstra and test
+        gp.dijkstra(graphVide, source, goals);
         assertEquals(graphVide.toString(),graphExp.toString());
         
+        // Test fullPath feature
         Path p1 = new Path();
         p1.setDeparture(reader.getMap().getIntersectionParId(source.getId()));
         p1.setArrival(reader.getMap().getIntersectionParId(dest1.getId()));
@@ -269,14 +283,63 @@ public class GraphProcessorTest {
     // @Test
     public void testChangeOrder() {
         System.out.println("changeOrder");
-        Tour tour = null;
-        List<Long> newOrder = null;
-        GraphProcessor instance = null;
-        Tour expResult = null;
-        Tour result = instance.changeOrder(tour, newOrder);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // First let's load a map
+        XmlReader reader = new XmlReader();
+        boolean mapLoaded = reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        assertTrue(mapLoaded);
+        Map map = reader.getMap();
+        assertNotEquals(map, null);
+
+        // Then let's load a planning request
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
+        assertNotEquals(pr, null);
+
+        // Init the graph processor controller
+        GraphProcessor instance = new GraphProcessor(map);
+
+        // Start the algorithm to find the best path
+        TourGenerator tourGenerator = instance.optimalTour(pr);
+        assertNotEquals(tourGenerator, null);
+        instance.startAlgo();
+
+        // Get the computed tour
+        Tour computedTour = tourGenerator.getTour();
+        assertNotEquals(computedTour, null);
+        
+        // Change the order of the tour
+        List<Long> newOrder = new ArrayList<>();
+        newOrder.add(2835339774L);
+        newOrder.add(25336179L);
+        newOrder.add(1679901320L);
+        newOrder.add(208769120L);
+        newOrder.add(208769457L);
+        boolean test1 = instance.verifyNewOrder(computedTour, newOrder);
+        assertFalse(test1);
+        
+        newOrder.remove(1);
+        boolean test2 = instance.verifyNewOrder(computedTour, newOrder);
+        assertFalse(test2);
+        
+        newOrder.add(123456789L);
+        boolean test3 = instance.verifyNewOrder(computedTour, newOrder);
+        assertFalse(test3);
+        
+        newOrder.remove(123456789L);
+        newOrder.add(25336179L);
+        boolean test4 = instance.verifyNewOrder(computedTour, newOrder);
+        assertTrue(test4);
+        
+        computedTour = instance.changeOrder(computedTour, newOrder);
+        // Get the tour as a list of points id
+        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];
+        int i = 0;
+        for(Path path : computedTour.getPaths()) {
+            computedTourPointsId[i] = path.getDeparture().getId();
+            ++i;
+        }
+
+        // Check if the list is good
+        assertArrayEquals(computedTourPointsId, new Long[]{2835339774L, 1679901320L, 208769120L, 208769457L, 25336179L});
     }
 
     /**
@@ -285,14 +348,47 @@ public class GraphProcessorTest {
     // @Test
     public void testAddRequestToTour() {
         System.out.println("addRequestToTour");
-        Tour tour = null;
-        Request rqst = null;
-        GraphProcessor instance = null;
-        Tour expResult = null;
-        Tour result = instance.addRequestToTour(tour, rqst);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // First let's load a map
+        XmlReader reader = new XmlReader();
+        boolean mapLoaded = reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml");
+        assertTrue(mapLoaded);
+        Map map = reader.getMap();
+        assertNotEquals(map, null);
+
+        // Then let's load a planning request
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml");
+        assertNotEquals(pr, null);
+
+        // Init the graph processor controller
+        GraphProcessor instance = new GraphProcessor(map);
+
+        // Start the algorithm to find the best path
+        TourGenerator tourGenerator = instance.optimalTour(pr);
+        assertNotEquals(tourGenerator, null);
+        instance.startAlgo();
+
+        // Get the computed tour
+        Tour computedTour = tourGenerator.getTour();
+        assertNotEquals(computedTour, null);
+        
+        // Add a new request to the tour
+        Request rqst = new Request();
+        rqst.setPickupAddress(instance.getMap().getIntersectionParId(55475018L));
+        rqst.setDeliveryAddress(instance.getMap().getIntersectionParId(26079654L));
+        rqst.setPickupDuration(360);
+        rqst.setDeliveryDuration(300);
+        
+        computedTour = instance.addRequestToTour(computedTour, rqst);
+        // Get the tour as a list of points id
+        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];
+        int i = 0;
+        for(Path path : computedTour.getPaths()) {
+            computedTourPointsId[i] = path.getDeparture().getId();
+            ++i;
+        }
+
+        // Check if the list is good
+        assertArrayEquals(computedTourPointsId, new Long[]{2835339774L, 208769120L, 1679901320L, 208769457L, 25336179L, 55475018L, 26079654L});
     }
 
     /**
@@ -301,14 +397,45 @@ public class GraphProcessorTest {
     // @Test
     public void testRemoveRequestFromTour() {
         System.out.println("removeRequestFromTour");
-        Tour t = null;
-        Request r = null;
-        GraphProcessor instance = null;
-        Tour expResult = null;
-        Tour result = instance.removeRequestFromTour(t, r);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // First let's load a map
+        XmlReader reader = new XmlReader();
+        boolean mapLoaded = reader.readMap("src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml");
+        assertTrue(mapLoaded);
+        Map map = reader.getMap();
+        assertNotEquals(map, null);
+
+        // Then let's load a planning request
+        PlanningRequest pr = reader.readRequest("src/main/resources/deliverif/app/fichiersXML2020/requestsMedium3.xml");
+        assertNotEquals(pr, null);
+
+        // Init the graph processor controller
+        GraphProcessor instance = new GraphProcessor(map);
+
+        // Start the algorithm to find the best path
+        TourGenerator tourGenerator = instance.optimalTour(pr);
+        assertNotEquals(tourGenerator, null);
+        instance.startAlgo();
+
+        // Get the computed tour
+        Tour computedTour = tourGenerator.getTour();
+        assertNotEquals(computedTour, null);
+        
+        // Remove a request from the tour
+        System.out.println(computedTour.getOrder());
+        Request rqst = pr.findRequestByAddress(505061101L);
+        computedTour = instance.removeRequestFromTour(computedTour, rqst);
+        
+        // Get the tour as a list of points id
+        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];
+        int i = 0;
+        for(Path path : computedTour.getPaths()) {
+            computedTourPointsId[i] = path.getDeparture().getId();
+            ++i;
+        }
+
+        // Check if the list is good
+        assertArrayEquals(computedTourPointsId, new Long[]{1349383079L, 26121686L, 55444018L, 191134392L, 26470086L});
+    
     }
 
     

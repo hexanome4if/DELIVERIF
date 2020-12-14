@@ -278,10 +278,7 @@ public class GraphProcessor {
      * @see Tour
      */
     public Tour changeOrder(Tour tour, List<Long> newOrder) {
-        //newOrder === depot -> nodes -> depot
-        if (newOrder.size() != tour.getOrder().size()) {
-            System.out.println("not the same length!!!!!!");
-        }
+        //let newOrder === depot -> nodes -> depot
         newOrder.add(newOrder.get(0));
         Tour newTour = new Tour(tour);
         ArrayList<Path> newPaths = new ArrayList<>();
@@ -292,6 +289,52 @@ public class GraphProcessor {
         newTour.update();// synchroniser les horaires
         
         return newTour;
+    }
+    
+    /**
+     * Check if the new order comform to the rules
+     * <p> This method has to be used before {@code changeOrder()}.
+     * @param tour the original tour
+     * @param newOrder the order of intersections that will be applied
+     * @return a boolean value, {@code false} if the rules above 
+     * are not respected.
+     * @see Tour
+     */
+    public boolean verifyNewOrder(Tour tour, List<Long> newOrder){
+        PlanningRequest pr1 = tour.getPr();
+        ArrayList<Long> ids = new ArrayList<>();
+        if (newOrder.size() != tour.getOrder().size()-1) {
+            System.out.println("not the same length!!!!!!");
+            return false;
+        }
+        if(!Objects.equals(newOrder.get(0), pr1.getDepot().getAddress().getId()) ){
+            System.out.println("ERROR: The first element of newOrder must be the depot's ID!");
+            return false;
+        }
+        List<Long> newOrderWithOutDepot = new ArrayList<>(newOrder);
+        newOrderWithOutDepot.remove(0);
+        for(Long l : newOrderWithOutDepot){
+            boolean finded = false;
+            for(Request r : pr1.getRequests()){
+                if(Objects.equals(r.getPickupAddress().getId(), l)){
+                    finded = true;
+                    ids.add(r.getDeliveryAddress().getId());
+                    break;
+                } else if(Objects.equals(r.getDeliveryAddress().getId(), l)){
+                    finded = true;
+                    if(!ids.contains(l)){
+                        System.out.println("ERROR: Bad order");
+                        return false;
+                    }
+                    break;
+                } 
+            }
+            if(!finded){
+                System.out.println("ERROR: ID " + l + " not found");
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
