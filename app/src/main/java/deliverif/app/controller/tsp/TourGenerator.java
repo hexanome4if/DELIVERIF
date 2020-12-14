@@ -117,4 +117,10 @@ public class TourGenerator extends Observable implements Observer {
         return sem;
     }
 
+    @Override
+    public String toString() {
+        return "TourGenerator{ tour=" + tour + '}';
+    }
+    
+    
 }
