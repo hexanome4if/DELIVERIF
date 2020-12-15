@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddingRequestState.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.State</a> &gt; <span class="el_source">AddingRequestState.java</span></div><h1>AddingRequestState.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.State;
+
+import deliverif.app.controller.Command.ListOfCommands;
+import deliverif.app.controller.Command.SelectNodeCommand;
+import deliverif.app.controller.MenuPageController;
+import java.util.Optional;
+import javafx.scene.control.TextInputDialog;
+
+/**
+ * State in which the user is adding a request to the current tour
+ * @author zakaria
+ */
+public class AddingRequestState extends State {
+    /**
+     * List of commands to be able to undo and redo
+     */
+    private final ListOfCommands loc;
+    /**
+     * Pickup intersection id to add
+     */
+    private String pickupId;
+    /**
+     * Delivery intersection id to add
+     */
+    private String deliveryId;
+    /**
+     * Pickup duration to add (in seconds)
+     */
+    private int pickupDuration;
+    /**
+     * Delivery duration to add (in seconds)
+     */
+    private int deliveryDuration;
+
+    /**
+     * Start a state to add a request to the current tour
+     *
+     * @param mpc current view controller
+     */
+    public AddingRequestState(MenuPageController mpc) {
+<span class="nc" id="L46">        super(mpc);</span>
+<span class="nc" id="L47">        loc = new ListOfCommands();</span>
+<span class="nc" id="L48">    }</span>
+
+    @Override
+    public void addRequest() {
+<span class="nc bnc" id="L52" title="All 4 branches missed.">        if (pickupId == null || deliveryId == null) {</span>
+<span class="nc" id="L53">            System.out.println(&quot;Il manque des points de selection&quot;);</span>
+<span class="nc" id="L54">            return;</span>
+        }
+<span class="nc" id="L56">        mpc.addRequest(pickupId, deliveryId, pickupDuration, deliveryDuration);</span>
+<span class="nc" id="L57">        mpc.setCurrentState(new TourComputedState(mpc));</span>
+<span class="nc" id="L58">        System.out.println(&quot;Requete ajoutée&quot;);</span>
+<span class="nc" id="L59">    }</span>
+
+    @Override
+    public void selectNode(String nodeId) {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (mpc.isNodeOnTour(nodeId)) {</span>
+<span class="nc" id="L64">            this.mpc.schowInfoAlert(&quot;Point already on the tour&quot;, &quot;Impossible to add, the point is already on the tour.&quot;);</span>
+<span class="nc" id="L65">            return;</span>
+        }
+<span class="nc bnc" id="L67" title="All 4 branches missed.">        if (pickupId == null || deliveryId == null) {</span>
+            //super.selectNode(nodeId);
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (pickupId == null) {</span>
+<span class="nc" id="L70">                SelectNodeCommand snc = new SelectNodeCommand(this, false, nodeId);</span>
+<span class="nc" id="L71">                loc.addCommand(snc);</span>
+<span class="nc" id="L72">                snc.doCommand();</span>
+<span class="nc" id="L73">                System.out.println(&quot;Pickup added&quot;);</span>
+<span class="nc" id="L74">                TextInputDialog dialog = new TextInputDialog(&quot;Pickup Duration&quot;);</span>
+<span class="nc" id="L75">                dialog.setTitle(&quot;Pickup duration&quot;);</span>
+<span class="nc" id="L76">                dialog.setHeaderText(&quot;Enter pickup duration (secondes) : &quot;);</span>
+<span class="nc" id="L77">                dialog.setContentText(&quot;Duration :&quot;);</span>
+<span class="nc" id="L78">                Optional&lt;String&gt; pickupDurationString = dialog.showAndWait();</span>
+<span class="nc bnc" id="L79" title="All 6 branches missed.">                while (!pickupDurationString.isPresent() || pickupDurationString.isEmpty() || !isParsable(pickupDurationString.get())) {</span>
+<span class="nc" id="L80">                    dialog.setTitle(&quot;Pickup duration&quot;);</span>
+<span class="nc" id="L81">                    dialog.setHeaderText(&quot;INVALID ANSWER - Enter pickup duration (secondes) : &quot;);</span>
+<span class="nc" id="L82">                    dialog.setContentText(&quot;Duration :&quot;);</span>
+<span class="nc" id="L83">                    pickupDurationString = dialog.showAndWait();</span>
+                }
+<span class="nc" id="L85">                pickupDuration = Integer.parseInt(pickupDurationString.get());</span>
+<span class="nc" id="L86">                this.mpc.schowInfoAlert(&quot;Select Delivery point&quot;, &quot;Pickup added ! Now select a delivery point on the map please.&quot;);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            } else if (deliveryId == null) {</span>
+<span class="nc" id="L88">                SelectNodeCommand snc = new SelectNodeCommand(this, true, nodeId);</span>
+<span class="nc" id="L89">                loc.addCommand(snc);</span>
+<span class="nc" id="L90">                snc.doCommand();</span>
+<span class="nc" id="L91">                System.out.println(&quot;Delivery added&quot;);</span>
+<span class="nc" id="L92">                TextInputDialog dialog = new TextInputDialog(&quot;Delivery Duration&quot;);</span>
+<span class="nc" id="L93">                dialog.setTitle(&quot;Delivery duration&quot;);</span>
+<span class="nc" id="L94">                dialog.setHeaderText(&quot;Enter delivery duration (secondes) : &quot;);</span>
+<span class="nc" id="L95">                dialog.setContentText(&quot;Duration :&quot;);</span>
+<span class="nc" id="L96">                Optional&lt;String&gt; deliveryDurationString = dialog.showAndWait();</span>
+<span class="nc bnc" id="L97" title="All 6 branches missed.">                while (!deliveryDurationString.isPresent() || deliveryDurationString.isEmpty() || !isParsable(deliveryDurationString.get())) {</span>
+<span class="nc" id="L98">                    dialog.setTitle(&quot;Delivery duration&quot;);</span>
+<span class="nc" id="L99">                    dialog.setHeaderText(&quot;INVALID ANSWER - Enter delivery duration (secondes) : &quot;);</span>
+<span class="nc" id="L100">                    dialog.setContentText(&quot;Duration :&quot;);</span>
+<span class="nc" id="L101">                    deliveryDurationString = dialog.showAndWait();</span>
+                }
+<span class="nc" id="L103">                deliveryDuration = Integer.parseInt(deliveryDurationString.get());</span>
+<span class="nc" id="L104">                this.addRequest(); //On lance la requete</span>
+<span class="nc" id="L105">            }</span>
+        } else {
+<span class="nc" id="L107">            System.out.println(&quot;Déjà 2 points sélectionné&quot;);</span>
+        }
+<span class="nc" id="L109">    }</span>
+
+    @Override
+    public void undo() {
+<span class="nc" id="L113">        loc.undo();</span>
+<span class="nc" id="L114">    }</span>
+
+    @Override
+    public void redo() {
+<span class="nc" id="L118">        loc.redo();</span>
+<span class="nc" id="L119">    }</span>
+
+    /**
+     * Set the pickup node id
+     *
+     * @param id pickup node id
+     */
+    public void setPickupId(String id) {
+<span class="nc" id="L127">        pickupId = id;</span>
+<span class="nc" id="L128">    }</span>
+
+    /**
+     * Set the delivery node id
+     *
+     * @param id delivery node id
+     */
+    public void setDeliveryId(String id) {
+<span class="nc" id="L136">        deliveryId = id;</span>
+<span class="nc" id="L137">    }</span>
+
+    /**
+     * Check if a string is parsable in int
+     *
+     * @param input the string to check
+     * @return whether the string is parsable or not
+     */
+    private boolean isParsable(String input) {
+        try {
+<span class="nc" id="L147">            Integer.parseInt(input);</span>
+<span class="nc" id="L148">            return true;</span>
+<span class="nc" id="L149">        } catch (final NumberFormatException e) {</span>
+<span class="nc" id="L150">            return false;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

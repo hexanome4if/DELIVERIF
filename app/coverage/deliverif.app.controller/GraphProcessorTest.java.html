@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphProcessorTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller</a> &gt; <span class="el_source">GraphProcessorTest.java</span></div><h1>GraphProcessorTest.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller;
+
+import deliverif.app.controller.tsp.BranchAndBound.TSP1;
+import deliverif.app.controller.tsp.TourGenerator;
+import deliverif.app.model.graph.Graph;
+import deliverif.app.model.graph.Tour;
+import deliverif.app.model.graph.Vertex;
+import deliverif.app.model.graph.VertexPath;
+import deliverif.app.model.map.Intersection;
+import deliverif.app.model.map.Map;
+import deliverif.app.model.request.Path;
+import deliverif.app.model.request.PlanningRequest;
+import deliverif.app.model.request.Request;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ *
+ * @author zakaria
+ */
+public class GraphProcessorTest {
+    
+    private HashMap&lt;String, VertexPath&gt; fullPath;
+    
+<span class="fc" id="L43">    public GraphProcessorTest() {</span>
+<span class="fc" id="L44">    }</span>
+    
+    @BeforeAll
+    public static void setUpClass() {
+<span class="fc" id="L48">    }</span>
+    
+    @AfterAll
+    public static void tearDownClass() {
+<span class="fc" id="L52">    }</span>
+    
+    @BeforeEach
+    public void setUp() {
+<span class="fc" id="L56">    }</span>
+    
+    @AfterEach
+    public void tearDown() {
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if (fullPath != null)  fullPath.clear();</span>
+<span class="fc" id="L61">    }</span>
+    
+    
+    /**
+     * Test of completeGraph method, of class GraphProcessor.
+     */
+    @Test
+    public void testCompleteGraph() {
+<span class="fc" id="L69">        System.out.println(&quot;completeGraph&quot;);</span>
+<span class="fc" id="L70">        XmlReader reader = new XmlReader();</span>
+<span class="fc" id="L71">        reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="fc" id="L72">        GraphProcessor instance = new GraphProcessor(reader.getMap());</span>
+<span class="fc" id="L73">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml&quot;);</span>
+        
+<span class="fc" id="L75">        assertNotEquals(pr, null);</span>
+<span class="fc" id="L76">        assertNotEquals(reader.getMap(), null);</span>
+<span class="fc" id="L77">        assertNotEquals(instance, null);</span>
+        
+<span class="fc" id="L79">        Graph result = instance.completeGraph(pr);</span>
+<span class="fc" id="L80">        Graph expResult = new Graph();</span>
+<span class="fc" id="L81">        expResult.addVertex(new Vertex(342873658L));</span>
+<span class="fc" id="L82">        expResult.addVertex(new Vertex(208769039L));</span>
+<span class="fc" id="L83">        expResult.addVertex(new Vertex(25173820L));</span>
+<span class="fc" id="L84">        expResult.addEdge(342873658L, 208769039L, (float) 231.60083);</span>
+<span class="fc" id="L85">        expResult.addEdge(342873658L, 25173820L, (float) 2330.1206);</span>
+<span class="fc" id="L86">        expResult.addEdge(25173820L, 208769039L, (float) 2202.1833);</span>
+<span class="fc" id="L87">        assertEquals(expResult.toString(), result.toString());</span>
+<span class="fc" id="L88">    }</span>
+
+    /**
+     * Test of dijkstra method, of class GraphProcessor.
+     */
+    @Test
+    public void testDijkstra() {
+<span class="fc" id="L95">        System.out.println(&quot;dijkstra&quot;);</span>
+        // Load map and requests
+<span class="fc" id="L97">        XmlReader reader = new XmlReader();</span>
+<span class="fc" id="L98">        reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="fc" id="L99">        GraphProcessor gp = new GraphProcessor(reader.getMap());</span>
+<span class="fc" id="L100">        Graph graphVide = new Graph();</span>
+<span class="fc" id="L101">        Graph graphExp = new Graph();</span>
+<span class="fc" id="L102">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml&quot;);</span>
+<span class="fc" id="L103">        Tour tour = new Tour(pr);</span>
+        
+<span class="fc" id="L105">        assertNotEquals(pr, null);</span>
+<span class="fc" id="L106">        assertNotEquals(reader.getMap(), null);</span>
+<span class="fc" id="L107">        assertNotEquals(gp, null);</span>
+        
+        // Initialize entry data and the expected object
+<span class="fc" id="L110">        Vertex source = new Vertex(208769457L);</span>
+<span class="fc" id="L111">        Vertex dest1 = new Vertex(1679901320L);</span>
+<span class="fc" id="L112">        Vertex dest2 = new Vertex(208769120L);</span>
+<span class="fc" id="L113">        Vertex dest3 = new Vertex(25336179L);</span>
+<span class="fc" id="L114">        Vertex dest4 = new Vertex(208769039L);</span>
+<span class="fc" id="L115">        List&lt;Vertex&gt; goals = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L116">        goals.add(dest1);</span>
+<span class="fc" id="L117">        goals.add(dest2);</span>
+<span class="fc" id="L118">        goals.add(dest3);</span>
+<span class="fc" id="L119">        goals.add(dest4);</span>
+        
+<span class="fc" id="L121">        graphVide.addVertex(source);</span>
+<span class="fc" id="L122">        graphExp.addVertex(source);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        for(Vertex v : goals){</span>
+<span class="fc" id="L124">            graphVide.addVertex(v);</span>
+<span class="fc" id="L125">            graphExp.addVertex(v);</span>
+<span class="fc" id="L126">        }</span>
+        
+<span class="fc" id="L128">        graphExp.addEdgeOneSide(source.getId(), dest1.getId(), (float) 411.126);</span>
+<span class="fc" id="L129">        graphExp.addEdgeOneSide(source.getId(), dest2.getId(), (float) 691.148);</span>
+<span class="fc" id="L130">        graphExp.addEdgeOneSide(source.getId(), dest3.getId(), (float) 1539.744);</span>
+<span class="fc" id="L131">        graphExp.addEdgeOneSide(source.getId(), dest4.getId(), (float) 207.214);</span>
+        
+        // Run dijkstra and test
+<span class="fc" id="L134">        gp.dijkstra(graphVide, source, goals);</span>
+<span class="fc" id="L135">        assertEquals(graphVide.toString(),graphExp.toString());</span>
+        
+        // Test fullPath feature
+<span class="fc" id="L138">        Path p1 = new Path();</span>
+<span class="fc" id="L139">        p1.setDeparture(reader.getMap().getIntersectionParId(source.getId()));</span>
+<span class="fc" id="L140">        p1.setArrival(reader.getMap().getIntersectionParId(dest1.getId()));</span>
+<span class="fc" id="L141">        p1.setLength((float)411.12595);</span>
+<span class="fc" id="L142">        Path p2 = new Path(p1);</span>
+<span class="fc" id="L143">        p2.setArrival(reader.getMap().getIntersectionParId(dest2.getId()));</span>
+<span class="fc" id="L144">        p2.setLength((float)691.1477);</span>
+<span class="fc" id="L145">        Path p3 = new Path(p1);</span>
+<span class="fc" id="L146">        p3.setArrival(reader.getMap().getIntersectionParId(dest3.getId()));</span>
+<span class="fc" id="L147">        p3.setLength((float)1539.7443);</span>
+<span class="fc" id="L148">        Path p4 = new Path(p1);</span>
+<span class="fc" id="L149">        p4.setArrival(reader.getMap().getIntersectionParId(dest4.getId()));</span>
+<span class="fc" id="L150">        p4.setLength((float)207.21445);</span>
+<span class="fc" id="L151">        tour.addPath(p1);</span>
+<span class="fc" id="L152">        tour.addPath(p2);</span>
+<span class="fc" id="L153">        tour.addPath(p3);</span>
+<span class="fc" id="L154">        tour.addPath(p4);</span>
+        
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        for(VertexPath vp : gp.fullPath.values()){</span>
+<span class="fc" id="L157">            Path p = vp.convertToPath(reader.getMap());</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            for(Path expPath : tour.getPaths()){</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                if(expPath.getDeparture() == p.getDeparture()</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">                        &amp;&amp; expPath.getArrival() == p.getArrival()){</span>
+<span class="nc" id="L161">                    assertEquals(p.toString(),expPath.toString());</span>
+                }
+<span class="fc" id="L163">            }</span>
+<span class="fc" id="L164">        }</span>
+<span class="fc" id="L165">    }</span>
+
+    /**
+     * Test of hamiltonianCircuit method, of class GraphProcessor.
+     */
+    @Test
+    public void testHamiltonianCircuit() {
+<span class="fc" id="L172">        System.out.println(&quot;hamiltonianCircuit&quot;);</span>
+<span class="fc" id="L173">        XmlReader reader = new XmlReader();</span>
+<span class="fc" id="L174">        reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="fc" id="L175">        GraphProcessor instance = new GraphProcessor(reader.getMap());</span>
+<span class="fc" id="L176">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml&quot;);</span>
+<span class="fc" id="L177">        Vertex [] expResult = null;</span>
+<span class="fc" id="L178">        TSP1 tsp1 = instance.hamiltonianCircuit(pr);</span>
+<span class="fc" id="L179">        Graph g = instance.completeGraph(pr);</span>
+<span class="fc" id="L180">        List&lt;Long&gt; ordre = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">        for (Request r : pr.getRequests()) {</span>
+<span class="fc" id="L182">            ordre.add(r.getPickupAddress().getId());</span>
+<span class="fc" id="L183">            ordre.add(r.getDeliveryAddress().getId());</span>
+<span class="fc" id="L184">        }</span>
+<span class="fc" id="L185">        System.out.println(&quot;Ok&quot;);</span>
+<span class="fc" id="L186">        tsp1.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);</span>
+<span class="fc" id="L187">        Vertex [] result = tsp1.getSolution();</span>
+<span class="fc" id="L188">        System.out.println(&quot;Printing result&quot;);</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">        if (result == null) System.out.println(&quot;Result is null&quot;);</span>
+<span class="fc" id="L190">        System.out.println(result.length);</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        for (Vertex v : result){</span>
+<span class="fc" id="L192">            System.out.println(v.toString());</span>
+        }
+<span class="fc" id="L194">        expResult = new Vertex [3];</span>
+        
+<span class="fc" id="L196">        expResult[0] = new Vertex((long) 342873658);</span>
+<span class="fc" id="L197">        expResult[1] = new Vertex((long) 208769039);</span>
+<span class="fc" id="L198">        expResult[2] = new Vertex((long) 25173820);</span>
+        
+<span class="fc" id="L200">        assertEquals(Arrays.toString(expResult), Arrays.toString(result));</span>
+<span class="fc" id="L201">    }</span>
+
+    
+
+    /**
+     * Test of shortestPathBetweenTwoIntersections method, of class GraphProcessor.
+     */
+    @Test
+    public void testShortestPathBetweenTwoIntersections() {
+<span class="fc" id="L210">        System.out.println(&quot;shortestPathBetweenTwoIntersections&quot;);</span>
+<span class="fc" id="L211">        XmlReader reader = new XmlReader();</span>
+<span class="fc" id="L212">        reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="fc" id="L213">        GraphProcessor instance = new GraphProcessor(reader.getMap());</span>
+<span class="fc" id="L214">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall1.xml&quot;);</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        for (Intersection i : instance.getMap().getIntersections().values()){</span>
+<span class="fc" id="L216">            System.out.println(i.toString());</span>
+<span class="fc" id="L217">        }</span>
+<span class="fc" id="L218">        Intersection v1 = instance.getMap().getIntersectionParId((long)208769039);</span>
+<span class="fc" id="L219">        Intersection v2 = instance.getMap().getIntersectionParId((long)25173820);</span>
+<span class="fc" id="L220">        Graph completeGr = instance.completeGraph(pr);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        for (String s : instance.fullPath.keySet()){</span>
+<span class="fc" id="L222">            System.out.println(s);</span>
+<span class="fc" id="L223">        }</span>
+<span class="fc" id="L224">        Path expResult = new Path();</span>
+<span class="fc" id="L225">        expResult.setDeparture(instance.getMap().getIntersectionParId((long)208769039));</span>
+<span class="fc" id="L226">        expResult.setArrival(instance.getMap().getIntersectionParId((long)25173820));</span>
+<span class="fc" id="L227">        expResult.setLength((float) 2202.1833);</span>
+<span class="fc" id="L228">        System.out.println(&quot;Before call&quot;);</span>
+        
+<span class="fc" id="L230">        Path result = instance.shortestPathBetweenTwoIntersections(v1, v2);</span>
+<span class="fc" id="L231">        System.out.println(&quot;Printing path&quot;);</span>
+<span class="fc" id="L232">        System.out.println(result.toString());</span>
+<span class="fc" id="L233">        assertEquals(expResult.toString(), result.toString());</span>
+<span class="fc" id="L234">    }</span>
+
+    /**
+     * Test get the optimal tour for a given PlanningRequest
+     */
+    @Test
+    public void testOptimalTour() {
+<span class="fc" id="L241">        System.out.println(&quot;optimalTour&quot;);</span>
+
+        // First let's load a map
+<span class="fc" id="L244">        XmlReader reader = new XmlReader();</span>
+<span class="fc" id="L245">        boolean mapLoaded = reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="fc" id="L246">        assertTrue(mapLoaded);</span>
+<span class="fc" id="L247">        Map map = reader.getMap();</span>
+<span class="fc" id="L248">        assertNotEquals(map, null);</span>
+
+        // Then let's load a planning request
+<span class="fc" id="L251">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml&quot;);</span>
+<span class="fc" id="L252">        assertNotEquals(pr, null);</span>
+
+        // Init the graph processor controller
+<span class="fc" id="L255">        GraphProcessor instance = new GraphProcessor(map);</span>
+
+        // Start the algorithm to find the best path
+<span class="fc" id="L258">        TourGenerator tourGenerator = instance.optimalTour(pr);</span>
+<span class="fc" id="L259">        assertNotEquals(tourGenerator, null);</span>
+<span class="fc" id="L260">        instance.startAlgo();</span>
+
+        // Get the computed tour
+<span class="fc" id="L263">        Tour computedTour = tourGenerator.getTour();</span>
+<span class="fc" id="L264">        assertNotEquals(computedTour, null);</span>
+
+        // Get the tour as a list of points id
+<span class="fc" id="L267">        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];</span>
+<span class="fc" id="L268">        int i = 0;</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">        for(Path path : computedTour.getPaths()) {</span>
+<span class="fc" id="L270">            computedTourPointsId[i] = path.getDeparture().getId();</span>
+<span class="fc" id="L271">            ++i;</span>
+<span class="fc" id="L272">        }</span>
+
+        // Check if the list is good
+<span class="fc" id="L275">        assertArrayEquals(computedTourPointsId, new Long[]{2835339774L, 208769120L, 1679901320L, 208769457L, 25336179L});</span>
+<span class="fc" id="L276">    }</span>
+
+    
+
+    /**
+     * Test of changeOrder method, of class GraphProcessor.
+     */
+    // @Test
+    public void testChangeOrder() {
+<span class="nc" id="L285">        System.out.println(&quot;changeOrder&quot;);</span>
+        // First let's load a map
+<span class="nc" id="L287">        XmlReader reader = new XmlReader();</span>
+<span class="nc" id="L288">        boolean mapLoaded = reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="nc" id="L289">        assertTrue(mapLoaded);</span>
+<span class="nc" id="L290">        Map map = reader.getMap();</span>
+<span class="nc" id="L291">        assertNotEquals(map, null);</span>
+
+        // Then let's load a planning request
+<span class="nc" id="L294">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml&quot;);</span>
+<span class="nc" id="L295">        assertNotEquals(pr, null);</span>
+
+        // Init the graph processor controller
+<span class="nc" id="L298">        GraphProcessor instance = new GraphProcessor(map);</span>
+
+        // Start the algorithm to find the best path
+<span class="nc" id="L301">        TourGenerator tourGenerator = instance.optimalTour(pr);</span>
+<span class="nc" id="L302">        assertNotEquals(tourGenerator, null);</span>
+<span class="nc" id="L303">        instance.startAlgo();</span>
+
+        // Get the computed tour
+<span class="nc" id="L306">        Tour computedTour = tourGenerator.getTour();</span>
+<span class="nc" id="L307">        assertNotEquals(computedTour, null);</span>
+        
+        // Change the order of the tour
+<span class="nc" id="L310">        List&lt;Long&gt; newOrder = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L311">        newOrder.add(2835339774L);</span>
+<span class="nc" id="L312">        newOrder.add(25336179L);</span>
+<span class="nc" id="L313">        newOrder.add(1679901320L);</span>
+<span class="nc" id="L314">        newOrder.add(208769120L);</span>
+<span class="nc" id="L315">        newOrder.add(208769457L);</span>
+<span class="nc" id="L316">        boolean test1 = instance.verifyNewOrder(computedTour, newOrder);</span>
+<span class="nc" id="L317">        assertFalse(test1);</span>
+        
+<span class="nc" id="L319">        newOrder.remove(1);</span>
+<span class="nc" id="L320">        boolean test2 = instance.verifyNewOrder(computedTour, newOrder);</span>
+<span class="nc" id="L321">        assertFalse(test2);</span>
+        
+<span class="nc" id="L323">        newOrder.add(123456789L);</span>
+<span class="nc" id="L324">        boolean test3 = instance.verifyNewOrder(computedTour, newOrder);</span>
+<span class="nc" id="L325">        assertFalse(test3);</span>
+        
+<span class="nc" id="L327">        newOrder.remove(123456789L);</span>
+<span class="nc" id="L328">        newOrder.add(25336179L);</span>
+<span class="nc" id="L329">        boolean test4 = instance.verifyNewOrder(computedTour, newOrder);</span>
+<span class="nc" id="L330">        assertTrue(test4);</span>
+        
+<span class="nc" id="L332">        computedTour = instance.changeOrder(computedTour, newOrder);</span>
+        // Get the tour as a list of points id
+<span class="nc" id="L334">        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];</span>
+<span class="nc" id="L335">        int i = 0;</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">        for(Path path : computedTour.getPaths()) {</span>
+<span class="nc" id="L337">            computedTourPointsId[i] = path.getDeparture().getId();</span>
+<span class="nc" id="L338">            ++i;</span>
+<span class="nc" id="L339">        }</span>
+
+        // Check if the list is good
+<span class="nc" id="L342">        assertArrayEquals(computedTourPointsId, new Long[]{2835339774L, 1679901320L, 208769120L, 208769457L, 25336179L});</span>
+<span class="nc" id="L343">    }</span>
+
+    /**
+     * Test of addRequestToTour method, of class GraphProcessor.
+     */
+    // @Test
+    public void testAddRequestToTour() {
+<span class="nc" id="L350">        System.out.println(&quot;addRequestToTour&quot;);</span>
+        // First let's load a map
+<span class="nc" id="L352">        XmlReader reader = new XmlReader();</span>
+<span class="nc" id="L353">        boolean mapLoaded = reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/smallMap.xml&quot;);</span>
+<span class="nc" id="L354">        assertTrue(mapLoaded);</span>
+<span class="nc" id="L355">        Map map = reader.getMap();</span>
+<span class="nc" id="L356">        assertNotEquals(map, null);</span>
+
+        // Then let's load a planning request
+<span class="nc" id="L359">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsSmall2.xml&quot;);</span>
+<span class="nc" id="L360">        assertNotEquals(pr, null);</span>
+
+        // Init the graph processor controller
+<span class="nc" id="L363">        GraphProcessor instance = new GraphProcessor(map);</span>
+
+        // Start the algorithm to find the best path
+<span class="nc" id="L366">        TourGenerator tourGenerator = instance.optimalTour(pr);</span>
+<span class="nc" id="L367">        assertNotEquals(tourGenerator, null);</span>
+<span class="nc" id="L368">        instance.startAlgo();</span>
+
+        // Get the computed tour
+<span class="nc" id="L371">        Tour computedTour = tourGenerator.getTour();</span>
+<span class="nc" id="L372">        assertNotEquals(computedTour, null);</span>
+        
+        // Add a new request to the tour
+<span class="nc" id="L375">        Request rqst = new Request();</span>
+<span class="nc" id="L376">        rqst.setPickupAddress(instance.getMap().getIntersectionParId(55475018L));</span>
+<span class="nc" id="L377">        rqst.setDeliveryAddress(instance.getMap().getIntersectionParId(26079654L));</span>
+<span class="nc" id="L378">        rqst.setPickupDuration(360);</span>
+<span class="nc" id="L379">        rqst.setDeliveryDuration(300);</span>
+        
+<span class="nc" id="L381">        computedTour = instance.addRequestToTour(computedTour, rqst);</span>
+        // Get the tour as a list of points id
+<span class="nc" id="L383">        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];</span>
+<span class="nc" id="L384">        int i = 0;</span>
+<span class="nc bnc" id="L385" title="All 2 branches missed.">        for(Path path : computedTour.getPaths()) {</span>
+<span class="nc" id="L386">            computedTourPointsId[i] = path.getDeparture().getId();</span>
+<span class="nc" id="L387">            ++i;</span>
+<span class="nc" id="L388">        }</span>
+
+        // Check if the list is good
+<span class="nc" id="L391">        assertArrayEquals(computedTourPointsId, new Long[]{2835339774L, 208769120L, 1679901320L, 208769457L, 25336179L, 55475018L, 26079654L});</span>
+<span class="nc" id="L392">    }</span>
+
+    /**
+     * Test of removeRequestFromTour method, of class GraphProcessor.
+     */
+    // @Test
+    public void testRemoveRequestFromTour() {
+<span class="nc" id="L399">        System.out.println(&quot;removeRequestFromTour&quot;);</span>
+        // First let's load a map
+<span class="nc" id="L401">        XmlReader reader = new XmlReader();</span>
+<span class="nc" id="L402">        boolean mapLoaded = reader.readMap(&quot;src/main/resources/deliverif/app/fichiersXML2020/mediumMap.xml&quot;);</span>
+<span class="nc" id="L403">        assertTrue(mapLoaded);</span>
+<span class="nc" id="L404">        Map map = reader.getMap();</span>
+<span class="nc" id="L405">        assertNotEquals(map, null);</span>
+
+        // Then let's load a planning request
+<span class="nc" id="L408">        PlanningRequest pr = reader.readRequest(&quot;src/main/resources/deliverif/app/fichiersXML2020/requestsMedium3.xml&quot;);</span>
+<span class="nc" id="L409">        assertNotEquals(pr, null);</span>
+
+        // Init the graph processor controller
+<span class="nc" id="L412">        GraphProcessor instance = new GraphProcessor(map);</span>
+
+        // Start the algorithm to find the best path
+<span class="nc" id="L415">        TourGenerator tourGenerator = instance.optimalTour(pr);</span>
+<span class="nc" id="L416">        assertNotEquals(tourGenerator, null);</span>
+<span class="nc" id="L417">        instance.startAlgo();</span>
+
+        // Get the computed tour
+<span class="nc" id="L420">        Tour computedTour = tourGenerator.getTour();</span>
+<span class="nc" id="L421">        assertNotEquals(computedTour, null);</span>
+        
+        // Remove a request from the tour
+<span class="nc" id="L424">        System.out.println(computedTour.getOrder());</span>
+<span class="nc" id="L425">        Request rqst = pr.findRequestByAddress(505061101L);</span>
+<span class="nc" id="L426">        computedTour = instance.removeRequestFromTour(computedTour, rqst);</span>
+        
+        // Get the tour as a list of points id
+<span class="nc" id="L429">        Long[] computedTourPointsId = new Long[computedTour.getPaths().size()];</span>
+<span class="nc" id="L430">        int i = 0;</span>
+<span class="nc bnc" id="L431" title="All 2 branches missed.">        for(Path path : computedTour.getPaths()) {</span>
+<span class="nc" id="L432">            computedTourPointsId[i] = path.getDeparture().getId();</span>
+<span class="nc" id="L433">            ++i;</span>
+<span class="nc" id="L434">        }</span>
+
+        // Check if the list is good
+<span class="nc" id="L437">        assertArrayEquals(computedTourPointsId, new Long[]{1349383079L, 26121686L, 55444018L, 191134392L, 26470086L});</span>
+    
+<span class="nc" id="L439">    }</span>
+
+    
+    /**Load text from .txt
+     * @param txtPath
+     * @return content in type of String
+     */
+    public static String readTxt(String txtPath) {
+<span class="nc" id="L447">        File file = new File(txtPath);</span>
+<span class="nc bnc" id="L448" title="All 4 branches missed.">        if(file.isFile() &amp;&amp; file.exists()){</span>
+            try {
+<span class="nc" id="L450">                FileInputStream fileInputStream = new FileInputStream(file);</span>
+<span class="nc" id="L451">                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);</span>
+<span class="nc" id="L452">                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);</span>
+                 
+<span class="nc" id="L454">                StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L455">                String text = null;</span>
+<span class="nc bnc" id="L456" title="All 2 branches missed.">                while((text = bufferedReader.readLine()) != null){</span>
+<span class="nc" id="L457">                    text += &quot;\n&quot;;</span>
+<span class="nc" id="L458">                    sb.append(text);</span>
+                }
+<span class="nc" id="L460">                return sb.toString().substring(0, sb.toString().length()-1);</span>
+<span class="nc" id="L461">            } catch (IOException e) {</span>
+<span class="nc" id="L462">                e.printStackTrace();</span>
+            }
+        }
+<span class="nc" id="L465">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

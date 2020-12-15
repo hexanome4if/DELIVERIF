@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Vertex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.graph</a> &gt; <span class="el_source">Vertex.java</span></div><h1>Vertex.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.graph;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Represents a vertex in a graph
+ * @author zakaria
+ */
+public class Vertex {
+
+    /**
+     * Vertex unique id
+     */
+    private final Long id;
+    /**
+     * Edges starting from this vertex
+     */
+    private final List&lt;Edge&gt; adj;
+
+    /**
+     * Create a vertex with an id
+     *
+     * @param id vertex id
+     */
+<span class="fc" id="L31">    public Vertex(Long id) {</span>
+<span class="fc" id="L32">        this.id = id;                      // name of this Vertex</span>
+<span class="fc" id="L33">        adj = new LinkedList&lt;&gt;(); // Start an empty adj list</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * Get the list of edges which are linked to the current vertex
+     *
+     * @return the list of edges
+     */
+    public List&lt;Edge&gt; getAdj() {
+<span class="fc" id="L42">        return adj;</span>
+    }
+
+    /**
+     * Get vertex id
+     *
+     * @return vertex id
+     */
+    public Long getId() {
+<span class="fc" id="L51">        return id;</span>
+    }
+
+    /**
+     * Check if there is an edge between the current vertex and a given vertex
+     *
+     * @param v the vertex to check
+     * @return whether an edge exists between the current edge and v
+     */
+    public boolean isEdge(Vertex v) {
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        for (Edge e : adj) {</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (e.dest == v) {</span>
+<span class="fc" id="L63">                return true;</span>
+            }
+<span class="fc" id="L65">        }</span>
+<span class="nc" id="L66">        return false;</span>
+    }
+
+    @Override
+    public boolean equals(Object o) {
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        if (!(o instanceof Vertex)) return false;</span>
+<span class="fc" id="L72">        Vertex v = (Vertex) o;</span>
+<span class="fc" id="L73">        return v.getId().equals(id);</span>
+    }
+
+    /**
+     * Get the cost of the path to another vertex
+     *
+     * @param v the other vertex
+     * @return the cost to go from the current vertex to other vertex
+     */
+    public float getCost(Vertex v) {
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        for (Edge e : adj) {</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            if (e.dest == v) {</span>
+<span class="fc" id="L85">                return e.cost;</span>
+            }
+<span class="fc" id="L87">        }</span>
+<span class="nc" id="L88">        return -1;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L93">        return &quot;Vertex{&quot; + &quot;id=&quot; + id + '}';</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

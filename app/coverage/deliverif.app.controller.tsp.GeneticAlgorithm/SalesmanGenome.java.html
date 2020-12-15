@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SalesmanGenome.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.tsp.GeneticAlgorithm</a> &gt; <span class="el_source">SalesmanGenome.java</span></div><h1>SalesmanGenome.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.tsp.GeneticAlgorithm;
+
+import deliverif.app.model.graph.Edge;
+import deliverif.app.model.graph.Vertex;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ *
+ * @author zakaria
+ * Adapted from the implementation provided by Darinka Zobenica: 
+ * https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
+ */
+public class SalesmanGenome implements Comparable {
+    // The list of stops in the order in which they should be visited.
+    // A genome represents a potential solution to the problem.
+    List&lt;Vertex&gt; genome;
+    // Travel costs between two vertices, used to calculate fitness.
+<span class="nc" id="L26">    public HashMap&lt;String, Float&gt; costs = new HashMap&lt;&gt;();</span>
+    Vertex start;
+    float fitness;
+    private List&lt;Long&gt; ordre;
+
+    /**
+     * Generates a random Salesman
+     * @param costs maps a pair of two vertices to the travel distance between them
+     * @param start the starting point, usually the warehouse
+     * @param ordre the precedence constraint for visiting vertices, pickup prior to delivery
+     */
+<span class="nc" id="L37">    public SalesmanGenome(HashMap&lt;String, Float&gt; costs, Vertex start, List&lt;Long&gt; ordre) {</span>
+<span class="nc" id="L38">        this.costs = costs;</span>
+<span class="nc" id="L39">        this.start = start;</span>
+<span class="nc" id="L40">        this.ordre = ordre;</span>
+<span class="nc" id="L41">        this.genome = randomSalesman();</span>
+<span class="nc" id="L42">        this.fitness = this.calculateFitness();</span>
+<span class="nc" id="L43">    }</span>
+    
+    /**
+     * Creates a random Salesman with a user-defined genome
+     * @param permutationOfStops user-defined genome
+     * @param costs maps a pair of two vertices to the travel distance between them
+     * @param start the starting point, usually the warehouse
+     * @param ordre the precedence constraint for visiting vertices, pickup prior to delivery
+     */
+<span class="nc" id="L52">    public SalesmanGenome(List&lt;Vertex&gt; permutationOfStops, HashMap&lt;String, Float&gt; costs, Vertex start, List&lt;Long&gt; ordre) {</span>
+<span class="nc" id="L53">        this.genome = permutationOfStops;</span>
+<span class="nc" id="L54">        this.costs = costs;</span>
+<span class="nc" id="L55">        this.start = start;</span>
+<span class="nc" id="L56">        this.ordre = ordre;</span>
+<span class="nc" id="L57">        this.fitness = this.calculateFitness();</span>
+<span class="nc" id="L58">    }</span>
+    
+    /**
+     * Generates a random genome
+     * Genomes are permutations of the list of stops to visit
+     * @return a genome
+     */
+    private List&lt;Vertex&gt; randomSalesman() {
+<span class="nc" id="L66">        List&lt;Vertex&gt; result = new ArrayList&lt;Vertex&gt;();</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        for (Edge e : start.getAdj()) {</span>
+<span class="nc" id="L68">            result.add(e.dest);</span>
+<span class="nc" id="L69">        }</span>
+<span class="nc" id="L70">        Collections.shuffle(result);</span>
+<span class="nc" id="L71">        return result;</span>
+    }
+    
+    /**
+     * Calculates the actual cost of taking certain path that we want to minimise
+     * @return the computed cost
+     */
+    public float calculateFitness() {
+<span class="nc" id="L79">        float fitness = 0;</span>
+<span class="nc" id="L80">        Vertex currentStop = start;</span>
+
+        // Calculating path cost
+<span class="nc" id="L83">        boolean allowed = true;</span>
+<span class="nc" id="L84">        List&lt;Long&gt; pickups = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        for (Vertex gene : genome) {</span>
+            try {
+<span class="nc" id="L87">                int orderIndex = ordre.indexOf(gene.getId());</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                if (orderIndex % 2 != 0) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">                    if (!pickups.contains(ordre.get(orderIndex - 1))) {</span>
+<span class="nc" id="L90">                        allowed = false;</span>
+<span class="nc" id="L91">                        break;</span>
+                    }
+                } else {
+<span class="nc" id="L94">                    pickups.add(gene.getId());</span>
+                }
+<span class="nc" id="L96">                fitness += costs.get(currentStop.getId() + &quot;-&quot; + gene.getId());</span>
+<span class="nc" id="L97">            } catch (Exception e) {</span>
+<span class="nc" id="L98">                System.out.println(&quot;Error on &quot; + currentStop.getId() + &quot; to &quot; + gene.getId());</span>
+<span class="nc" id="L99">                throw e;</span>
+<span class="nc" id="L100">            }</span>
+<span class="nc" id="L101">            currentStop = gene;</span>
+<span class="nc" id="L102">        }</span>
+
+        // We have to add going back to the starting city to complete the circle
+        // the genome is missing the starting city, and indexing starts at 0, which is why we subtract 2
+<span class="nc" id="L106">        fitness += costs.get(genome.get(genome.size() - 1).getId() + &quot;-&quot; + start.getId());</span>
+
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (!allowed) {</span>
+<span class="nc" id="L109">            fitness = Integer.MAX_VALUE;</span>
+        }
+
+<span class="nc" id="L112">        return fitness;</span>
+    }
+
+    public List&lt;Vertex&gt; getGenome() {
+<span class="nc" id="L116">        return genome;</span>
+    }
+
+    public float getFitness() {
+<span class="nc" id="L120">        return fitness;</span>
+    }
+
+    public void setFitness(int fitness) {
+<span class="nc" id="L124">        this.fitness = fitness;</span>
+<span class="nc" id="L125">    }</span>
+
+    @Override
+    public int compareTo(Object o) {
+<span class="nc" id="L129">        SalesmanGenome genome = (SalesmanGenome) o;</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (this.fitness &gt; genome.getFitness()) {</span>
+<span class="nc" id="L131">            return 1;</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        } else if (this.fitness &lt; genome.getFitness()) {</span>
+<span class="nc" id="L133">            return -1;</span>
+        } else {
+<span class="nc" id="L135">            return 0;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

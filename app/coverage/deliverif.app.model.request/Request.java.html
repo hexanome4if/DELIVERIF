@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Request.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.request</a> &gt; <span class="el_source">Request.java</span></div><h1>Request.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.request;
+
+import deliverif.app.model.map.Intersection;
+
+/**
+ * An object representing a request of a client
+ * @author zakaria
+ */
+public class Request {
+    /**
+     * Pickup address point
+     */
+    private Intersection pickupAddress;
+    /**
+     * Delivery address point
+     */
+    private Intersection deliveryAddress;
+    /**
+     * Time needed to pickup
+     */
+    private Integer pickupDuration;
+    /**
+     * Time needed to delivery
+     */
+    private Integer deliveryDuration;
+
+    /**
+     * Create an empty request
+     */
+<span class="nc" id="L35">    public Request() {</span>
+<span class="nc" id="L36">    }</span>
+
+    /**
+     * Create a new request
+     *
+     * @param pickupAddress pickup address of the request as an intersection
+     * @param deliveryAddress delivery address of the request as an intersection
+     * @param pickupDuration duration in seconds of the pickup
+     * @param deliveryDuration duration in seconds of the delivery
+     */
+<span class="fc" id="L46">    public Request(Intersection pickupAddress, Intersection deliveryAddress, Integer pickupDuration, Integer deliveryDuration) {</span>
+<span class="fc" id="L47">        this.pickupAddress = pickupAddress;</span>
+<span class="fc" id="L48">        this.deliveryAddress = deliveryAddress;</span>
+<span class="fc" id="L49">        this.pickupDuration = pickupDuration;</span>
+<span class="fc" id="L50">        this.deliveryDuration = deliveryDuration;</span>
+<span class="fc" id="L51">    }</span>
+
+    /**
+     * Get pickup address as an intersection
+     *
+     * @return intersection representing pickup address
+     */
+    public Intersection getPickupAddress() {
+<span class="fc" id="L59">        return pickupAddress;</span>
+    }
+
+    /**
+     * Get delivery address as an intersection
+     *
+     * @return intersection representing delivery address
+     */
+    public Intersection getDeliveryAddress() {
+<span class="fc" id="L68">        return deliveryAddress;</span>
+    }
+
+    /**
+     * Get pickup duration in seconds
+     *
+     * @return pickup duration in seconds
+     */
+    public Integer getPickupDuration() {
+<span class="fc" id="L77">        return pickupDuration;</span>
+    }
+
+    /**
+     * Get delivery duration in seconds
+     *
+     * @return delivery duration in seconds
+     */
+    public Integer getDeliveryDuration() {
+<span class="fc" id="L86">        return deliveryDuration;</span>
+    }
+
+    /**
+     * Set pickup address for that request
+     *
+     * @param pickupAddress intersection representing the pickup address
+     */
+    public void setPickupAddress(Intersection pickupAddress) {
+<span class="nc" id="L95">        this.pickupAddress = pickupAddress;</span>
+<span class="nc" id="L96">    }</span>
+
+    /**
+     * Set delivery address for that request
+     *
+     * @param deliveryAddress intersection representing the delivery address
+     */
+    public void setDeliveryAddress(Intersection deliveryAddress) {
+<span class="nc" id="L104">        this.deliveryAddress = deliveryAddress;</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Set pickup duration in seconds for that request
+     *
+     * @param pickupDuration pickup duration in seconds
+     */
+    public void setPickupDuration(Integer pickupDuration) {
+<span class="nc" id="L113">        this.pickupDuration = pickupDuration;</span>
+<span class="nc" id="L114">    }</span>
+
+    /**
+     * Set delivery duration in seconds for that request
+     *
+     * @param deliveryDuration delivery duration in seconds
+     */
+    public void setDeliveryDuration(Integer deliveryDuration) {
+<span class="nc" id="L122">        this.deliveryDuration = deliveryDuration;</span>
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L127">        return &quot;Request{&quot; + &quot;pickupAddress=&quot; + pickupAddress + &quot;, deliveryAddress=&quot; + deliveryAddress + &quot;, pickupDuration=&quot; + pickupDuration + &quot;, deliveryDuration=&quot; + deliveryDuration + '}';</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller</a> &gt; <span class="el_source">GraphProcessor.java</span></div><h1>GraphProcessor.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller;
+
+import deliverif.app.controller.tsp.GeneticAlgorithm.SalesmanGenome;
+import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman;
+import deliverif.app.controller.tsp.GeneticAlgorithm.TravellingSalesman.SelectionType;
+import deliverif.app.controller.tsp.BranchAndBound.TSP1;
+import deliverif.app.controller.tsp.TourGenerator;
+import deliverif.app.model.graph.Edge;
+import deliverif.app.model.graph.Graph;
+import deliverif.app.model.graph.Tour;
+import deliverif.app.model.graph.Vertex;
+import deliverif.app.model.graph.VertexPath;
+import deliverif.app.model.map.Intersection;
+import deliverif.app.model.map.Map;
+import deliverif.app.model.map.Segment;
+import deliverif.app.model.request.Path;
+import deliverif.app.model.request.PlanningRequest;
+import deliverif.app.model.request.Request;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ *
+ * @author zakaria
+ */
+public class GraphProcessor {
+
+    private final Graph graph;
+    private final Map map;
+    protected HashMap&lt;String, VertexPath&gt; fullPath;
+    public List&lt;Vertex&gt; currentVertex;
+    private TSP1 currentTsp;
+    private PlanningRequest pr;
+
+    /**
+     * Constructor of GraphProcessor
+     *
+     * @param m the main map
+     */
+<span class="fc" id="L48">    public GraphProcessor(Map m) {</span>
+<span class="fc" id="L49">        graph = new Graph();</span>
+<span class="fc" id="L50">        map = m;</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (Intersection i : m.getIntersections().values()) {</span>
+<span class="fc" id="L52">            graph.addVertex(new Vertex(i.getId()));</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        for (Segment s : m.getSegments()) {</span>
+<span class="fc" id="L55">            graph.addEdge(s.getOrigin().getId(), s.getDestination().getId(), s.getLength());</span>
+<span class="fc" id="L56">        }</span>
+<span class="fc" id="L57">        fullPath = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L58">        currentVertex = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * Calculate the shortest paths from {@code source} to every vertices 
+     * in {@code goals} using Dijkstra's algorithm.
+     * 
+     * @param completeGraph the graph that stores the results
+     * @param source the vertex of departure, in type of {@code Vertex}
+     * @param goals a list of {@code Vertex} containing all targets
+     * @see Graph
+     * @see Vertex
+     */
+    public void dijkstra(Graph completeGraph, Vertex source, List&lt;Vertex&gt; goals) {
+        // Strutures
+<span class="fc" id="L73">        HashMap&lt;Long, Float&gt; dis = new HashMap&lt;&gt;();  //distance : &lt;idNoeud, distance&gt;</span>
+<span class="fc" id="L74">        HashMap&lt;Long, Long&gt; precedents = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L75">        List&lt;Vertex&gt; gris = new ArrayList&lt;&gt;();          //liste des noeuds grisés (mais cet algo est sobre;)</span>
+<span class="fc" id="L76">        List&lt;Vertex&gt; noir = new ArrayList&lt;&gt;();         //liste des noeuds noircis</span>
+
+        // Initialisation
+<span class="fc" id="L79">        source = graph.getVertexMap().get(source.getId());</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (Edge edg : source.getAdj()) {</span>
+<span class="fc" id="L81">            dis.put(edg.dest.getId(), edg.cost);</span>
+<span class="fc" id="L82">            precedents.put(edg.dest.getId(), source.getId());</span>
+<span class="fc" id="L83">            gris.add(edg.dest);</span>
+<span class="fc" id="L84">        }</span>
+<span class="fc" id="L85">        System.out.println(&quot;Before dijkstra loop&quot;);</span>
+<span class="fc" id="L86">        noir.add(source);</span>
+<span class="fc" id="L87">        List&lt;Vertex&gt; found = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L88" title="All 4 branches covered.">        while (!gris.isEmpty() &amp;&amp; found.size() &lt; goals.size()) {  //continue s'il reste des noeuds gris ou il reste des noeuds non-déterminé dans la liste goal</span>
+<span class="fc" id="L89">            float dis_MIN = Float.POSITIVE_INFINITY;</span>
+<span class="fc" id="L90">            Vertex vertex = null;</span>
+            // Parcours de liste gris pour trouver le noeud dont la valeur &quot;distance&quot; est minimal
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            for (Vertex v : gris) {</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">                if (dis.get(v.getId()) &lt; dis_MIN) {</span>
+<span class="fc" id="L94">                    dis_MIN = dis.get(v.getId());</span>
+<span class="fc" id="L95">                    vertex = v;</span>
+                }
+<span class="fc" id="L97">            }</span>
+<span class="fc" id="L98">            vertex = graph.getVertexMap().get(vertex.getId());</span>
+
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            for (Edge edg : vertex.getAdj()) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                if (!noir.contains(edg.dest)) {</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">                    if (dis.containsKey(edg.dest.getId())) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                        if (edg.cost + dis.get(vertex.getId()) &lt; dis.get(edg.dest.getId())) { //MAJ si ce chemin est plus court</span>
+<span class="fc" id="L104">                            dis.replace(edg.dest.getId(), edg.cost + dis.get(vertex.getId()));</span>
+<span class="fc" id="L105">                            precedents.replace(edg.dest.getId(), vertex.getId());</span>
+                        }
+                    } else {
+<span class="fc" id="L108">                        dis.put(edg.dest.getId(), edg.cost + dis.get(vertex.getId())); //ajouter la valeur &quot;distance&quot; d'un noeud blanc et le griser</span>
+<span class="fc" id="L109">                        precedents.put(edg.dest.getId(), vertex.getId());</span>
+<span class="fc" id="L110">                        gris.add(edg.dest);</span>
+                    }
+                }
+<span class="fc" id="L113">            }</span>
+
+<span class="fc" id="L115">            gris.remove(vertex); //changement d'état gris-&gt;noir pour le noeud choisi</span>
+<span class="fc" id="L116">            noir.add(vertex);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">            if (goals.indexOf(vertex) != -1) {</span>
+<span class="fc" id="L118">                found.add(vertex);</span>
+            }
+<span class="fc" id="L120">        }</span>
+<span class="fc" id="L121">        System.out.println(&quot;After dijkstra loop&quot;);</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        for (Vertex v : goals) {</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if (!Objects.equals(v.getId(), source.getId())) {</span>
+<span class="fc" id="L124">                completeGraph.addEdgeOneSide(source.getId(), v.getId(), dis.get(v.getId()));</span>
+<span class="fc" id="L125">                VertexPath path = new VertexPath();</span>
+<span class="fc" id="L126">                path.addVertex(v);</span>
+<span class="fc" id="L127">                Vertex prec = v;</span>
+                do {
+<span class="fc" id="L129">                    Long precId = precedents.get(prec.getId());</span>
+<span class="fc" id="L130">                    prec = graph.getVertexById(precId);</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">                    if (prec != null) {</span>
+<span class="fc" id="L132">                        path.addVertex(prec);</span>
+                    }
+<span class="pc bpc" id="L134" title="1 of 4 branches missed.">                } while (prec != null &amp;&amp; !Objects.equals(prec.getId(), source.getId()));</span>
+<span class="fc" id="L135">                fullPath.put(source.getId() + &quot;-&quot; + v.getId(), path);</span>
+            }
+<span class="fc" id="L137">        }</span>
+<span class="fc" id="L138">    }</span>
+
+    /**
+     * Create a complete graph with a planning request
+     * &lt;p&gt; The returning graph is complete and includes every 
+     * {@code Intersection} mentioned in the given 
+     * {@code PlanningRequest}, in the form of {@code Vertex}.
+     * @param pr the planning request
+     * @return the object {@code Graph} after calculating with Dijkstra's Algo
+     * @see PlanningRequest
+     * @see Graph
+     */
+    public Graph completeGraph(PlanningRequest pr) {
+<span class="fc" id="L151">        Graph g = new Graph();</span>
+<span class="fc" id="L152">        List&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L153">        vertices.add(new Vertex(pr.getDepot().getAddress().getId()));</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        for (Request r : pr.getRequests()) {</span>
+<span class="fc" id="L155">            vertices.add(new Vertex(r.getPickupAddress().getId()));</span>
+<span class="fc" id="L156">            vertices.add(new Vertex(r.getDeliveryAddress().getId()));</span>
+<span class="fc" id="L157">        }</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        for (Vertex v : vertices) {</span>
+<span class="fc" id="L159">            g.addVertex(v);</span>
+<span class="fc" id="L160">        }</span>
+<span class="fc" id="L161">        System.out.println(&quot;Complete graph&quot;);</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        for (Vertex v : vertices) {</span>
+<span class="fc" id="L163">            dijkstra(g, v, vertices);</span>
+<span class="fc" id="L164">        }</span>
+<span class="fc" id="L165">        System.out.println(&quot;Ok&quot;);</span>
+<span class="fc" id="L166">        return g;</span>
+    }
+
+    /**
+     * Create a template to resolve the Travelling Salesman Problem
+     * @param pr the planning request
+     * @return the template {@code TSP1}
+     * @see TSP1
+     */
+    public TSP1 hamiltonianCircuit(PlanningRequest pr) {
+
+<span class="fc" id="L177">        TSP1 tsp = new TSP1();</span>
+
+<span class="fc" id="L179">        return tsp;</span>
+    }
+
+    /**
+     * Create a template of TSP which uses genetic algorithms
+     * @param pr the planning request
+     * @return the list of result
+     * @see TravellingSalesman
+     * @see SalesmanGenome
+     */
+    public Vertex[] hamiltonianCircuit2(PlanningRequest pr) {
+<span class="nc" id="L190">        Graph g = completeGraph(pr);</span>
+<span class="nc" id="L191">        List&lt;Long&gt; ordre = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        for (Request r : pr.getRequests()) {</span>
+<span class="nc" id="L193">            ordre.add(r.getPickupAddress().getId());</span>
+<span class="nc" id="L194">            ordre.add(r.getDeliveryAddress().getId());</span>
+<span class="nc" id="L195">        }</span>
+<span class="nc" id="L196">        TravellingSalesman tsp = new TravellingSalesman(SelectionType.ROULETTE, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre, 8000);</span>
+<span class="nc" id="L197">        SalesmanGenome genome = tsp.optimise();</span>
+<span class="nc" id="L198">        List&lt;Vertex&gt; listResult = genome.getGenome();</span>
+<span class="nc" id="L199">        Vertex[] result = new Vertex[listResult.size()];</span>
+<span class="nc" id="L200">        int i = 0;</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        for (Vertex v : listResult) {</span>
+<span class="nc" id="L202">            result[i++] = v;</span>
+<span class="nc" id="L203">        }</span>
+<span class="nc" id="L204">        return result;</span>
+    }
+
+    /**
+     * Get the shortest path between two intersections
+     * &lt;p&gt; Get the path registered in the HashMap {@code fullPath},
+     * it's different from {@code getNewPath}.
+     * @param v1 the starting intersection
+     * @param v2 the ending intersection
+     * @return the object {@code Path} which is the shortest and links these
+     * two intersection
+     */
+    public Path shortestPathBetweenTwoIntersections(Intersection v1, Intersection v2) {
+<span class="fc" id="L217">        Vertex source = graph.getVertexById(v1.getId());</span>
+<span class="fc" id="L218">        Vertex destination = graph.getVertexById(v2.getId());</span>
+<span class="fc" id="L219">        System.out.println(&quot;source:&quot; + source.getId());</span>
+<span class="fc" id="L220">        System.out.println(&quot;dest:&quot; + destination.getId());</span>
+<span class="fc" id="L221">        VertexPath vertexPath = fullPath.get(source.getId().toString() + &quot;-&quot; + destination.getId().toString());</span>
+        
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">        if(vertexPath == null){</span>
+<span class="nc" id="L224">            System.out.println(&quot;VP null&quot;);</span>
+        }
+        
+<span class="fc" id="L227">        System.out.println(&quot;Made it past vertextPath&quot;);</span>
+<span class="fc" id="L228">        Path path = vertexPath.convertToPath(map);</span>
+<span class="fc" id="L229">        System.out.println(&quot;Conversion réussie&quot;);</span>
+<span class="fc" id="L230">        path.setDeparture(v1);</span>
+<span class="fc" id="L231">        path.setArrival(v2);</span>
+<span class="fc" id="L232">        return path;</span>
+    }
+
+    /**
+     * Generate the optimal tour
+     * @param pr the planning request
+     * @return the tour generator
+     * @see TourGenerator
+     */
+    public TourGenerator optimalTour(PlanningRequest pr) {
+<span class="fc" id="L242">        System.out.println(&quot;Init&quot;);</span>
+<span class="fc" id="L243">        currentVertex.clear();</span>
+<span class="fc" id="L244">        this.pr = pr;</span>
+<span class="fc" id="L245">        fullPath.clear();</span>
+<span class="fc" id="L246">        currentTsp = hamiltonianCircuit(pr);</span>
+<span class="fc" id="L247">        TourGenerator tourGenerator = new TourGenerator(currentTsp, pr, this, map);</span>
+<span class="fc" id="L248">        System.out.println(&quot;Init good&quot;);</span>
+<span class="fc" id="L249">        return tourGenerator;</span>
+    }
+
+    /**
+     * Start the TSP algorithm
+     * @see TSP1
+     */
+    public void startAlgo() {
+<span class="fc" id="L257">        System.out.println(&quot;Start&quot;);</span>
+<span class="fc" id="L258">        Graph g = completeGraph(pr);</span>
+<span class="fc" id="L259">        List&lt;Long&gt; ordre = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        for (Request r : pr.getRequests()) {</span>
+<span class="fc" id="L261">            ordre.add(r.getPickupAddress().getId());</span>
+<span class="fc" id="L262">            ordre.add(r.getDeliveryAddress().getId());</span>
+<span class="fc" id="L263">        }</span>
+<span class="fc" id="L264">        System.out.println(&quot;Ok&quot;);</span>
+<span class="fc" id="L265">        currentTsp.searchSolution(75000, g, g.getVertexById(pr.getDepot().getAddress().getId()), ordre);</span>
+<span class="fc" id="L266">    }</span>
+
+    /**
+     * Rearrange an existing request with a given order 
+     * &lt;p&gt; The new order is a list of identity in type of {@code Long}, 
+     * it should be starting and ending with the ID of the intersection
+     * of {@code Depot}, and its length has to be the same as the 
+     * original length of {@code Tour.paths}.
+     * @param tour the original tour
+     * @param newOrder the order of intersections that will be applied
+     * @return the object {@code Tour} after changing, {@code null} if the
+     * rules above are not respected.
+     * @see Tour
+     */
+    public Tour changeOrder(Tour tour, List&lt;Long&gt; newOrder) {
+        //let newOrder === depot -&gt; nodes -&gt; depot
+<span class="nc" id="L282">        newOrder.add(newOrder.get(0));</span>
+<span class="nc" id="L283">        Tour newTour = new Tour(tour);</span>
+<span class="nc" id="L284">        ArrayList&lt;Path&gt; newPaths = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">        for (int i = 0; i &lt; newOrder.size() - 1; i++) {</span>
+<span class="nc" id="L286">            newPaths.add(getNewPath(newOrder.get(i), newOrder.get(i+1)));</span>
+        }
+<span class="nc" id="L288">        newTour.setPaths(newPaths);</span>
+<span class="nc" id="L289">        newTour.update();// synchroniser les horaires</span>
+        
+<span class="nc" id="L291">        return newTour;</span>
+    }
+    
+    /**
+     * Check if the new order comform to the rules
+     * &lt;p&gt; This method has to be used before {@code changeOrder()}.
+     * @param tour the original tour
+     * @param newOrder the order of intersections that will be applied
+     * @return a boolean value, {@code false} if the rules above 
+     * are not respected.
+     * @see Tour
+     */
+    public boolean verifyNewOrder(Tour tour, List&lt;Long&gt; newOrder){
+<span class="nc" id="L304">        PlanningRequest pr1 = tour.getPr();</span>
+<span class="nc" id="L305">        ArrayList&lt;Long&gt; ids = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (newOrder.size() != tour.getOrder().size()-1) {</span>
+<span class="nc" id="L307">            System.out.println(&quot;not the same length!!!!!!&quot;);</span>
+<span class="nc" id="L308">            return false;</span>
+        }
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if(!Objects.equals(newOrder.get(0), pr1.getDepot().getAddress().getId()) ){</span>
+<span class="nc" id="L311">            System.out.println(&quot;ERROR: The first element of newOrder must be the depot's ID!&quot;);</span>
+<span class="nc" id="L312">            return false;</span>
+        }
+<span class="nc" id="L314">        List&lt;Long&gt; newOrderWithOutDepot = new ArrayList&lt;&gt;(newOrder);</span>
+<span class="nc" id="L315">        newOrderWithOutDepot.remove(0);</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">        for(Long l : newOrderWithOutDepot){</span>
+<span class="nc" id="L317">            boolean finded = false;</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">            for(Request r : pr1.getRequests()){</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">                if(Objects.equals(r.getPickupAddress().getId(), l)){</span>
+<span class="nc" id="L320">                    finded = true;</span>
+<span class="nc" id="L321">                    ids.add(r.getDeliveryAddress().getId());</span>
+<span class="nc" id="L322">                    break;</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">                } else if(Objects.equals(r.getDeliveryAddress().getId(), l)){</span>
+<span class="nc" id="L324">                    finded = true;</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                    if(!ids.contains(l)){</span>
+<span class="nc" id="L326">                        System.out.println(&quot;ERROR: Bad order&quot;);</span>
+<span class="nc" id="L327">                        return false;</span>
+                    }
+                    break;
+                } 
+<span class="nc" id="L331">            }</span>
+<span class="nc bnc" id="L332" title="All 2 branches missed.">            if(!finded){</span>
+<span class="nc" id="L333">                System.out.println(&quot;ERROR: ID &quot; + l + &quot; not found&quot;);</span>
+<span class="nc" id="L334">                return false;</span>
+            }
+<span class="nc" id="L336">        }</span>
+<span class="nc" id="L337">        return true;</span>
+    }
+
+    /**
+     * Get the shortest path between two intersections
+     * &lt;p&gt; A sub-method of {@code changeOrder}, it's different from 
+     * {@code shortestPathBetweenTwoIntersections} because it uses the
+     * method {@code dijkstra}.
+     * @param idStart the identity of the starting intersection
+     * @param idStop the identity of the ending intersection
+     * @return the object {@code Path} which is the shortest and links these
+     * two intersection
+     */
+    public Path getNewPath(Long idStart, Long idStop) {
+<span class="nc" id="L351">        Graph g = new Graph();</span>
+<span class="nc" id="L352">        Vertex start = graph.getVertexById(idStart);</span>
+<span class="nc" id="L353">        Vertex stop = graph.getVertexById(idStop);</span>
+<span class="nc" id="L354">        List&lt;Vertex&gt; goal = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L355">        goal.add(stop);</span>
+<span class="nc" id="L356">        dijkstra(g, start, goal);</span>
+<span class="nc" id="L357">        return fullPath.get(idStart + &quot;-&quot; + idStop).convertToPath(map);</span>
+    }
+
+    /**
+     * Add a new request to the circuit after the delivery begins
+     * &lt;p&gt; The added one will be placed at the last of the tour 
+     * in order to keep the agreed arrangements.
+     * @param tour the original tour
+     * @param rqst the request that will be added
+     * @return the object {@code Tour} after inserting
+     * @see Tour
+     */
+    public Tour addRequestToTour(Tour tour, Request rqst) {
+<span class="nc" id="L370">        tour.getPr().addRequest(rqst);</span>
+<span class="nc" id="L371">        tour.removePath(tour.getPaths().get(tour.getPaths().size() - 1));</span>
+<span class="nc" id="L372">        Vertex lastPoint = graph.getVertexById(tour.getPaths().get(tour.getPaths().size() - 1).getArrival().getId());</span>
+<span class="nc" id="L373">        Vertex pickup = graph.getVertexById(rqst.getPickupAddress().getId());</span>
+<span class="nc" id="L374">        Vertex delivery = graph.getVertexById(rqst.getDeliveryAddress().getId());</span>
+<span class="nc" id="L375">        Vertex warehouse = graph.getVertexById(tour.getPaths().get(0).getDeparture().getId());</span>
+
+<span class="nc" id="L377">        List&lt;Vertex&gt; goals = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L378">        goals.add(pickup);</span>
+<span class="nc" id="L379">        goals.add(delivery);</span>
+<span class="nc bnc" id="L380" title="All 2 branches missed.">        for (Vertex v : currentVertex) {</span>
+<span class="nc" id="L381">            dijkstra(new Graph(), v, goals);</span>
+<span class="nc" id="L382">        }</span>
+<span class="nc" id="L383">        currentVertex.add(pickup);</span>
+<span class="nc" id="L384">        currentVertex.add(delivery);</span>
+
+<span class="nc" id="L386">        dijkstra(new Graph(), pickup, currentVertex);</span>
+<span class="nc" id="L387">        dijkstra(new Graph(), delivery, currentVertex);</span>
+
+<span class="nc" id="L389">        Path beforePickup = tour.getPaths().get(tour.getPaths().size() - 1);</span>
+<span class="nc" id="L390">        Path lastToPick = fullPath.get(lastPoint.getId() + &quot;-&quot; + pickup.getId()).convertToPath(map);</span>
+<span class="nc" id="L391">        lastToPick.setDeparture(map.getIntersectionParId(lastPoint.getId()));</span>
+<span class="nc" id="L392">        lastToPick.setArrival(map.getIntersectionParId(pickup.getId()));</span>
+<span class="nc" id="L393">        Path pickToDeli = fullPath.get(pickup.getId() + &quot;-&quot; + delivery.getId()).convertToPath(map);</span>
+<span class="nc" id="L394">        pickToDeli.setDeparture(map.getIntersectionParId(pickup.getId()));</span>
+<span class="nc" id="L395">        pickToDeli.setArrival(map.getIntersectionParId(delivery.getId()));</span>
+<span class="nc" id="L396">        Path deliToWrhs = fullPath.get(delivery.getId() + &quot;-&quot; + warehouse.getId()).convertToPath(map);</span>
+<span class="nc" id="L397">        deliToWrhs.setDeparture(map.getIntersectionParId(delivery.getId()));</span>
+<span class="nc" id="L398">        deliToWrhs.setArrival(map.getIntersectionParId(warehouse.getId()));</span>
+
+<span class="nc" id="L400">        Calendar cal = Calendar.getInstance();</span>
+<span class="nc" id="L401">        cal.setTime(beforePickup.getArrivalTime());</span>
+<span class="nc" id="L402">        int lastTimeToAdd = 0;</span>
+<span class="nc bnc" id="L403" title="All 2 branches missed.">        for (Request r : tour.getPr().getRequests()) {</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">            if (r.getDeliveryAddress().getId().equals(beforePickup.getArrival().getId())) {</span>
+<span class="nc" id="L405">                lastTimeToAdd = r.getDeliveryDuration();</span>
+<span class="nc" id="L406">                break;</span>
+            }
+<span class="nc bnc" id="L408" title="All 2 branches missed.">            if (r.getPickupAddress().getId().equals(beforePickup.getArrival().getId())) {</span>
+<span class="nc" id="L409">                lastTimeToAdd = r.getPickupDuration();</span>
+<span class="nc" id="L410">                break;</span>
+            }
+<span class="nc" id="L412">        }</span>
+<span class="nc" id="L413">        cal.add(Calendar.SECOND, lastTimeToAdd);</span>
+<span class="nc" id="L414">        lastToPick.setDepatureTime(cal.getTime());</span>
+<span class="nc" id="L415">        double velocity = 15 * 1000 / 3600;</span>
+
+<span class="nc" id="L417">        double commute = lastToPick.getLength() / velocity;</span>
+<span class="nc" id="L418">        cal.add(Calendar.SECOND, (int) commute);</span>
+<span class="nc" id="L419">        lastToPick.setArrivalTime(cal.getTime());</span>
+<span class="nc" id="L420">        cal.add(Calendar.SECOND, rqst.getPickupDuration());</span>
+<span class="nc" id="L421">        lastToPick.setRequest(rqst);</span>
+
+<span class="nc" id="L423">        pickToDeli.setDepatureTime(cal.getTime());</span>
+<span class="nc" id="L424">        commute = pickToDeli.getLength() / velocity;</span>
+<span class="nc" id="L425">        cal.add(Calendar.SECOND, (int) commute);</span>
+<span class="nc" id="L426">        pickToDeli.setArrivalTime(cal.getTime());</span>
+<span class="nc" id="L427">        cal.add(Calendar.SECOND, rqst.getDeliveryDuration());</span>
+<span class="nc" id="L428">        lastToPick.setRequest(rqst);</span>
+
+<span class="nc" id="L430">        deliToWrhs.setDepatureTime(cal.getTime());</span>
+<span class="nc" id="L431">        commute = deliToWrhs.getLength() / velocity;</span>
+<span class="nc" id="L432">        cal.add(Calendar.SECOND, (int) commute);</span>
+<span class="nc" id="L433">        deliToWrhs.setArrivalTime(cal.getTime());</span>
+<span class="nc" id="L434">        cal.add(Calendar.SECOND, rqst.getDeliveryDuration());</span>
+
+<span class="nc" id="L436">        tour.addPath(lastToPick);</span>
+<span class="nc" id="L437">        tour.addPath(pickToDeli);</span>
+<span class="nc" id="L438">        tour.addPath(deliToWrhs);</span>
+<span class="nc" id="L439">        return tour;</span>
+    }
+
+    /**
+     * Remove an existing request from the circuit
+     * @param t the original tour
+     * @param r the request that will be cancelled
+     * @return the object {@code Tour} after cancelling
+     * @see Tour
+     */
+    public Tour removeRequestFromTour(Tour t, Request r) {
+<span class="nc" id="L450">        t.getPr().removeRequest(r);</span>
+<span class="nc" id="L451">        Intersection pickup = r.getPickupAddress();</span>
+<span class="nc" id="L452">        Intersection delivery = r.getDeliveryAddress();</span>
+<span class="nc" id="L453">        double velocity = 15 * 1000 / 3600;</span>
+<span class="nc" id="L454">        Path beforePickup = null;</span>
+<span class="nc" id="L455">        Path afterPickup = null;</span>
+<span class="nc" id="L456">        Path beforeDelivery = null;</span>
+<span class="nc" id="L457">        Path afterDelivery = null;</span>
+<span class="nc" id="L458">        int i = 0;</span>
+<span class="nc" id="L459">        int deliveryIndex = 0;</span>
+<span class="nc" id="L460">        int pickupIndex = 0;</span>
+<span class="nc bnc" id="L461" title="All 2 branches missed.">        for (Path p : t.getPaths()) {</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">            if (p.getDeparture().getId().equals(pickup.getId())) {</span>
+<span class="nc" id="L463">                afterPickup = p;</span>
+<span class="nc" id="L464">                pickupIndex = i;</span>
+            }
+<span class="nc bnc" id="L466" title="All 2 branches missed.">            if (p.getArrival().getId().equals(pickup.getId())) {</span>
+<span class="nc" id="L467">                beforePickup = p;</span>
+            }
+<span class="nc bnc" id="L469" title="All 2 branches missed.">            if (p.getDeparture().getId().equals(delivery.getId())) {</span>
+<span class="nc" id="L470">                afterDelivery = p;</span>
+<span class="nc" id="L471">                deliveryIndex = i;</span>
+            }
+<span class="nc bnc" id="L473" title="All 2 branches missed.">            if (p.getArrival().getId().equals(delivery.getId())) {</span>
+<span class="nc" id="L474">                beforeDelivery = p;</span>
+            }
+<span class="nc" id="L476">            i++;</span>
+<span class="nc" id="L477">        }</span>
+
+<span class="nc bnc" id="L479" title="All 8 branches missed.">        if (beforePickup == null || afterPickup == null || beforeDelivery == null || afterDelivery == null) {</span>
+<span class="nc" id="L480">            System.out.println(&quot;Problem&quot;);</span>
+<span class="nc" id="L481">            System.out.println(beforePickup);</span>
+<span class="nc" id="L482">            System.out.println(afterPickup);</span>
+<span class="nc" id="L483">            System.out.println(beforeDelivery);</span>
+<span class="nc" id="L484">            System.out.println(afterDelivery);</span>
+<span class="nc" id="L485">            return t;</span>
+        }
+<span class="nc bnc" id="L487" title="All 2 branches missed.">        if (afterPickup == beforeDelivery) {</span>
+<span class="nc" id="L488">            Path path = shortestPathBetweenTwoIntersections(beforePickup.getDeparture(), afterDelivery.getArrival());</span>
+<span class="nc" id="L489">            path.setDepatureTime(beforePickup.getDepatureTime());</span>
+<span class="nc" id="L490">            Calendar cal = Calendar.getInstance();</span>
+<span class="nc" id="L491">            cal.setTime(beforePickup.getDepatureTime());</span>
+<span class="nc" id="L492">            double commute = path.getLength() / velocity;</span>
+<span class="nc" id="L493">            cal.add(Calendar.SECOND, (int) commute);</span>
+<span class="nc" id="L494">            path.setArrivalTime(cal.getTime());</span>
+<span class="nc" id="L495">            t.getPaths().add(pickupIndex, path);</span>
+<span class="nc" id="L496">        } else {</span>
+<span class="nc" id="L497">            Path pickupPath = shortestPathBetweenTwoIntersections(beforePickup.getDeparture(), afterPickup.getArrival());</span>
+<span class="nc" id="L498">            pickupPath.setDepatureTime(beforePickup.getDepatureTime());</span>
+<span class="nc" id="L499">            Calendar cal = Calendar.getInstance();</span>
+<span class="nc" id="L500">            cal.setTime(beforePickup.getDepatureTime());</span>
+<span class="nc" id="L501">            double commute = pickupPath.getLength() / velocity;</span>
+<span class="nc" id="L502">            cal.add(Calendar.SECOND, (int) commute);</span>
+<span class="nc" id="L503">            pickupPath.setArrivalTime(cal.getTime());</span>
+<span class="nc" id="L504">            t.getPaths().add(pickupIndex, pickupPath);</span>
+
+<span class="nc" id="L506">            Path deliveryPath = shortestPathBetweenTwoIntersections(beforeDelivery.getDeparture(), afterDelivery.getArrival());</span>
+<span class="nc" id="L507">            deliveryPath.setDepatureTime(beforeDelivery.getDepatureTime());</span>
+<span class="nc" id="L508">            cal.setTime(beforeDelivery.getDepatureTime());</span>
+<span class="nc" id="L509">            commute = deliveryPath.getLength() / velocity;</span>
+<span class="nc" id="L510">            cal.add(Calendar.SECOND, (int) commute);</span>
+<span class="nc" id="L511">            deliveryPath.setArrivalTime(cal.getTime());</span>
+<span class="nc" id="L512">            t.getPaths().add(deliveryIndex, deliveryPath);</span>
+        }
+<span class="nc" id="L514">        t.removePath(afterPickup);</span>
+<span class="nc" id="L515">        t.removePath(beforePickup);</span>
+<span class="nc" id="L516">        t.removePath(beforeDelivery);</span>
+<span class="nc" id="L517">        t.removePath(afterDelivery);</span>
+
+<span class="nc" id="L519">        return t;</span>
+    }
+
+    /**
+     * Get the current map
+     * @return current map
+     */
+    public Map getMap() {
+<span class="fc" id="L527">        return map;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.view</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package deliverif.app.view;
+
+import deliverif.app.controller.*;
+import deliverif.app.model.map.Map;
+import deliverif.app.model.request.PlanningRequest;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javax.swing.JFileChooser;
+
+/**
+ * JavaFX App. Main class. Initialize and show the fxml scene of the
+ * application.
+ */
+<span class="nc" id="L21">public class App extends Application {</span>
+
+    // PRIVATES STATIC ATTRIBUTES
+    /**
+     * JavaFX scene of the application
+     */
+    private static Scene scene;
+
+    /**
+     * JavaFX stage of the application
+     */
+    private static Stage stage;
+
+    // PUBLIC STATIC ATTRIBUTES 
+    /**
+     * CSS style sheet for the graph using graphstream library
+     */
+    public static final String STYLESHEET
+            = &quot;node {\n&quot;
+            + &quot;     size: 3px;\n&quot;
+            + &quot;     fill-mode: dyn-plain;&quot;
+            + &quot;     fill-color: #222, #555, green, yellow;\n&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 0;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;edge.default {\n&quot;
+            + &quot;     size: 1px;\n&quot;
+            + &quot;     shape: line;\n&quot;
+            + &quot;     fill-mode: dyn-plain;&quot;
+            + &quot;     fill-color: #222, #555, green, yellow;\n&quot;
+            + &quot;     arrow-size: 3px, 2px;&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;sprite.depotSprite {\n&quot;
+            + &quot;     shape: diamond;\n&quot;
+            + &quot;     size: 12px;\n&quot;
+            + &quot;     fill-color: red;&quot;
+            + &quot;     fill-mode: gradient-diagonal1;&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 98;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;sprite.pickupSprite {\n&quot;
+            + &quot;     size: 12px;\n&quot;
+            + &quot;     fill-mode: dyn-plain;&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 98;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;sprite.deliverySprite {\n&quot;
+            + &quot;     shape: triangle;\n&quot;
+            + &quot;     size: 12px;\n&quot;
+            + &quot;     fill-mode: dyn-plain;&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 98;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;sprite.depotSpriteSelected {\n&quot;
+            + &quot;     shape: diamond;\n&quot;
+            + &quot;     size: 24px;\n&quot;
+            + &quot;     fill-color: red;&quot;
+            + &quot;     fill-mode: gradient-diagonal1;&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 99;\n&quot;
+            + &quot;     stroke-mode: plain;\n&quot;
+            + &quot;     stroke-color: yellow;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;sprite.pickupSpriteSelected {\n&quot;
+            + &quot;     size: 24px;\n&quot;
+            + &quot;     fill-mode: dyn-plain;&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 99;\n&quot;
+            + &quot;     stroke-mode: plain;\n&quot;
+            + &quot;     stroke-color: yellow;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;sprite.deliverySpriteSelected {\n&quot;
+            + &quot;     shape: triangle;\n&quot;
+            + &quot;     size: 24px;\n&quot;
+            + &quot;     fill-mode: dyn-plain;&quot;
+            + &quot;     text-mode: hidden;\n&quot;
+            + &quot;     z-index: 99;\n&quot;
+            + &quot;     stroke-mode: plain;\n&quot;
+            + &quot;     stroke-color: yellow;\n&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;sprite.segmentSprite {\n&quot;
+            + &quot;     shape: cross; &quot;
+            + &quot;     size: 9px; z-index: 99;&quot;
+            + &quot;     fill-color: green;&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;edge.marked {\n&quot;
+            + &quot;     size: 4px;&quot;
+            + &quot;     fill-color: blue;&quot;
+            + &quot;}\n&quot;
+            + &quot;\n&quot;
+            + &quot;edge.unmarked {\n&quot;
+            + &quot;     size: 4px;&quot;
+            + &quot;     fill-color: red;&quot;
+            + &quot;}\n&quot;;
+
+    // RUN THE APPLICATION
+    /**
+     * Method called at the start of the application. Create the scene and add
+     * it to the stage.
+     *
+     * @param stage JavaFX stage
+     * @throws IOException may be thrown when reading the fxml file
+     */
+    @Override
+    public void start(Stage stage) throws IOException {
+<span class="nc" id="L134">        App.stage = stage;</span>
+<span class="nc" id="L135">        stage.setTitle(&quot;DELIVERIF&quot;);</span>
+<span class="nc" id="L136">        App.scene = new Scene(loadFXML(&quot;menuPage&quot;));</span>
+<span class="nc" id="L137">        App.stage.setScene(scene);</span>
+<span class="nc" id="L138">        App.stage.show();</span>
+<span class="nc" id="L139">        KeyboardEventManager kem = new KeyboardEventManager();</span>
+<span class="nc" id="L140">    }</span>
+
+    /**
+     * Method called at the end of the application. Stops the application and
+     * makes sure that all threads are stopped.
+     *
+     * @throws Exception
+     */
+    @Override
+    public void stop() throws Exception {
+<span class="nc" id="L150">        MenuPageController.stopPathThread();</span>
+<span class="nc" id="L151">        super.stop();</span>
+<span class="nc" id="L152">    }</span>
+
+    /**
+     * Main method. Just call the method launch.
+     *
+     * @param args arguments of the application. (no args needed)
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+<span class="nc" id="L161">        launch(args);</span>
+<span class="nc" id="L162">    }</span>
+
+    // PRIVATE STATIC METHODS
+    /**
+     * Used to load the FXML file from the app resources by its name. Returns
+     * the Parent instance of the scene.
+     *
+     * @param fxml name of the fxml file in the resources of the app.
+     * @return Parent used then to create the scene
+     * @throws IOException
+     */
+    private static Parent loadFXML(String fxml) throws IOException {
+<span class="nc" id="L174">        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + &quot;.fxml&quot;));</span>
+<span class="nc" id="L175">        return fxmlLoader.load();</span>
+    }
+
+    // PUBLIC STATIC METHODS 
+    // LOAD THE XML FILES
+    
+    /**
+     * Shows a dialogue window to choose a xml map file and returns the map
+     * created with this file.
+     *
+     * @param reader XmlReader to read the map file.
+     * @return model.map.Map instance of the map. Null if the reading operation failed. Empty if cancelled.
+     * @throws IOException
+     */
+    public static Map choseMapFile(XmlReader reader) throws IOException {
+
+<span class="nc" id="L191">        JFileChooser dialogue = new JFileChooser(new File(&quot;./src/main/resources/deliverif/app/fichiersXML2020&quot;));</span>
+
+        PrintWriter out;
+        String filename;
+        File file;
+
+<span class="nc bnc" id="L197" title="All 2 branches missed.">        if (dialogue.showOpenDialog(null)</span>
+                == JFileChooser.APPROVE_OPTION) {
+<span class="nc" id="L199">            file = dialogue.getSelectedFile();</span>
+<span class="nc" id="L200">            out = new PrintWriter(new FileWriter(file.getPath(), true));</span>
+<span class="nc" id="L201">            filename = file.getPath();</span>
+<span class="nc" id="L202">            out.close();</span>
+        } else {
+            //Canceled
+<span class="nc" id="L205">            return new Map();</span>
+        }
+
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (!reader.readMap(filename)) {</span>
+<span class="nc" id="L209">            return null;</span>
+        }
+
+<span class="nc" id="L212">        return reader.getMap();</span>
+    }
+    
+    /**
+     * Shows a dialogue window to choose a xml request file and returns the planning request
+     * created with this file.
+     * 
+     * @param reader XmlReader to read the request file.
+     * @return model.map.PlanningRequest instance of the request. Null if the reading operation failed. Empty if cancelled.
+     * @throws IOException
+     */
+    public static PlanningRequest choseRequestFile(XmlReader reader) throws IOException {
+
+<span class="nc" id="L225">        JFileChooser dialogue = new JFileChooser(new File(&quot;./src/main/resources/deliverif/app/fichiersXML2020&quot;));</span>
+
+        PrintWriter out;
+
+        String filename;
+        File file;
+
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (dialogue.showOpenDialog(null)</span>
+                == JFileChooser.APPROVE_OPTION) {
+<span class="nc" id="L234">            file = dialogue.getSelectedFile();</span>
+<span class="nc" id="L235">            out = new PrintWriter(new FileWriter(file.getPath(), true));</span>
+<span class="nc" id="L236">            filename = file.getPath();</span>
+<span class="nc" id="L237">            out.close();</span>
+        } else {
+            //Cancelled
+<span class="nc" id="L240">            return new PlanningRequest();</span>
+        }
+<span class="nc" id="L242">        PlanningRequest pr = reader.readRequest(filename);</span>
+<span class="nc" id="L243">        return pr;</span>
+    }
+
+    // GETTERS
+    
+    /**
+     * Return the JavaFX scene of the application.
+     * @return Scene (JavaFX Scene)
+     */
+    public static Scene getScene() {
+<span class="nc" id="L253">        return scene;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

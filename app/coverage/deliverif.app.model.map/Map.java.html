@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Map.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.map</a> &gt; <span class="el_source">Map.java</span></div><h1>Map.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.map;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Represent a map composed by intersections and segments
+ * @author zakaria
+ */
+public class Map {
+    /**
+     * Intersections of the map
+     */
+    private HashMap&lt;Long, Intersection&gt; intersections;
+    /**
+     * Segments between the intersections of the map
+     */
+    private List&lt;Segment&gt; segments;
+
+    /**
+     * Create an empty map
+     */
+<span class="nc" id="L29">    public Map() {</span>
+<span class="nc" id="L30">    }</span>
+
+    /**
+     * Create a new map
+     *
+     * @param intersections intersections of the map represented by an hashmap
+     * with intersection id as key and intersection as value
+     * @param segments segments between the intersections of the map
+     */
+<span class="fc" id="L39">    public Map(HashMap&lt;Long, Intersection&gt; intersections, List&lt;Segment&gt; segments) {</span>
+<span class="fc" id="L40">        this.intersections = intersections;</span>
+<span class="fc" id="L41">        this.segments = segments;</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Get map intersections
+     *
+     * @return map intersections as a hashmap with intersection id as key and
+     * intersection as value
+     */
+    public HashMap&lt;Long, Intersection&gt; getIntersections() {
+<span class="fc" id="L51">        return intersections;</span>
+    }
+
+    /**
+     * Get an intersection by it's id
+     *
+     * @param id intersection id
+     * @return intersection or null
+     */
+    public Intersection getIntersectionParId(Long id) {
+<span class="fc" id="L61">        return intersections.get(id);</span>
+    }
+
+    /**
+     * Get all the map segments
+     *
+     * @return map segments
+     */
+    public List&lt;Segment&gt; getSegments() {
+<span class="fc" id="L70">        return segments;</span>
+    }
+
+    /**
+     * Get a segment from two intersections (the intersection order is not
+     * important)
+     *
+     * @param origine first intersection
+     * @param destination second intersection
+     * @return the segment between origine and destination or null
+     */
+    public Segment getSegmentParExtremites(Long origine, Long destination) {
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        for (Segment s : segments) {</span>
+<span class="fc bfc" id="L83" title="All 4 branches covered.">            if (Objects.equals(s.getOrigin().getId(), origine) &amp;&amp; Objects.equals(s.getDestination().getId(), destination)) {</span>
+<span class="fc" id="L84">                return s;</span>
+<span class="fc bfc" id="L85" title="All 4 branches covered.">            } else if (Objects.equals(s.getOrigin().getId(), destination) &amp;&amp; Objects.equals(s.getDestination().getId(), origine)) {</span>
+<span class="fc" id="L86">                return s;</span>
+            }
+<span class="fc" id="L88">        }</span>
+<span class="nc" id="L89">        return null;</span>
+    }
+
+    /**
+     * Set map intersections
+     *
+     * @param intersections map intersections
+     */
+    public void setIntersections(HashMap&lt;Long, Intersection&gt; intersections) {
+<span class="nc" id="L98">        this.intersections = intersections;</span>
+<span class="nc" id="L99">    }</span>
+
+    /**
+     * Set map segments
+     *
+     * @param segments map segments
+     */
+    public void setSegments(List&lt;Segment&gt; segments) {
+<span class="nc" id="L107">        this.segments = segments;</span>
+<span class="nc" id="L108">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L112">        return &quot;Map{intersections=&quot; + intersections + &quot;, segments=&quot; + segments + '}';</span>
+    }
+
+    /**
+     * Return wether the map is empty or not
+     *
+     * @return wether the map is empty or not
+     */
+    public boolean isEmpty() {
+<span class="nc bnc" id="L121" title="All 4 branches missed.">        return intersections == null || segments == null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

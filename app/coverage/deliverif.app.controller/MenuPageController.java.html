@@ -1,0 +1,1227 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MenuPageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller</a> &gt; <span class="el_source">MenuPageController.java</span></div><h1>MenuPageController.java</h1><pre class="source lang-java linenums">package deliverif.app.controller;
+
+import deliverif.app.controller.Command.AddRequestCommand;
+import deliverif.app.controller.Command.ListOfCommands;
+import deliverif.app.controller.Command.RemoveRequestCommand;
+import deliverif.app.controller.Command.SwapRequestCommand;
+import deliverif.app.controller.Observer.Observable;
+import deliverif.app.controller.Observer.Observer;
+import deliverif.app.controller.State.InitialState;
+import deliverif.app.controller.State.State;
+import deliverif.app.controller.thread.*;
+import deliverif.app.controller.tsp.TourGenerator;
+import deliverif.app.model.graph.Tour;
+import deliverif.app.model.map.Intersection;
+import deliverif.app.model.map.Map;
+import deliverif.app.model.map.Segment;
+import deliverif.app.model.request.Path;
+import deliverif.app.model.request.PlanningRequest;
+import deliverif.app.model.request.Request;
+import deliverif.app.view.App;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Random;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.EdgeRejectedException;
+import org.graphstream.graph.ElementNotFoundException;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.IdAlreadyInUseException;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.fx_viewer.FxViewPanel;
+import org.graphstream.ui.fx_viewer.FxViewer;
+import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.stylesheet.Selector;
+import org.graphstream.ui.spriteManager.Sprite;
+import org.graphstream.ui.spriteManager.SpriteManager;
+import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.util.InteractiveElement;
+
+/**
+ *
+ * @author H4314
+ */
+public class MenuPageController implements Observer {
+
+    //PRIVATE FXML ATTRIBUTES
+    
+    /**
+    * Button used to load an xml map
+    */
+    @FXML
+    private Button loadCityMapButton;
+
+    /**
+    * Button used to load an xml request
+    */
+    @FXML
+    private Button loadRequestButton;
+
+    /**
+    * Button used to compute a tour
+    */
+    @FXML
+    private Button computeTourButton;
+
+    /**
+    * Button used to add a request in an existing tour
+    */
+    @FXML
+    private Button addRequestButton;
+
+    /**
+    * Button used to delete a request in an existing tour
+    */
+    @FXML
+    private Button deleteRequestButton;
+
+    /**
+    * Button used to swap 2 requests
+    */
+    @FXML
+    private Button swapRequestButton;
+    
+    /**
+    * Button used to stop the algorithm
+    */
+    @FXML
+    private Button stopResearchButton;
+
+    /**
+    * Panel of the map
+    */
+    @FXML
+    private AnchorPane mapPane;
+
+    /**
+    * Text inside the map panel
+    */
+    @FXML
+    private Text loadMapText;
+
+    /**
+    * Text &quot;Selection :&quot;
+    */
+    @FXML
+    private Text selectionText;
+
+    /**
+    * Text under &quot;Selection&quot;, information of the selected element
+    */
+    @FXML
+    private Text infosText;
+
+    /**
+    * Text &quot;Tour infos&quot;
+    */
+    @FXML
+    private Text infosTextTour1;
+
+    /**
+    * Text under &quot;Tour infos&quot;, information about the current tour
+    */
+    @FXML
+    private Text infosTextTour2;
+
+    /**
+    * Text informations about the selected segment
+    */
+    @FXML
+    private Text segmentNameText;
+
+    /**
+    * List of requests
+    */
+    @FXML
+    private ListView&lt;Text&gt; requestList;
+
+    /**
+    * Streets list of the selected path
+    */
+    @FXML
+    private ListView&lt;String&gt; streetsList;
+        
+    /**
+    * Indicator about the progression of the tour compute
+    */
+    @FXML
+    private ProgressIndicator progressIndicator;
+
+    /**
+    * Panel of the progression and compute time
+    */
+    @FXML
+    private AnchorPane timerPane;
+
+    /**
+    * Text of the time
+    */
+    @FXML
+    private Text timerText;
+
+    //PRIVATE ATTRIBUTES
+    
+    /**
+    * Map
+    */
+    private Map map;
+
+    /**
+    * Planning request loaded
+    */
+<span class="nc" id="L187">    private PlanningRequest planningRequest = null;</span>
+
+    /**
+    * Graph loaded
+    */
+<span class="nc" id="L192">    private Graph graph = null;</span>
+
+    /**
+    * From GraphStream to display the map on a panel
+    */
+    private FxViewPanel panel;
+
+    /**
+    * Sprite manager (requests points)
+    */
+    private SpriteManager sman;
+
+    /**
+    * Graph processor
+    */
+    private GraphProcessor graphProcessor;
+
+    /**
+    * Tour loaded
+    */
+<span class="nc" id="L212">    private Tour tour = null;</span>
+
+    /**
+    * Edges currently selected
+    */
+<span class="nc" id="L217">    private final String[] selectedEdges = null;</span>
+
+    /**
+    * Edges of the graph
+    */
+<span class="nc" id="L222">    private List&lt;String&gt; graphEdges = new ArrayList&lt;&gt;();</span>
+
+    /**
+    * Node currently selected
+    */
+<span class="nc" id="L227">    private volatile String selectedNode = null;</span>
+
+    /**
+    * List of commands
+    */
+<span class="nc" id="L232">    private ListOfCommands loc = null;</span>
+
+    /**
+    * CUrrent state of the Application
+    */
+    private State currentState;
+
+    /**
+    * Used to read xml files
+    */
+<span class="nc" id="L242">    private final XmlReader xmlReader = new XmlReader();</span>
+
+    /**
+    * Thread to display the selected path
+    */
+<span class="nc" id="L247">    private static PathThread pathThread = null;</span>
+
+    /**
+    * Thread to compute the tour
+    */
+<span class="nc" id="L252">    private static ComputeTourThread computeTourThread = null;</span>
+
+    /**
+    * Thread to display the timer and progression
+    */
+<span class="nc" id="L257">    private static TimerThread timerThread = null;</span>
+
+    /**
+    * Instance (singleton)
+    */
+<span class="nc" id="L262">    private static MenuPageController instance = null;</span>
+
+    //CONSTRUCTOR
+
+    /**
+     * Constructor of the MenuPageController, used only when we lauched the app (Singleton pattern)
+     */
+<span class="nc" id="L269">    public MenuPageController() {</span>
+<span class="nc" id="L270">        loc = new ListOfCommands();</span>
+<span class="nc" id="L271">        instance = this;</span>
+<span class="nc" id="L272">        currentState = new InitialState(this);</span>
+<span class="nc" id="L273">    }</span>
+
+    //PUBLIC METHODS
+
+    /**
+     * Return the instance of MenuPageController (Singleton pattern)
+     * @return MenuPageCntroller instance
+     */
+    public static MenuPageController getInstance() {
+<span class="nc" id="L282">        return instance;</span>
+    }
+
+    /**
+     * Set current state
+     * @param s State we want to set
+     */
+    public void setCurrentState(State s) {
+<span class="nc" id="L290">        currentState = s;</span>
+<span class="nc" id="L291">    }</span>
+
+    /**
+     * Init the UI
+     */
+    public void initUI() {
+<span class="nc" id="L297">        this.planningRequest = null;</span>
+<span class="nc" id="L298">        this.tour = null;</span>
+<span class="nc" id="L299">        this.requestList.getItems().clear();</span>
+<span class="nc" id="L300">        this.infosText.setText(&quot;&quot;);</span>
+<span class="nc" id="L301">        this.infosTextTour1.setText(&quot;Tour infos = &quot;);</span>
+<span class="nc" id="L302">        this.infosTextTour2.setText(&quot;&quot;);</span>
+<span class="nc" id="L303">        this.addRequestButton.setVisible(false);</span>
+<span class="nc" id="L304">        this.deleteRequestButton.setVisible(false);</span>
+<span class="nc" id="L305">        stopPathThread();</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (this.graphEdges != null) {</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">            for (String edgeId : graphEdges) {</span>
+<span class="nc" id="L308">                graph.getEdge(edgeId).setAttribute(&quot;ui.class&quot;, &quot;default&quot;);</span>
+<span class="nc" id="L309">            }</span>
+        }
+<span class="nc" id="L311">        this.graphEdges = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L313">    }</span>
+
+    /**
+     * Update the selection, called by the MouseOverMouseManager
+     * @param element GraphicElement Element that was clicked.
+     */
+    public void updateSelection(GraphicElement element) {
+
+<span class="nc" id="L321">        System.out.println(&quot;UPDATE SELECTION&quot;);</span>
+
+        // EDGES, when we click on an edge
+<span class="nc bnc" id="L324" title="All 2 branches missed.">        if (element.getSelectorType() == Selector.Type.EDGE) {</span>
+<span class="nc" id="L325">            Edge edge = graph.getEdge(element.getId());</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">            for (String id : this.graphEdges) {</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">                if (element.getId().equals(id)) {</span>
+<span class="nc" id="L328">                    System.out.println(id + &quot; is on the path&quot;);</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">                    for (Text t : this.requestList.getItems()) {</span>
+<span class="nc bnc" id="L330" title="All 2 branches missed.">                        if (t.getId().contains(id)) {</span>
+<span class="nc" id="L331">                            this.requestList.getSelectionModel().select(t);</span>
+<span class="nc" id="L332">                            String[] ids = t.getId().split(&quot;#&quot;);</span>
+<span class="nc" id="L333">                            int endNum = t.getText().indexOf(&quot;]&quot;, 2);</span>
+<span class="nc" id="L334">                            String numString = t.getText().substring(1, endNum);</span>
+<span class="nc" id="L335">                            int num = Integer.parseInt(numString);</span>
+<span class="nc" id="L336">                            this.setSelectedPath(num); //Select the good path</span>
+<span class="nc" id="L337">                            setBigSprite(tour.getPaths().get(num - 1).getDeparture().getId().toString());</span>
+<span class="nc" id="L338">                            break;</span>
+                        }
+<span class="nc" id="L340">                    }</span>
+
+<span class="nc" id="L342">                    break;</span>
+                }
+<span class="nc" id="L344">            }</span>
+<span class="nc" id="L345">            String name = (String) edge.getAttribute(&quot;segment.name&quot;);</span>
+<span class="nc" id="L346">            System.out.println(name);</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">            if (name != null) {</span>
+<span class="nc" id="L348">                segmentNameText.setText(name); //Set the segment selected</span>
+<span class="nc" id="L349">                sman.removeSprite(&quot;segmentSprite&quot;);</span>
+
+<span class="nc" id="L351">                Sprite segmentSprite = sman.addSprite(&quot;segmentSprite&quot;);</span>
+
+<span class="nc" id="L353">                segmentSprite.setAttribute(&quot;ui.class&quot;, &quot;segmentSprite&quot;);</span>
+<span class="nc" id="L354">                segmentSprite.setAttribute(&quot;ui.style&quot;, &quot;fill-color: green;&quot;);</span>
+<span class="nc" id="L355">                Node origin = edge.getNode0();</span>
+<span class="nc" id="L356">                Node dest = edge.getNode1();</span>
+<span class="nc" id="L357">                Float longitude = (((Float) origin.getAttribute(&quot;x&quot;)) + ((Float) dest.getAttribute(&quot;x&quot;))) / 2;</span>
+<span class="nc" id="L358">                Float latitude = (((Float) origin.getAttribute(&quot;y&quot;)) + ((Float) dest.getAttribute(&quot;y&quot;))) / 2;</span>
+<span class="nc" id="L359">                segmentSprite.setPosition(longitude, latitude, 0);</span>
+            }
+<span class="nc" id="L361">            return;</span>
+        }
+        
+        // NODE
+
+<span class="nc bnc" id="L366" title="All 2 branches missed.">        if (this.planningRequest == null) { // We need a loaded planning request</span>
+<span class="nc" id="L367">            return;</span>
+        }
+
+<span class="nc bnc" id="L370" title="All 2 branches missed.">        if (element.getSelectorType() == Selector.Type.NODE) { //Update the selected node</span>
+<span class="nc" id="L371">            this.currentState.selectNode(element.getId());</span>
+<span class="nc" id="L372">            this.selectedNode = element.getId();</span>
+<span class="nc" id="L373">            System.out.println(&quot;CHANGE : &quot; + this.selectedNode);</span>
+<span class="nc" id="L374">            return;</span>
+        }
+
+<span class="nc bnc" id="L377" title="All 2 branches missed.">        if (element.getSelectorType() != Selector.Type.SPRITE) {</span>
+<span class="nc" id="L378">            return;</span>
+        }
+
+        // SPRITE
+<span class="nc" id="L382">        String idElement = element.getId();</span>
+<span class="nc bnc" id="L383" title="All 2 branches missed.">        if (idElement.equals(&quot;segmentSprite&quot;)) {</span>
+<span class="nc" id="L384">            return;</span>
+        }
+<span class="nc" id="L386">        this.currentState.selectSprite(element.getId()); //Update the selected sprite</span>
+<span class="nc" id="L387">        this.currentState.selectNode(element.getId());</span>
+<span class="nc" id="L388">    }</span>
+
+    /**
+     * Load a map using XML reader
+     * @throws IOException
+     */
+    public void loadMap() throws IOException {
+<span class="nc" id="L395">        System.out.println(&quot;loadCityMapAction&quot;);</span>
+<span class="nc" id="L396">        Map m = App.choseMapFile(this.xmlReader);</span>
+
+<span class="nc bnc" id="L398" title="All 2 branches missed.">        if (m == null) {</span>
+<span class="nc" id="L399">            showErrorAlert(&quot;Bad file&quot;, &quot;FORMAT ERRORS ON MAP FILE - Load another file&quot;);</span>
+<span class="nc" id="L400">            return;</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">        } else if (m.isEmpty()) {</span>
+<span class="nc" id="L402">            return;</span>
+        } else {
+<span class="nc" id="L404">            this.map = m;</span>
+        }
+
+<span class="nc" id="L407">        this.chargerGraph(this.map);</span>
+<span class="nc" id="L408">        this.graph.setAttribute(&quot;ui.stylesheet&quot;, App.STYLESHEET);</span>
+
+<span class="nc" id="L410">        Viewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);</span>
+<span class="nc" id="L411">        panel = (FxViewPanel) viewer.addDefaultView(false);</span>
+<span class="nc" id="L412">        panel.enableMouseOptions();</span>
+<span class="nc" id="L413">        panel.setMouseManager(new MouseOverMouseManager(EnumSet.of(InteractiveElement.EDGE, InteractiveElement.SPRITE, InteractiveElement.NODE), this));</span>
+<span class="nc" id="L414">        mapPane.getChildren().remove(loadMapText);</span>
+<span class="nc" id="L415">        mapPane.getChildren().add(panel);</span>
+<span class="nc" id="L416">        AnchorPane.setTopAnchor(panel, 1.0);</span>
+<span class="nc" id="L417">        AnchorPane.setLeftAnchor(panel, 1.0);</span>
+<span class="nc" id="L418">        AnchorPane.setRightAnchor(panel, 1.0);</span>
+<span class="nc" id="L419">        AnchorPane.setBottomAnchor(panel, 1.0);</span>
+<span class="nc" id="L420">        graphProcessor = new GraphProcessor(map);</span>
+<span class="nc" id="L421">        sman = new SpriteManager(this.graph);</span>
+<span class="nc" id="L422">    }</span>
+
+    /**
+     * Load a Request using XML reader
+     * @throws IOException
+     */
+    public void loadRequest() throws IOException {
+<span class="nc" id="L429">        System.out.println(&quot;loadRequestAction&quot;);</span>
+<span class="nc bnc" id="L430" title="All 2 branches missed.">        if (map == null) {</span>
+<span class="nc bnc" id="L431" title="All 2 branches missed.">            if (map == null) {</span>
+<span class="nc" id="L432">                showErrorAlert(&quot;Load a map&quot;, &quot;You need to load a city map first&quot;);</span>
+<span class="nc" id="L433">                return;</span>
+            }
+<span class="nc" id="L435">            System.out.println(&quot;Il faut charger une map avant&quot;);</span>
+<span class="nc" id="L436">            return;</span>
+        }
+<span class="nc" id="L438">        this.chargerPlanningRequests();</span>
+        //System.out.println(this.planningRequest);
+<span class="nc" id="L440">    }</span>
+
+    /**
+     * COmpute a tour
+     */
+    public void computeTour() {
+
+<span class="nc bnc" id="L447" title="All 2 branches missed.">        if (map == null) {</span>
+<span class="nc" id="L448">            showErrorAlert(&quot;Load a map&quot;, &quot;You need to load a city map first&quot;);</span>
+<span class="nc" id="L449">            return;</span>
+        }
+<span class="nc bnc" id="L451" title="All 2 branches missed.">        if (this.planningRequest == null) {</span>
+<span class="nc" id="L452">            showErrorAlert(&quot;Load a request&quot;, &quot;You need to load a request first&quot;);</span>
+<span class="nc" id="L453">            return;</span>
+        }
+
+<span class="nc" id="L456">        addRequestMode();</span>
+<span class="nc" id="L457">        System.out.println(&quot;computeTourAction&quot;);</span>
+        //tour = graphProcessor.optimalTour(this.planningRequest);
+<span class="nc" id="L459">        TourGenerator tourGenerator = graphProcessor.optimalTour(planningRequest);</span>
+<span class="nc" id="L460">        System.out.println(&quot;Optimal&quot;);</span>
+<span class="nc" id="L461">        tourGenerator.addObserver(this);</span>
+<span class="nc" id="L462">        stopResearchButton.setVisible(true);</span>
+<span class="nc" id="L463">        computeTourThread = new ComputeTourThread(this);</span>
+<span class="nc" id="L464">        computeTourThread.start();</span>
+<span class="nc" id="L465">        timerThread = new TimerThread(this);</span>
+<span class="nc" id="L466">        timerThread.start();</span>
+<span class="nc" id="L467">    }</span>
+
+    /**
+     * Render a tour
+     */
+    public void renderTour() {
+
+<span class="nc bnc" id="L474" title="All 2 branches missed.">        for (String edgeId : graphEdges) {</span>
+<span class="nc" id="L475">            resetEdge(edgeId);</span>
+<span class="nc" id="L476">        }</span>
+<span class="nc" id="L477">        graphEdges.clear();</span>
+
+<span class="nc" id="L479">        this.requestList.getItems().clear();</span>
+
+<span class="nc" id="L481">        Text txt = null;</span>
+<span class="nc" id="L482">        int cpt = 1;</span>
+<span class="nc" id="L483">        SimpleDateFormat dtf = new SimpleDateFormat(&quot;HH:mm:ss&quot;);</span>
+<span class="nc" id="L484">        int[] rgb = randomColorSprite();</span>
+
+<span class="nc bnc" id="L486" title="All 2 branches missed.">        for (Path p : tour.getPaths()) {</span>
+<span class="nc" id="L487">            String id = &quot;&quot;;</span>
+<span class="nc bnc" id="L488" title="All 2 branches missed.">            for (Segment s : p.getSegments()) {</span>
+<span class="nc" id="L489">                String originId = s.getOrigin().getId().toString();</span>
+<span class="nc" id="L490">                String destId = s.getDestination().getId().toString();</span>
+<span class="nc" id="L491">                Edge edge = graph.getEdge(originId + &quot;|&quot; + destId);</span>
+<span class="nc bnc" id="L492" title="All 2 branches missed.">                if (edge != null) {</span>
+<span class="nc" id="L493">                    edge.setAttribute(&quot;ui.style&quot;, &quot;fill-color: red;&quot;);</span>
+<span class="nc" id="L494">                    edge.setAttribute(&quot;ui.style&quot;, &quot;size: 4px;&quot;);</span>
+<span class="nc" id="L495">                    edge.setAttribute(&quot;ui.class&quot;, &quot;pathEdge&quot;);</span>
+<span class="nc" id="L496">                    this.graphEdges.add(edge.getId());</span>
+<span class="nc" id="L497">                    id = id + edge.getId() + &quot;#&quot;;</span>
+                } else {
+<span class="nc" id="L499">                    edge = graph.getEdge(destId + &quot;|&quot; + originId);</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">                    if (edge != null) {</span>
+<span class="nc" id="L501">                        edge.setAttribute(&quot;ui.style&quot;, &quot;fill-color: red;&quot;);</span>
+<span class="nc" id="L502">                        edge.setAttribute(&quot;ui.style&quot;, &quot;size: 4px;&quot;);</span>
+<span class="nc" id="L503">                        edge.setAttribute(&quot;ui.class&quot;, &quot;pathEdge&quot;);</span>
+<span class="nc" id="L504">                        this.graphEdges.add(edge.getId());</span>
+<span class="nc" id="L505">                        id = id + edge.getId() + &quot;#&quot;;</span>
+                    } else {
+<span class="nc" id="L507">                        System.out.println(&quot;Edge not found&quot;);</span>
+                    }
+                }
+<span class="nc" id="L510">            }</span>
+<span class="nc" id="L511">            Long departId = p.getDeparture().getId();</span>
+<span class="nc" id="L512">            String typePoint = tour.getPr().researchTypeIntersection(departId);</span>
+
+<span class="nc bnc" id="L514" title="All 2 branches missed.">            if (typePoint != &quot;&quot;) {</span>
+<span class="nc" id="L515">                txt = new Text(&quot;[&quot; + cpt + &quot;] &quot; + typePoint + &quot; from &quot; + dtf.format(p.getDepatureTime())</span>
+<span class="nc" id="L516">                        + &quot; to &quot; + dtf.format(p.getArrivalTime()) + &quot; / &quot; + String.format(&quot;%.03f&quot;, p.getLength() / 1000) + &quot;km&quot;);</span>
+            } else {
+<span class="nc" id="L518">                txt = new Text(&quot;[&quot; + cpt + &quot;] Depot from &quot; + dtf.format(p.getDepatureTime())</span>
+<span class="nc" id="L519">                        + &quot; to &quot; + dtf.format(p.getArrivalTime()) + &quot; / &quot; + String.format(&quot;%.03f&quot;, p.getLength() / 1000) + &quot;km&quot;);</span>
+            }
+
+<span class="nc" id="L522">            txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));</span>
+<span class="nc" id="L523">            txt.setId(id);</span>
+<span class="nc" id="L524">            this.requestList.getItems().add(txt);</span>
+<span class="nc" id="L525">            cpt++;</span>
+<span class="nc" id="L526">        }</span>
+
+<span class="nc" id="L528">        float distance = this.tour.getTotalDistance();</span>
+<span class="nc" id="L529">        int time = this.tour.getTotalDuration(); //seconds</span>
+
+<span class="nc" id="L531">        distance = distance / 1000;</span>
+
+<span class="nc" id="L533">        int duration = time / 60; //minutes</span>
+<span class="nc" id="L534">        int hours = duration / 60;</span>
+<span class="nc" id="L535">        int mins = duration - (60 * hours);</span>
+        //System.out.println(&quot;hours/&quot; + duration + &quot;/ min/&quot; + min + &quot;/ mins/&quot; + mins);
+
+<span class="nc" id="L538">        Date departure = this.tour.getDepartureTime();</span>
+<span class="nc" id="L539">        Date arrival = this.tour.getArrivalTime();</span>
+
+<span class="nc" id="L541">        this.infosTextTour1.setText(&quot;TOUR = &quot; + String.format(&quot;%.03f&quot;, distance) + &quot; km / &quot; + hours + &quot;h&quot; + mins + &quot;min&quot;);</span>
+<span class="nc" id="L542">        this.infosTextTour2.setText(&quot;from &quot; + dtf.format(departure) + &quot; to &quot; + dtf.format(arrival));</span>
+
+<span class="nc" id="L544">    }</span>
+
+    /**
+     * Set the selected sprite
+     * @param spriteId new sprite selected
+     */
+    public void setSelectedSprite(String spriteId) {
+<span class="nc" id="L551">        selectedNode = spriteId;</span>
+<span class="nc" id="L552">        Sprite sprite = sman.getSprite(spriteId);</span>
+<span class="nc bnc" id="L553" title="All 2 branches missed.">        if (sprite == null) {</span>
+<span class="nc" id="L554">            return;</span>
+        }
+<span class="nc" id="L556">        String spriteType = (String) sprite.getAttribute(&quot;ui.class&quot;);</span>
+<span class="nc bnc" id="L557" title="All 4 branches missed.">        if (spriteType == null || spriteType == &quot;segmentSprite&quot;) {</span>
+<span class="nc" id="L558">            return;</span>
+        }
+<span class="nc" id="L560">        this.setBigSprite(spriteId);</span>
+
+<span class="nc bnc" id="L562" title="All 2 branches missed.">        if (spriteType.equals(&quot;depotSprite&quot;)) {</span>
+<span class="nc" id="L563">            SimpleDateFormat hourFormat = new SimpleDateFormat(&quot;HH:mm:ss&quot;);</span>
+<span class="nc" id="L564">            String strDate = hourFormat.format(this.planningRequest.getDepot().getDepartureTime());</span>
+<span class="nc" id="L565">            this.infosText.setText(&quot;Departure time = &quot; + strDate);</span>
+<span class="nc" id="L566">        } else {</span>
+<span class="nc bnc" id="L567" title="All 2 branches missed.">            for (Request r : this.planningRequest.getRequests()) {</span>
+<span class="nc" id="L568">                String idPickupAddress = r.getPickupAddress().getId().toString();</span>
+<span class="nc" id="L569">                String idDeliveryAdress = r.getDeliveryAddress().getId().toString();</span>
+<span class="nc bnc" id="L570" title="All 2 branches missed.">                if (idPickupAddress.equals(spriteId)) {</span>
+<span class="nc" id="L571">                    this.infosText.setText(&quot;Pickup duration = &quot; + String.valueOf(r.getPickupDuration() / 60) + &quot; min&quot;);</span>
+<span class="nc" id="L572">                    break;</span>
+                }
+<span class="nc bnc" id="L574" title="All 2 branches missed.">                if (idDeliveryAdress.equals(spriteId)) {</span>
+<span class="nc" id="L575">                    this.infosText.setText(&quot;Delivery duration = &quot; + String.valueOf(r.getDeliveryDuration() / 60) + &quot; min&quot;);</span>
+<span class="nc" id="L576">                    break;</span>
+                }
+<span class="nc" id="L578">            }</span>
+        }
+
+<span class="nc bnc" id="L581" title="All 2 branches missed.">        if (tour != null) {</span>
+<span class="nc bnc" id="L582" title="All 2 branches missed.">            for (int i = 0; i &lt; tour.getPaths().size(); i++) {</span>
+<span class="nc" id="L583">                Path p = tour.getPaths().get(i);</span>
+<span class="nc bnc" id="L584" title="All 2 branches missed.">                if (p.getDeparture().getId().toString().equals(spriteId)) {</span>
+<span class="nc" id="L585">                    this.setSelectedPath(i + 1);</span>
+<span class="nc bnc" id="L586" title="All 2 branches missed.">                    for (Text t : this.requestList.getItems()) {</span>
+<span class="nc bnc" id="L587" title="All 2 branches missed.">                        if (t.getText().contains(&quot;[&quot; + (i + 1) + &quot;]&quot;)) {</span>
+<span class="nc" id="L588">                            this.requestList.getSelectionModel().select(t);</span>
+                        }
+<span class="nc" id="L590">                    }</span>
+                }
+            }
+<span class="nc" id="L593">            this.deleteRequestButton.setVisible(true);</span>
+        } else {
+<span class="nc" id="L595">            Text spriteText = null;</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">            for (Text t : this.requestList.getItems()) {</span>
+<span class="nc bnc" id="L597" title="All 2 branches missed.">                if (t.getId().equals(spriteId)) {</span>
+<span class="nc" id="L598">                    spriteText = t;</span>
+                }
+<span class="nc" id="L600">            }</span>
+<span class="nc" id="L601">            this.requestList.getSelectionModel().select(spriteText);</span>
+        }
+
+<span class="nc" id="L604">    }</span>
+
+    /**
+     * Return a random color
+     * @return an RGB color --&gt; index 0 = RED, index 1 = Green, index 2 = Blue
+     */
+    public int[] randomColorSprite() {
+
+<span class="nc" id="L612">        Random rand = new Random();</span>
+
+        int min, max;
+<span class="nc" id="L615">        min = 55;</span>
+<span class="nc" id="L616">        max = 200;</span>
+
+<span class="nc" id="L618">        int r = rand.nextInt((max - min) + 1) + min;</span>
+<span class="nc" id="L619">        int g = rand.nextInt((max - min) + 1) + min;</span>
+<span class="nc" id="L620">        int b = rand.nextInt((max - min) + 1) + min;</span>
+
+<span class="nc" id="L622">        int[] rgb = {r, g, b};</span>
+<span class="nc" id="L623">        return rgb;</span>
+    }
+
+    /**
+     * Stop the path thread
+     */
+    public static void stopPathThread() {
+<span class="nc bnc" id="L630" title="All 2 branches missed.">        if (pathThread != null) {</span>
+<span class="nc" id="L631">            pathThread.end();</span>
+<span class="nc bnc" id="L632" title="All 2 branches missed.">            while (!pathThread.isIsFinished()) {</span>
+            }
+        }
+<span class="nc" id="L635">    }</span>
+
+    /**
+     * Remove the selected request
+     */
+    public void removeRequest() {
+<span class="nc" id="L641">        System.out.println(&quot;Try to remove&quot;);</span>
+<span class="nc bnc" id="L642" title="All 2 branches missed.">        if (selectedNode == null) {</span>
+<span class="nc" id="L643">            return;</span>
+        }
+<span class="nc" id="L645">        System.out.println(&quot;Node selected&quot;);</span>
+<span class="nc" id="L646">        Request selectedRequest = null;</span>
+<span class="nc bnc" id="L647" title="All 2 branches missed.">        if (this.planningRequest.getDepot().getAddress().getId().toString().equals(this.selectedNode)) {</span>
+<span class="nc" id="L648">            showErrorAlert(&quot;Suppression error&quot;, &quot;Impossible to remove the deposit&quot;);</span>
+<span class="nc" id="L649">            return;</span>
+        }
+<span class="nc bnc" id="L651" title="All 2 branches missed.">        if (this.planningRequest.getRequests().size() == 1) {</span>
+<span class="nc" id="L652">            showErrorAlert(&quot;Suppression error&quot;, &quot;Impossible to remove the request because it's the last one&quot;);</span>
+<span class="nc" id="L653">            return;</span>
+        }
+<span class="nc bnc" id="L655" title="All 2 branches missed.">        for (Request r : this.planningRequest.getRequests()) {</span>
+<span class="nc" id="L656">            String idPickupAddress = r.getPickupAddress().getId().toString();</span>
+<span class="nc" id="L657">            String idDeliveryAdress = r.getDeliveryAddress().getId().toString();</span>
+<span class="nc bnc" id="L658" title="All 2 branches missed.">            if (idPickupAddress.equals(selectedNode)) {</span>
+<span class="nc" id="L659">                selectedRequest = r;</span>
+<span class="nc" id="L660">                break;</span>
+            }
+<span class="nc bnc" id="L662" title="All 2 branches missed.">            if (idDeliveryAdress.equals(selectedNode)) {</span>
+<span class="nc" id="L663">                selectedRequest = r;</span>
+<span class="nc" id="L664">                break;</span>
+            }
+<span class="nc" id="L666">        }</span>
+<span class="nc bnc" id="L667" title="All 2 branches missed.">        if (selectedRequest == null) {</span>
+<span class="nc" id="L668">            System.out.println(&quot;Request not found&quot;);</span>
+<span class="nc" id="L669">            return;</span>
+        }
+<span class="nc" id="L671">        System.out.println(&quot;Found request&quot;);</span>
+<span class="nc" id="L672">        stopPathThread();</span>
+<span class="nc" id="L673">        RemoveRequestCommand rr = new RemoveRequestCommand(graphProcessor, tour, selectedRequest);</span>
+<span class="nc" id="L674">        sman.removeSprite(&quot;bigSprite&quot;);</span>
+<span class="nc" id="L675">        loc.addCommand(rr);</span>
+
+<span class="nc" id="L677">    }</span>
+
+    /**
+     * Show an info alert
+     * @param title title of the info
+     * @param content content of the info
+     */
+    public void schowInfoAlert(String title, String content) {
+<span class="nc" id="L685">        Alert alert = new Alert(AlertType.INFORMATION);</span>
+<span class="nc" id="L686">        alert.setHeaderText(null);</span>
+<span class="nc" id="L687">        alert.setTitle(title);</span>
+<span class="nc" id="L688">        alert.setContentText(content);</span>
+<span class="nc" id="L689">        alert.showAndWait();</span>
+<span class="nc" id="L690">    }</span>
+
+    /**
+     * Start adding a request
+     */
+    public void startAddRequest() {
+<span class="nc" id="L696">        System.out.println(&quot;Start add request&quot;);</span>
+<span class="nc" id="L697">        this.addRequestMode();</span>
+<span class="nc" id="L698">        this.schowInfoAlert(&quot;Select Pickup point&quot;, &quot;Please select a pickup point on the map&quot;);</span>
+<span class="nc" id="L699">    }</span>
+
+    /**
+     * Start swap 2 requests
+     */
+    public void startSwapRequest() {
+<span class="nc" id="L705">        System.out.println(&quot;Start swap request&quot;);</span>
+<span class="nc" id="L706">        this.addRequestMode();</span>
+<span class="nc" id="L707">        this.schowInfoAlert(&quot;Select a first point to swap&quot;, &quot;Please select a point on the tour&quot;);</span>
+<span class="nc" id="L708">    }</span>
+
+    /**
+     * Add a request to the current tour
+     * @param pickupId
+     * @param deliveryId
+     * @param pickupDuration
+     * @param deliveryDuration
+     */
+    public void addRequest(String pickupId, String deliveryId, int pickupDuration, int deliveryDuration) {
+
+<span class="nc" id="L719">        Intersection pickup = map.getIntersectionParId(Long.parseLong(pickupId));</span>
+<span class="nc" id="L720">        Intersection delivery = map.getIntersectionParId(Long.parseLong(deliveryId));</span>
+<span class="nc" id="L721">        Request r = new Request(pickup, delivery, pickupDuration, deliveryDuration);</span>
+<span class="nc" id="L722">        AddRequestCommand ar = new AddRequestCommand(graphProcessor, tour, r);</span>
+<span class="nc" id="L723">        loc.addCommand(ar);</span>
+<span class="nc" id="L724">        this.defaultMode();</span>
+<span class="nc" id="L725">    }</span>
+
+    /**
+     * Swap 2 requests
+     * @param firstId First request, ID of the departure
+     * @param secondId Second request, ID of the departure
+     */
+    public void swapRequest(String firstId, String secondId) {
+<span class="nc" id="L733">        ArrayList&lt;Long&gt; requestIds = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L734" title="All 2 branches missed.">        for (Path p : tour.getPaths()) {</span>
+<span class="nc" id="L735">            requestIds.add(p.getDeparture().getId());</span>
+<span class="nc" id="L736">        }</span>
+<span class="nc" id="L737">        Collections.swap(requestIds, requestIds.indexOf(Long.parseLong(firstId)), requestIds.indexOf(Long.parseLong(secondId)));</span>
+<span class="nc" id="L738">        SwapRequestCommand sr = new SwapRequestCommand(graphProcessor, tour, requestIds);</span>
+<span class="nc" id="L739">        loc.addCommand(sr);</span>
+<span class="nc" id="L740">        this.defaultMode();</span>
+<span class="nc" id="L741">    }</span>
+
+    /**
+     * Remove the sprite of a request
+     * @param r Request removed
+     */
+    public void removeSpriteRequest(Request r) {
+<span class="nc" id="L748">        String pickupId = r.getPickupAddress().getId().toString();</span>
+<span class="nc" id="L749">        String deliveryId = r.getDeliveryAddress().getId().toString();</span>
+<span class="nc" id="L750">        sman.removeSprite(pickupId);</span>
+<span class="nc" id="L751">        sman.removeSprite(deliveryId);</span>
+<span class="nc" id="L752">    }</span>
+
+    /**
+     * Display a request on the map
+     * @param r
+     */
+    public void displayRequest(Request r) {
+<span class="nc" id="L759">        int[] rgb = randomColorSprite();</span>
+<span class="nc" id="L760">        String color = &quot;fill-color: rgb(&quot; + rgb[0] + &quot;,&quot; + rgb[1] + &quot;,&quot; + rgb[2] + &quot;);&quot;;</span>
+<span class="nc" id="L761">        Intersection pickupAddress = r.getPickupAddress();</span>
+<span class="nc" id="L762">        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());</span>
+<span class="nc" id="L763">        pickupAddressSprite.setAttribute(&quot;ui.class&quot;, &quot;pickupSprite&quot;);</span>
+<span class="nc" id="L764">        pickupAddressSprite.setAttribute(&quot;ui.style&quot;, color);</span>
+<span class="nc" id="L765">        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);</span>
+
+<span class="nc" id="L767">        Intersection deliveryAdress = r.getDeliveryAddress();</span>
+<span class="nc" id="L768">        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());</span>
+<span class="nc" id="L769">        deliveryAdressSprite.setAttribute(&quot;ui.class&quot;, &quot;deliverySprite&quot;);</span>
+<span class="nc" id="L770">        deliveryAdressSprite.setAttribute(&quot;ui.style&quot;, color);</span>
+<span class="nc" id="L771">        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);</span>
+<span class="nc" id="L772">    }</span>
+
+    @Override
+    public void update(Observable observed, Object arg) {
+<span class="nc bnc" id="L776" title="All 2 branches missed.">        if (observed instanceof Tour) {</span>
+<span class="nc" id="L777">            Tour t = (Tour) observed;</span>
+<span class="nc bnc" id="L778" title="All 2 branches missed.">            if (t != tour) {</span>
+<span class="nc" id="L779">                return;</span>
+            }
+<span class="nc" id="L781">            this.planningRequest = t.getPr();</span>
+<span class="nc" id="L782">            renderTour();</span>
+<span class="nc bnc" id="L783" title="All 2 branches missed.">        } else if (observed instanceof TourGenerator) {</span>
+<span class="nc" id="L784">            boolean isFinished = (boolean) arg;</span>
+<span class="nc" id="L785">            this.requestList.getItems().clear();</span>
+<span class="nc bnc" id="L786" title="All 2 branches missed.">            if (isFinished) {</span>
+<span class="nc" id="L787">                defaultMode();</span>
+<span class="nc" id="L788">                stopResearchButton.setVisible(false);</span>
+<span class="nc" id="L789">                this.timerPane.setVisible(false);</span>
+<span class="nc" id="L790">                this.addRequestButton.setVisible(true);</span>
+<span class="nc" id="L791">                this.swapRequestButton.setVisible(true);</span>
+
+            }
+<span class="nc" id="L794">            TourGenerator tourGenerator = (TourGenerator) observed;</span>
+<span class="nc" id="L795">            this.tour = tourGenerator.getTour();</span>
+<span class="nc" id="L796">            this.tour.addObserver(this);</span>
+<span class="nc" id="L797">            this.planningRequest = tour.getPr();</span>
+<span class="nc" id="L798">            renderTour();</span>
+        }
+<span class="nc" id="L800">    }</span>
+
+    /**
+     * Undo an action
+     */
+    public void undo() {
+<span class="nc" id="L806">        loc.undo();</span>
+<span class="nc" id="L807">    }</span>
+
+    /**
+     * Redo an action
+     */
+    public void redo() {
+<span class="nc" id="L813">        loc.redo();</span>
+<span class="nc" id="L814">    }</span>
+
+    /**
+     * Get the current state
+     * @return current state
+     */
+    public State getCurrentState() {
+<span class="nc" id="L821">        return currentState;</span>
+    }
+
+    /**
+     * Get the current graph
+     * @return graph
+     */
+    public Graph getGraph() {
+<span class="nc" id="L829">        return graph;</span>
+    }
+
+    /**
+     * Get the current tour
+     * @return tour
+     */
+    public Tour getTour() {
+<span class="nc" id="L837">        return tour;</span>
+    }
+
+    /**
+     * Get the current Compute tour thread
+     * @return compute tour thread
+     */
+    public static ComputeTourThread getComputeTourThread() {
+<span class="nc" id="L845">        return computeTourThread;</span>
+    }
+
+    /**
+     * Get the current graph processor
+     * @return graph processor
+     */
+    public GraphProcessor getGraphProcessor() {
+<span class="nc" id="L853">        return graphProcessor;</span>
+    }
+
+    /**
+     * Get the current selected node
+     * @return selected node
+     */
+    public String getSelectedNode() {
+<span class="nc" id="L861">        return selectedNode;</span>
+    }
+
+    /**
+     * Get the current selected planning request
+     * @return planning request
+     */
+    public PlanningRequest getPlanningRequest() {
+<span class="nc" id="L869">        return planningRequest;</span>
+    }
+
+    /**
+     * Get the timer pane
+     * @return timer pane
+     */
+    public AnchorPane getTimerPane() {
+<span class="nc" id="L877">        return timerPane;</span>
+    }
+
+    /**
+     * Get the timer text
+     * @return timer text
+     */
+    public Text getTimerText() {
+<span class="nc" id="L885">        return timerText;</span>
+    }
+        
+    /**
+     * Get the progress indicator
+     * @return progress indicator
+     */
+    public ProgressIndicator getProgressIndicator() {
+<span class="nc" id="L893">        return progressIndicator;</span>
+    }
+    
+    public Button getStopResearchButton() {
+<span class="nc" id="L897">        return stopResearchButton;</span>
+    }
+    
+
+    /**
+     * Set the selected node
+     * @param selectedNode id of the node
+     */
+    public void setSelectedNode(String selectedNode) {
+<span class="nc" id="L906">        this.selectedNode = selectedNode;</span>
+<span class="nc" id="L907">    }</span>
+
+    /**
+     * Check if the node is on the tour
+     * @param nodeId
+     * @return true if the node is on the tour
+     */
+    public boolean isNodeOnTour(String nodeId) {
+<span class="nc" id="L915">        Sprite sprite = sman.getSprite(nodeId);</span>
+<span class="nc bnc" id="L916" title="All 2 branches missed.">        return sprite != null;</span>
+    }
+
+    //PUBLIC FXML METHODS
+
+    /**
+     * Action when we click on remove request
+     * @param arg0
+     */
+    @FXML
+    public void requestListClick(MouseEvent arg0) {
+
+<span class="nc bnc" id="L928" title="All 2 branches missed.">        if (this.tour == null) {</span>
+<span class="nc" id="L929">            System.out.println(&quot;clicked on &quot; + requestList.getSelectionModel().getSelectedItem().getText());</span>
+<span class="nc" id="L930">            String spriteId = requestList.getSelectionModel().getSelectedItem().getId();</span>
+<span class="nc" id="L931">            this.currentState.selectNode(spriteId);</span>
+<span class="nc" id="L932">        } else {</span>
+<span class="nc" id="L933">            System.out.println(&quot;clicked on &quot; + this.requestList.getSelectionModel().getSelectedItem().getText());</span>
+<span class="nc" id="L934">            int endNum = this.requestList.getSelectionModel().getSelectedItem().getText().indexOf(&quot;]&quot;, 2);</span>
+<span class="nc" id="L935">            int num = Integer.parseInt(this.requestList.getSelectionModel().getSelectedItem().getText().substring(1, endNum));</span>
+<span class="nc" id="L936">            String departureId = this.tour.getPaths().get(num - 1).getDeparture().getId().toString();</span>
+<span class="nc" id="L937">            this.currentState.selectNode(departureId);</span>
+<span class="nc" id="L938">            this.setSelectedPath(num);</span>
+        }
+<span class="nc" id="L940">    }</span>
+
+    //PRIVATE FXML METHODS
+    
+    /**
+     * Action when we click on load a map
+     * @throws IOException
+     */
+    @FXML
+    private void loadCityMapAction() throws IOException {
+<span class="nc" id="L950">        currentState.loadMap();</span>
+<span class="nc" id="L951">    }</span>
+
+    /**
+     * Action when we click on load a request
+     * @throws IOException
+     */
+    @FXML
+    private void loadRequestAction() throws IOException {
+<span class="nc" id="L959">        currentState.loadRequest();</span>
+<span class="nc" id="L960">    }</span>
+
+    /**
+     * Action when we click on compute a tour
+     * @throws IOException
+     */
+    @FXML
+    private void computeTourAction() throws IOException {
+<span class="nc" id="L968">        currentState.computeTour();</span>
+<span class="nc" id="L969">    }</span>
+
+    /**
+     * Action when we click on add a request
+     * @throws IOException
+     */
+    @FXML
+    private void addRequestAction() throws IOException {
+<span class="nc" id="L977">        currentState.startAddRequest();</span>
+<span class="nc" id="L978">    }</span>
+
+    /**
+     * Action when we click on delete a request
+     * @throws IOException
+     */
+    @FXML
+    private void deleteRequestAction() throws IOException {
+<span class="nc" id="L986">        System.out.println(&quot;deleteRequestAction&quot;);</span>
+<span class="nc" id="L987">        this.currentState.removeRequest();</span>
+<span class="nc" id="L988">        this.deleteRequestButton.setVisible(false);</span>
+<span class="nc" id="L989">    }</span>
+
+    /**
+     * Action when we want to render a tour
+     */
+    @FXML
+    private void renderTourAction() {
+<span class="nc" id="L996">        defaultMode();</span>
+<span class="nc" id="L997">        this.stopResearchButton.setVisible(false);</span>
+<span class="nc" id="L998">        this.timerPane.setVisible(false);</span>
+<span class="nc" id="L999">        System.out.println(&quot;cancel&quot;);</span>
+<span class="nc" id="L1000">        computeTourThread.stop();</span>
+<span class="nc" id="L1001">        tour.addObserver(this);</span>
+<span class="nc" id="L1002">        renderTour();</span>
+<span class="nc" id="L1003">        this.addRequestButton.setVisible(true);</span>
+<span class="nc" id="L1004">        this.swapRequestButton.setVisible(true);</span>
+<span class="nc" id="L1005">    }</span>
+
+    /**
+     * Action when we click on swap requests
+     */
+    @FXML
+    private void swapRequestAction() {
+<span class="nc" id="L1012">        System.out.println(&quot;swapRequestAction&quot;);</span>
+<span class="nc" id="L1013">        currentState.startSwapRequest();</span>
+
+<span class="nc" id="L1015">    }</span>
+
+    //PRIVATE METHODS
+    
+    /**
+     * Load a graph
+     * @param map current map
+     */
+    private void chargerGraph(Map map) {
+<span class="nc bnc" id="L1024" title="All 2 branches missed.">        if (graph != null) {</span>
+<span class="nc" id="L1025">            initUI();</span>
+        }
+
+<span class="nc" id="L1028">        this.graph = new SingleGraph(&quot;Graph test 1&quot;);</span>
+
+<span class="nc" id="L1030">        map.getIntersections().entrySet().forEach((mapentry) -&gt; {</span>
+<span class="nc" id="L1031">            String nodeId = mapentry.getKey().toString();</span>
+<span class="nc" id="L1032">            Intersection intersection = (Intersection) mapentry.getValue();</span>
+<span class="nc" id="L1033">            graph.addNode(nodeId);</span>
+<span class="nc" id="L1034">            graph.getNode(nodeId).setAttribute(&quot;x&quot;, intersection.getLongitude());</span>
+<span class="nc" id="L1035">            graph.getNode(nodeId).setAttribute(&quot;y&quot;, intersection.getLatitude());</span>
+
+<span class="nc" id="L1037">        });</span>
+
+<span class="nc" id="L1039">        map.getSegments().forEach((s) -&gt; {</span>
+<span class="nc" id="L1040">            String origin = s.getOrigin().getId().toString();</span>
+<span class="nc" id="L1041">            String destination = s.getDestination().getId().toString();</span>
+            try {
+<span class="nc" id="L1043">                graph.addEdge(origin + &quot;|&quot; + destination, origin, destination);</span>
+<span class="nc" id="L1044">                graph.getEdge(origin + &quot;|&quot; + destination).setAttribute(&quot;segment.name&quot;, s.getName());</span>
+<span class="nc" id="L1045">                graph.getEdge(origin + &quot;|&quot; + destination).setAttribute(&quot;ui.class&quot;, &quot;default&quot;);</span>
+<span class="nc" id="L1046">            } catch (EdgeRejectedException | ElementNotFoundException | IdAlreadyInUseException e) {</span>
+                //System.out.println(&quot;Error edge &quot; + origin + &quot; -&gt; &quot; + destination);
+<span class="nc" id="L1048">                Edge ed = graph.getEdge(destination + &quot;|&quot; + origin);</span>
+<span class="nc bnc" id="L1049" title="All 2 branches missed.">                if (ed != null) {</span>
+<span class="nc" id="L1050">                    ed.setAttribute(&quot;ui.style&quot;, &quot;size: 2px;&quot;);</span>
+                }
+<span class="nc" id="L1052">            }</span>
+<span class="nc" id="L1053">        });</span>
+<span class="nc" id="L1054">    }</span>
+
+    /**
+     * Set the selected path
+     * @param num position of the path in the tour (start at 1)
+     */
+    private void setSelectedPath(int num) {
+        // complete list
+<span class="nc" id="L1062">        completePathList(num);</span>
+        try {
+<span class="nc" id="L1064">            stopPathThread();</span>
+<span class="nc" id="L1065">            pathThread = new PathThread(this, num);</span>
+<span class="nc" id="L1066">            pathThread.start();</span>
+<span class="nc" id="L1067">        } catch (Exception e) {</span>
+<span class="nc" id="L1068">            System.out.println(&quot;Error in setSelectedPath &quot; + e);</span>
+<span class="nc" id="L1069">        }</span>
+
+<span class="nc" id="L1071">    }</span>
+
+    /**
+     * Complete the path list
+     * @param num position of the path in the tour (start at 1)
+     */
+    private void completePathList(int num) {
+<span class="nc" id="L1078">        streetsList.getItems().clear();</span>
+<span class="nc" id="L1079">        Path p = tour.getPaths().get(num - 1);</span>
+<span class="nc bnc" id="L1080" title="All 2 branches missed.">        for (int i = p.getSegments().size() - 1; i &gt;= 0; i--) {</span>
+<span class="nc" id="L1081">            Segment s = p.getSegments().get(i);</span>
+<span class="nc bnc" id="L1082" title="All 4 branches missed.">            if (!this.streetsList.getItems().contains(s.getName()) &amp;&amp; (s.getName() != &quot;&quot;)) {</span>
+<span class="nc" id="L1083">                this.streetsList.getItems().add(s.getName());</span>
+            }
+        }
+<span class="nc" id="L1086">    }</span>
+
+    /**
+     * Load a planning request
+     * @throws IOException
+     */
+    private void chargerPlanningRequests() throws IOException {
+<span class="nc" id="L1093">        PlanningRequest pr = App.choseRequestFile(this.xmlReader);</span>
+<span class="nc bnc" id="L1094" title="All 2 branches missed.">        if (pr == null) {</span>
+<span class="nc" id="L1095">            showErrorAlert(&quot;Bad file&quot;, &quot;FORMAT ERRORS ON REQUEST FILE \nLoad another file&quot;);</span>
+<span class="nc" id="L1096">            return;</span>
+<span class="nc bnc" id="L1097" title="All 2 branches missed.">        } else if (pr.isEmpty()) {</span>
+<span class="nc" id="L1098">            showErrorAlert(&quot;Bad file&quot;, &quot;REQUEST FILE DO NOT MATCH WITH THE MAP \nLoad another file&quot;);</span>
+
+<span class="nc" id="L1100">            return;</span>
+        }
+
+<span class="nc bnc" id="L1103" title="All 2 branches missed.">        if (planningRequest != null) {</span>
+<span class="nc" id="L1104">            initUI();</span>
+
+<span class="nc" id="L1106">            ArrayList&lt;String&gt; spriteIds = new ArrayList&lt;String&gt;();</span>
+<span class="nc bnc" id="L1107" title="All 2 branches missed.">            for (Sprite s : this.sman.sprites()) {</span>
+<span class="nc" id="L1108">                spriteIds.add(s.getId());</span>
+<span class="nc" id="L1109">            }</span>
+<span class="nc bnc" id="L1110" title="All 2 branches missed.">            for (String id : spriteIds) {</span>
+<span class="nc" id="L1111">                sman.removeSprite(id);</span>
+<span class="nc" id="L1112">            }</span>
+        }
+
+<span class="nc" id="L1115">        this.planningRequest = pr;</span>
+
+        Text txt;
+<span class="nc" id="L1118">        Intersection depot = planningRequest.getDepot().getAddress();</span>
+<span class="nc" id="L1119">        Sprite depotSprite = sman.addSprite(depot.getId().toString());</span>
+<span class="nc" id="L1120">        depotSprite.setAttribute(&quot;ui.class&quot;, &quot;depotSprite&quot;);</span>
+<span class="nc" id="L1121">        depotSprite.setPosition(depot.getLongitude(), depot.getLatitude(), 0);</span>
+<span class="nc" id="L1122">        txt = new Text(&quot;Depot&quot;);</span>
+<span class="nc" id="L1123">        txt.setId(depotSprite.getId());</span>
+<span class="nc" id="L1124">        txt.setFill(Color.RED);</span>
+<span class="nc" id="L1125">        this.requestList.getItems().add(txt);</span>
+<span class="nc" id="L1126">        int cpt = 1;</span>
+<span class="nc bnc" id="L1127" title="All 2 branches missed.">        for (Request r : planningRequest.getRequests()) {</span>
+<span class="nc" id="L1128">            this.displayRequestWithAddToListView(r, cpt);</span>
+<span class="nc" id="L1129">            cpt++;</span>
+<span class="nc" id="L1130">        }</span>
+<span class="nc" id="L1131">    }</span>
+
+    /**
+     * Display a request on the map and add the request to the list view
+     * @param r request to display
+     * @param cpt position on the list view
+     */
+    private void displayRequestWithAddToListView(Request r, int cpt) {
+        Text txt;
+<span class="nc" id="L1140">        int[] rgb = randomColorSprite();</span>
+<span class="nc" id="L1141">        String color = &quot;fill-color: rgb(&quot; + rgb[0] + &quot;,&quot; + rgb[1] + &quot;,&quot; + rgb[2] + &quot;);&quot;;</span>
+<span class="nc" id="L1142">        Intersection pickupAddress = r.getPickupAddress();</span>
+<span class="nc" id="L1143">        Sprite pickupAddressSprite = sman.addSprite(pickupAddress.getId().toString());</span>
+<span class="nc" id="L1144">        pickupAddressSprite.setAttribute(&quot;ui.class&quot;, &quot;pickupSprite&quot;);</span>
+<span class="nc" id="L1145">        pickupAddressSprite.setAttribute(&quot;ui.style&quot;, color);</span>
+<span class="nc" id="L1146">        pickupAddressSprite.setPosition(pickupAddress.getLongitude(), pickupAddress.getLatitude(), 0);</span>
+<span class="nc" id="L1147">        txt = new Text(&quot;Pickup &quot; + cpt);</span>
+<span class="nc" id="L1148">        txt.setId(pickupAddressSprite.getId());</span>
+<span class="nc" id="L1149">        txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));</span>
+<span class="nc" id="L1150">        this.requestList.getItems().add(txt);</span>
+
+<span class="nc" id="L1152">        Intersection deliveryAdress = r.getDeliveryAddress();</span>
+<span class="nc" id="L1153">        Sprite deliveryAdressSprite = sman.addSprite(deliveryAdress.getId().toString());</span>
+<span class="nc" id="L1154">        deliveryAdressSprite.setAttribute(&quot;ui.class&quot;, &quot;deliverySprite&quot;);</span>
+<span class="nc" id="L1155">        deliveryAdressSprite.setAttribute(&quot;ui.style&quot;, color);</span>
+<span class="nc" id="L1156">        deliveryAdressSprite.setPosition(deliveryAdress.getLongitude(), deliveryAdress.getLatitude(), 0);</span>
+<span class="nc" id="L1157">        txt = new Text(&quot;Delivery &quot; + cpt);</span>
+<span class="nc" id="L1158">        txt.setId(deliveryAdressSprite.getId());</span>
+<span class="nc" id="L1159">        txt.setFill(Color.rgb(rgb[0], rgb[1], rgb[2]));</span>
+<span class="nc" id="L1160">        this.requestList.getItems().add(txt);</span>
+<span class="nc" id="L1161">    }</span>
+
+    /**
+     * Reset the appearance of the edge
+     * @param edgeId
+     */
+    private void resetEdge(String edgeId) {
+<span class="nc" id="L1168">        graph.getEdge(edgeId).setAttribute(&quot;ui.class&quot;, &quot;default&quot;);</span>
+<span class="nc" id="L1169">    }</span>
+
+    /**
+     * Set sprite appearance as a selected sprite
+     * @param spriteId
+     */
+    private void setBigSprite(String spriteId) {
+<span class="nc bnc" id="L1176" title="All 2 branches missed.">        for (Sprite s : sman.sprites()) {</span>
+<span class="nc bnc" id="L1177" title="All 2 branches missed.">            if (((String) s.getAttribute(&quot;ui.class&quot;)).contains(&quot;Selected&quot;)) {</span>
+<span class="nc" id="L1178">                s.setAttribute(&quot;ui.class&quot;, ((String) s.getAttribute(&quot;ui.class&quot;)).replace(&quot;Selected&quot;, &quot;&quot;));</span>
+            }
+<span class="nc" id="L1180">        }</span>
+<span class="nc" id="L1181">        Sprite sprite = sman.getSprite(spriteId);</span>
+<span class="nc" id="L1182">        sprite.setAttribute(&quot;ui.class&quot;, ((String) sprite.getAttribute(&quot;ui.class&quot;)) + &quot;Selected&quot;);</span>
+<span class="nc" id="L1183">    }</span>
+
+    /**
+     * Show an error alert
+     * @param title title of the error
+     * @param content content of the error
+     */
+    private void showErrorAlert(String title, String content) {
+<span class="nc" id="L1191">        Alert alert = new Alert(AlertType.ERROR);</span>
+<span class="nc" id="L1192">        alert.setHeaderText(null);</span>
+<span class="nc" id="L1193">        alert.setTitle(title);</span>
+<span class="nc" id="L1194">        alert.setContentText(content);</span>
+
+<span class="nc" id="L1196">        alert.showAndWait();</span>
+<span class="nc" id="L1197">    }</span>
+
+    /**
+     * Currently adding a request, all button aren't visible and the list view is not selectable
+     */
+    private void addRequestMode() {
+<span class="nc" id="L1203">        this.loadCityMapButton.setVisible(false);</span>
+<span class="nc" id="L1204">        this.loadRequestButton.setVisible(false);</span>
+<span class="nc" id="L1205">        this.computeTourButton.setVisible(false);</span>
+<span class="nc" id="L1206">        this.addRequestButton.setVisible(false);</span>
+<span class="nc" id="L1207">        this.deleteRequestButton.setVisible(false);</span>
+<span class="nc" id="L1208">        this.requestList.setMouseTransparent(true);</span>
+<span class="nc" id="L1209">        this.requestList.setFocusTraversable(false);</span>
+<span class="nc" id="L1210">        this.swapRequestButton.setVisible(false);</span>
+
+<span class="nc" id="L1212">    }</span>
+
+    /**
+     * Default appearence mode of the application
+     */
+    private void defaultMode() {
+<span class="nc" id="L1218">        this.loadCityMapButton.setVisible(true);</span>
+<span class="nc" id="L1219">        this.loadRequestButton.setVisible(true);</span>
+<span class="nc" id="L1220">        this.computeTourButton.setVisible(true);</span>
+<span class="nc" id="L1221">        this.addRequestButton.setVisible(true);</span>
+<span class="nc" id="L1222">        this.requestList.setMouseTransparent(false);</span>
+<span class="nc" id="L1223">        this.requestList.setFocusTraversable(true);</span>
+<span class="nc" id="L1224">        this.swapRequestButton.setVisible(true);</span>
+<span class="nc" id="L1225">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

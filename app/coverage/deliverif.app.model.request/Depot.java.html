@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Depot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.request</a> &gt; <span class="el_source">Depot.java</span></div><h1>Depot.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.request;
+
+import deliverif.app.model.map.Intersection;
+import java.util.Date;
+
+/**
+ * Represents the deposit point on the map
+ * @author zakaria
+ */
+public class Depot {
+    /**
+     * The intersection point where the deposit is placed
+     */
+    private Intersection address;
+    /**
+     * The time at which we should start the tour from the deposit
+     */
+    private Date departureTime;
+
+    /**
+     * Create an empty depot
+     */
+<span class="nc" id="L28">    public Depot() {</span>
+<span class="nc" id="L29">    }</span>
+
+    /**
+     * Create a new depot
+     *
+     * @param address address of the depot represented by an intersection
+     * @param departureTime departure time from the depot
+     */
+<span class="fc" id="L37">    public Depot(Intersection address, Date departureTime) {</span>
+<span class="fc" id="L38">        this.address = address;</span>
+<span class="fc" id="L39">        this.departureTime = departureTime;</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Get depot address
+     *
+     * @return depot address as an intersection
+     */
+    public Intersection getAddress() {
+<span class="fc" id="L48">        return address;</span>
+    }
+
+    /**
+     * Get depot departure time
+     *
+     * @return depot depoarture time as a date object
+     */
+    public Date getDepartureTime() {
+<span class="fc" id="L57">        return departureTime;</span>
+    }
+
+    /**
+     * Set depot address
+     *
+     * @param address depot address as an intersection
+     */
+    public void setAddress(Intersection address) {
+<span class="nc" id="L66">        this.address = address;</span>
+<span class="nc" id="L67">    }</span>
+
+    /**
+     * Set depot departure time
+     *
+     * @param departureTime depot departure time as a date object
+     */
+    public void setDepartureTime(Date departureTime) {
+<span class="nc" id="L75">        this.departureTime = departureTime;</span>
+<span class="nc" id="L76">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L80">        return &quot;Depot{&quot; + &quot;address=&quot; + address + &quot;, departureTime=&quot; + departureTime + '}';</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

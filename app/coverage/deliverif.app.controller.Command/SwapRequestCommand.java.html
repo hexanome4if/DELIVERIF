@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwapRequestCommand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.Command</a> &gt; <span class="el_source">SwapRequestCommand.java</span></div><h1>SwapRequestCommand.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.Command;
+
+import deliverif.app.controller.GraphProcessor;
+import deliverif.app.controller.MenuPageController;
+import deliverif.app.model.graph.Tour;
+import deliverif.app.model.request.Request;
+import java.util.List;
+
+/**
+ * Command to swap two points in the current tour
+ * @author zakaria
+ */
+public class SwapRequestCommand implements Command {
+    /**
+     * Current graph processor controller
+     */
+    private final GraphProcessor gp;
+    /**
+     * The tour before the command has been executed
+     */
+    private final Tour oldTour;
+    /**
+     * The current tour rendered by the view
+     */
+    private final Tour tour;
+    /**
+     * The new order of points on the tour
+     */
+    private final List&lt;Long&gt; newOrder;
+
+    /**
+     * Create a swap request
+     * @param gp the graph processor
+     * @param t the tour to update
+     * @param newOrder the new request order
+     */
+<span class="nc" id="L42">    public SwapRequestCommand(GraphProcessor gp, Tour t, List&lt;Long&gt; newOrder) {</span>
+<span class="nc" id="L43">        this.gp = gp;</span>
+<span class="nc" id="L44">        tour = t;</span>
+<span class="nc" id="L45">        oldTour = new Tour(t);</span>
+<span class="nc" id="L46">        this.newOrder = newOrder;</span>
+<span class="nc" id="L47">    }</span>
+
+    @Override
+    public void doCommand() {  
+<span class="nc" id="L51">        tour.copyTour(gp.changeOrder(tour, newOrder));</span>
+<span class="nc" id="L52">        tour.notifiyObservers(null);</span>
+<span class="nc" id="L53">    }</span>
+
+    @Override
+    public void undoCommand() {
+<span class="nc" id="L57">        tour.copyTour(oldTour);</span>
+<span class="nc" id="L58">        tour.notifiyObservers(null);</span>
+<span class="nc" id="L59">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

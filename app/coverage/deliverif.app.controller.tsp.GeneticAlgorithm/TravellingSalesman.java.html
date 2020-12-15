@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TravellingSalesman.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.tsp.GeneticAlgorithm</a> &gt; <span class="el_source">TravellingSalesman.java</span></div><h1>TravellingSalesman.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.tsp.GeneticAlgorithm;
+
+import deliverif.app.model.graph.Edge;
+import deliverif.app.model.graph.Graph;
+import deliverif.app.model.graph.Vertex;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+
+/**
+ *
+ * @author zakaria
+ * Adapted from the implementation provided by Darinka Zobenica:
+ * https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
+
+ */
+public class TravellingSalesman {
+
+    private int generationSize;
+    private int genomeSize;
+    private int reproductionSize;
+    private int maxIterations;
+    private float mutationRate;
+    private HashMap&lt;String, Float&gt; costs;
+    private Vertex start;
+    private float targetFitness;
+    private int tournamentSize;
+    private SelectionType selectionType;
+    private List&lt;Long&gt; ordre;
+
+<span class="nc" id="L38">    public enum SelectionType {</span>
+<span class="nc" id="L39">        TOURNAMENT,</span>
+<span class="nc" id="L40">        ROULETTE</span>
+    }
+
+<span class="nc" id="L43">    public TravellingSalesman(SelectionType selectionType, Graph g, Vertex start, List&lt;Long&gt; ordre, int maxIterations) {</span>
+<span class="nc" id="L44">        this.selectionType = selectionType;</span>
+<span class="nc" id="L45">        this.ordre = ordre;</span>
+<span class="nc" id="L46">        this.costs = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L47">        onInit(g, start);</span>
+<span class="nc" id="L48">        this.start = start;</span>
+<span class="nc" id="L49">        this.targetFitness = targetFitness;</span>
+<span class="nc" id="L50">        this.genomeSize = start.getAdj().size();</span>
+
+<span class="nc" id="L52">        generationSize = 1000;</span>
+<span class="nc" id="L53">        reproductionSize = 750;</span>
+<span class="nc" id="L54">        this.maxIterations = maxIterations;</span>
+<span class="nc" id="L55">        mutationRate = 0.1f;</span>
+<span class="nc" id="L56">        tournamentSize = 40;</span>
+<span class="nc" id="L57">    }</span>
+    /**
+     * A method to call on initialisation to fill the cost map.
+     * @param g the complete graph from previous processing (see GraphProcessor)
+     * @param start the starting point, usually the warehouse
+     */
+    protected void onInit(Graph g, Vertex start) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        for (Vertex v : g.getVertexMap().values()) {</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            for (Edge e : v.getAdj()) {</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">                if (e.dest.getId() == start.getId()) {</span>
+<span class="nc" id="L67">                    System.out.println(&quot;Add: &quot; + v.getId() + &quot;-&quot; + &quot;0&quot;);</span>
+<span class="nc" id="L68">                    costs.put(v.getId() + &quot;-&quot; + e.dest.getId(), e.cost);</span>
+                } else {
+<span class="nc" id="L70">                    System.out.println(&quot;Add: &quot; + v.getId() + &quot;-&quot; + e.dest.getId());</span>
+<span class="nc" id="L71">                    costs.put(v.getId() + &quot;-&quot; + e.dest.getId(), e.cost);</span>
+                }
+<span class="nc" id="L73">            }</span>
+<span class="nc" id="L74">        }</span>
+<span class="nc" id="L75">    }</span>
+    /**
+     * Generates a first solution candidate
+     * @return the random population to start the algorithm with
+     */
+    public List&lt;SalesmanGenome&gt; initialPopulation() {
+<span class="nc" id="L81">        List&lt;SalesmanGenome&gt; population = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        for (int i = 0; i &lt; generationSize; i++) {</span>
+<span class="nc" id="L83">            population.add(new SalesmanGenome(costs, start, ordre));</span>
+        }
+<span class="nc" id="L85">        return population;</span>
+    }
+    
+    /**
+     * Select reproductionSize genomes based on the method predefined in the selectionType attribute
+     * @param population a list of genomes
+     * @return a list of selected genomes
+     */
+    public List&lt;SalesmanGenome&gt; selection(List&lt;SalesmanGenome&gt; population) {
+<span class="nc" id="L94">        List&lt;SalesmanGenome&gt; selected = new ArrayList&lt;&gt;();</span>
+        SalesmanGenome winner;
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        for (int i = 0; i &lt; reproductionSize; i++) {</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            if (selectionType == SelectionType.ROULETTE) {</span>
+<span class="nc" id="L98">                selected.add(rouletteSelection(population));</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">            } else if (selectionType == SelectionType.TOURNAMENT) {</span>
+<span class="nc" id="L100">                selected.add(tournamentSelection(population));</span>
+            }
+        }
+
+<span class="nc" id="L104">        return selected;</span>
+    }
+
+    /**
+     * Implements the roulette selection approach
+     * @param population a generation of genomes
+     * @return 
+     */
+    public SalesmanGenome rouletteSelection(List&lt;SalesmanGenome&gt; population) {
+<span class="nc" id="L113">        float totalFitness = 0;</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        for (SalesmanGenome gen : population) {</span>
+<span class="nc" id="L115">            totalFitness += gen.getFitness();</span>
+<span class="nc" id="L116">        }</span>
+
+        // We pick a random value - a point on our roulette wheel
+<span class="nc" id="L119">        Random random = new Random();</span>
+<span class="nc" id="L120">        int selectedValue = random.nextInt((int) totalFitness);</span>
+
+        // Because we're doing minimization, we need to use reciprocal
+        // value so the probability of selecting a genome would be
+        // inversely proportional to its fitness - the smaller the fitness
+        // the higher the probability
+<span class="nc" id="L126">        float recValue = (float) 1 / selectedValue;</span>
+
+        // We add up values until we reach out recValue, and we pick the
+        // genome that crossed the threshold
+<span class="nc" id="L130">        float currentSum = 0;</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        for (SalesmanGenome genome : population) {</span>
+<span class="nc" id="L132">            currentSum += (float) 1 / genome.getFitness();</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (currentSum &gt;= recValue) {</span>
+<span class="nc" id="L134">                return genome;</span>
+            }
+<span class="nc" id="L136">        }</span>
+
+        // In case the return didn't happen in the loop above, we just
+        // select at random
+<span class="nc" id="L140">        int selectRandom = random.nextInt(generationSize);</span>
+<span class="nc" id="L141">        return population.get(selectRandom);</span>
+    }
+    /**
+     * A helper function to pick n random elements from the population
+     * so we could enter them into a tournament
+     * @param &lt;E&gt; Generic output type
+     * @param list list of generic type
+     * @param n number of elements in list
+     * @return a list of randomly picked elements
+     */
+    public static &lt;E&gt; List&lt;E&gt; pickNRandomElements(List&lt;E&gt; list, int n) {
+<span class="nc" id="L152">        Random r = new Random();</span>
+<span class="nc" id="L153">        int length = list.size();</span>
+
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (length &lt; n) {</span>
+<span class="nc" id="L156">            return null;</span>
+        }
+
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        for (int i = length - 1; i &gt;= length - n; --i) {</span>
+<span class="nc" id="L160">            Collections.swap(list, i, r.nextInt(i + 1));</span>
+        }
+<span class="nc" id="L162">        return list.subList(length - n, length);</span>
+    }
+
+    
+    /**
+     * A simple implementation of the deterministic tournament - the best genome
+     * always wins
+     * @param population a generation of genomes
+     * @return a genome instance (candidate solution)
+     */
+    public SalesmanGenome tournamentSelection(List&lt;SalesmanGenome&gt; population) {
+<span class="nc" id="L173">        List&lt;SalesmanGenome&gt; selected = pickNRandomElements(population, tournamentSize);</span>
+<span class="nc" id="L174">        return Collections.min(selected);</span>
+    }
+
+    /**
+     * The technique used is called Partially Mapped Crossover (PMX)
+     * PMX randomly picks one crossover point, but unlike one-point crossover,
+     *  it doesn't just swap elements from two parents, but instead swaps the elements within them. 
+     * @param parents a list of genomes to participate in reproduction
+     * @return list of genomes after crossover
+     */
+    public List&lt;SalesmanGenome&gt; crossover(List&lt;SalesmanGenome&gt; parents) {
+        // Housekeeping
+<span class="nc" id="L186">        Random random = new Random();</span>
+<span class="nc" id="L187">        int breakpoint = random.nextInt(genomeSize);</span>
+<span class="nc" id="L188">        List&lt;SalesmanGenome&gt; children = new ArrayList&lt;&gt;();</span>
+
+        // Copy parental genomes - we copy so we wouldn't modify in case they were
+        // chosen to participate in crossover multiple times
+<span class="nc" id="L192">        List&lt;Vertex&gt; parent1Genome = new ArrayList&lt;&gt;(parents.get(0).getGenome());</span>
+<span class="nc" id="L193">        List&lt;Vertex&gt; parent2Genome = new ArrayList&lt;&gt;(parents.get(1).getGenome());</span>
+
+        // Creating child 1
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        for (int i = 0; i &lt; breakpoint; i++) {</span>
+            Vertex newVal;
+<span class="nc" id="L198">            newVal = parent2Genome.get(i);</span>
+<span class="nc" id="L199">            Collections.swap(parent1Genome, parent1Genome.indexOf(newVal), i);</span>
+        }
+<span class="nc" id="L201">        children.add(new SalesmanGenome(parent1Genome, costs, start, ordre));</span>
+<span class="nc" id="L202">        parent1Genome = parents.get(0).getGenome(); // Reseting the edited parent</span>
+
+        // Creating child 2
+<span class="nc bnc" id="L205" title="All 2 branches missed.">        for (int i = breakpoint; i &lt; genomeSize; i++) {</span>
+<span class="nc" id="L206">            Vertex newVal = parent1Genome.get(i);</span>
+<span class="nc" id="L207">            Collections.swap(parent2Genome, parent2Genome.indexOf(newVal), i);</span>
+        }
+<span class="nc" id="L209">        children.add(new SalesmanGenome(parent2Genome, costs, start, ordre));</span>
+
+<span class="nc" id="L211">        return children;</span>
+    }
+
+    /**
+     * If we pass a probability check we mutate by swapping two cities in the genome. 
+     * Otherwise, we just return the original genome
+     * @param salesman a genome to mutate
+     * @return either the original genome or after swapping
+     */
+    public SalesmanGenome mutate(SalesmanGenome salesman) {
+<span class="nc" id="L221">        Random random = new Random();</span>
+<span class="nc" id="L222">        float mutate = random.nextFloat();</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (mutate &lt; mutationRate) {</span>
+<span class="nc" id="L224">            List&lt;Vertex&gt; genome = salesman.getGenome();</span>
+<span class="nc" id="L225">            Collections.swap(genome, random.nextInt(genomeSize), random.nextInt(genomeSize));</span>
+<span class="nc" id="L226">            return new SalesmanGenome(genome, costs, start, ordre);</span>
+        }
+<span class="nc" id="L228">        return salesman;</span>
+    }
+
+    /**
+     * This is generational algorithm, so we make an entirely new population of children
+     * @param population a generation of genomes
+     * @return a new population of children
+     */
+    public List&lt;SalesmanGenome&gt; createGeneration(List&lt;SalesmanGenome&gt; population) {
+<span class="nc" id="L237">        List&lt;SalesmanGenome&gt; generation = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L238">        int currentGenerationSize = 0;</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        while (currentGenerationSize &lt; generationSize) {</span>
+<span class="nc" id="L240">            List&lt;SalesmanGenome&gt; parents = pickNRandomElements(population, 2);</span>
+<span class="nc" id="L241">            List&lt;SalesmanGenome&gt; children = crossover(parents);</span>
+<span class="nc" id="L242">            children.set(0, mutate(children.get(0)));</span>
+<span class="nc" id="L243">            children.set(1, mutate(children.get(1)));</span>
+<span class="nc" id="L244">            generation.addAll(children);</span>
+<span class="nc" id="L245">            currentGenerationSize += 2;</span>
+<span class="nc" id="L246">        }</span>
+<span class="nc" id="L247">        return generation;</span>
+    }
+
+    /**
+     * This method orchestrates the computations and  terminates if 
+     * the number of generations has reached maxIterations
+     * @return the best solution found by the algorithm
+     */
+    public SalesmanGenome optimise() {
+<span class="nc" id="L256">        List&lt;SalesmanGenome&gt; population = initialPopulation();</span>
+<span class="nc" id="L257">        SalesmanGenome globalBestGenome = population.get(0);</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        for (int i = 0; i &lt; maxIterations; i++) {</span>
+<span class="nc" id="L259">            List&lt;SalesmanGenome&gt; selected = selection(population);</span>
+<span class="nc" id="L260">            population = createGeneration(selected);</span>
+<span class="nc" id="L261">            SalesmanGenome popBest = Collections.min(population);</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">            if (popBest.getFitness() &lt; globalBestGenome.getFitness()) {</span>
+<span class="nc" id="L263">                globalBestGenome = popBest;</span>
+            }
+        }
+<span class="nc" id="L266">        globalBestGenome.getGenome().add(0, start);</span>
+<span class="nc" id="L267">        return globalBestGenome;</span>
+    }
+
+    public void printGeneration(List&lt;SalesmanGenome&gt; generation) {
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        for (SalesmanGenome genome : generation) {</span>
+<span class="nc" id="L272">            System.out.println(genome);</span>
+<span class="nc" id="L273">        }</span>
+<span class="nc" id="L274">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

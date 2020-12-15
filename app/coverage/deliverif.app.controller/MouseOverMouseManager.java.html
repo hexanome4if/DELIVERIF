@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MouseOverMouseManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller</a> &gt; <span class="el_source">MouseOverMouseManager.java</span></div><h1>MouseOverMouseManager.java</h1><pre class="source lang-java linenums">package deliverif.app.controller;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
+import org.graphstream.graph.Edge;
+import org.graphstream.ui.fx_viewer.util.FxMouseManager;
+import org.graphstream.ui.geom.Point3;
+import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
+import org.graphstream.ui.graphicGraph.GraphicNode;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.util.InteractiveElement;
+
+
+/**
+ * Custom MouseManager to manage mouse events on the map.
+ */ 
+public class MouseOverMouseManager extends FxMouseManager {
+    
+    /**
+     * Controller of the scene.
+     */
+    private final MenuPageController menuPageController;
+    
+    /**
+     * Constructor.
+     * @param of Set of element types that can respond to mouse events (Node or/and Edge or/and Sprite)
+     * @param mpc Controller of the scene
+     */
+    public MouseOverMouseManager(EnumSet&lt;InteractiveElement&gt; of, MenuPageController mpc) {
+<span class="nc" id="L34">        super(of);</span>
+<span class="nc" id="L35">        this.menuPageController = mpc;</span>
+<span class="nc" id="L36">    }</span>
+    
+    /**
+     * Initialize the mouse manager, add the listeners to the view. 
+     * @param gg Graph
+     * @param view View of the graph
+     */
+    @Override
+    public void init(GraphicGraph gg, View view) {
+<span class="nc" id="L45">        super.init(gg, view);</span>
+<span class="nc" id="L46">        super.release();</span>
+<span class="nc" id="L47">        view.addListener(MouseEvent.MOUSE_PRESSED, mousePressed);</span>
+<span class="nc" id="L48">    }</span>
+
+    /**
+     * Does nothing but overrides the inherited method to
+     * keep the nodes from moving.
+     * @param element GraphicElement moving with the mouse
+     * @param event MouseEvent 
+     */
+    @Override
+    protected void elementMoving(GraphicElement element, MouseEvent event) {
+<span class="nc" id="L58">    }</span>
+    
+    /**
+     * Called when an element is pressed on.
+     * Update selection by calling the menuPageController method &quot;updateSelection&quot;.
+     * @param element GraphicElement Element that was clicked.
+     * @param event MouseEvent
+     */
+    @Override
+    protected void mouseButtonPressOnElement(GraphicElement element,
+            MouseEvent event) {
+<span class="nc" id="L69">        view.freezeElement(element, true);</span>
+<span class="nc" id="L70">        this.menuPageController.updateSelection(element);</span>
+<span class="nc" id="L71">    }</span>
+
+    /**
+     * Handle a press on the mouse.
+     * Update curElement with the element clicked if there is one
+     */
+<span class="nc" id="L77">    private final EventHandler&lt;MouseEvent&gt; mousePressed = (MouseEvent e) -&gt; {</span>
+<span class="nc" id="L78">        curElement = view.findGraphicElementAt(getManagedTypes(), e.getX(), e.getY());</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (curElement != null) {</span>
+<span class="nc" id="L80">            mouseButtonPressOnElement(curElement, e);</span>
+        } else {
+            // Edge click
+<span class="nc" id="L83">            Edge edge = selectEdge(e.getX(), e.getY());</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (edge != null) {</span>
+<span class="nc" id="L85">                curElement = (GraphicElement) edge;</span>
+<span class="nc" id="L86">                mouseButtonPressOnElement(curElement, e);</span>
+            } else {
+<span class="nc" id="L88">                x1 = e.getX();</span>
+<span class="nc" id="L89">                y1 = e.getY();</span>
+<span class="nc" id="L90">                mouseButtonPress(e);</span>
+<span class="nc" id="L91">                view.beginSelectionAt(x1, y1);</span>
+            }   
+        }
+<span class="nc" id="L94">    };</span>
+    
+    /**
+     * Finds and returns the edge on the position (px,py). 
+     * @param px x position on screen
+     * @param py y position screen
+     * @return The Edge on the position (px,py) or null if there is not.
+     */
+    private Edge selectEdge(double px, double py) {
+<span class="nc" id="L103">        double ld = 5; // Max distance mouse click can be from line to be a click</span>
+<span class="nc" id="L104">        Edge se = null; // Current closest edge to mouse click that is withing max distance</span>
+<span class="nc" id="L105">        GraphicGraph gg = graph;</span>
+<span class="nc" id="L106">        List&lt;Edge&gt; list = graph.edges().collect(Collectors.toList());</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        for (Edge ge : list) {</span>
+            // Nodes of current edge
+<span class="nc" id="L109">            GraphicNode gn0 = (GraphicNode) ge.getNode0();</span>
+<span class="nc" id="L110">            GraphicNode gn1 = (GraphicNode) ge.getNode1();</span>
+            // Coordinates of node 0 and node 1
+<span class="nc" id="L112">            Point3 gn0p = view.getCamera().transformGuToPx(gn0.getX(), gn0.getY(), gn0.getZ());</span>
+<span class="nc" id="L113">            Point3 gn1p = view.getCamera().transformGuToPx(gn1.getX(), gn1.getY(), gn1.getZ());</span>
+            // Values for equation of the line
+<span class="nc" id="L115">            double m = (gn1p.y - gn0p.y) / (gn1p.x - gn0p.x); // slope</span>
+<span class="nc" id="L116">            double b = gn1p.y - m * gn1p.x; // y intercept</span>
+            // Distance of mouse click from the line
+<span class="nc" id="L118">            double d = Math.abs(m * px - py + b) / Math.sqrt(Math.pow(m, 2) + 1);</span>
+
+            //System.out.println(&quot;Mouse Point: &quot; + px + &quot;,&quot; + py + &quot;, GN0Point: &quot; + gn0p.toString() + &quot;, GN1Point: &quot; + gn1p.toString() + &quot;. Distance: &quot; + d);
+            // Determine lowest x (lnx), hishest x (hnx), lowest y (lny), highest y (hny)
+<span class="nc" id="L122">            double lnx = gn0p.x;</span>
+<span class="nc" id="L123">            double lny = gn0p.y;</span>
+<span class="nc" id="L124">            double hnx = gn1p.x;</span>
+<span class="nc" id="L125">            double hny = gn1p.y;</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (hnx &lt; lnx) {</span>
+<span class="nc" id="L127">                lnx = gn1p.x;</span>
+<span class="nc" id="L128">                hnx = gn0p.x;</span>
+            }
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if (hny &lt; lny) {</span>
+<span class="nc" id="L131">                lny = gn1p.y;</span>
+<span class="nc" id="L132">                hny = gn0p.y;</span>
+            }
+            // Determine if click is close enough to line (d &lt; ld), and click is within edge bounds (lnx &lt;= px &amp;&amp; lny &lt;= py &amp;&amp; hnx &gt;= px &amp;&amp; hny &gt;= py)
+<span class="nc bnc" id="L135" title="All 10 branches missed.">            if (d &lt; ld &amp;&amp; lnx &lt;= px &amp;&amp; lny &lt;= py &amp;&amp; hnx &gt;= px &amp;&amp; hny &gt;= py) {</span>
+<span class="nc" id="L136">                se = ge; // store edge</span>
+<span class="nc" id="L137">                ld = d; // update max distance to get the closest edge to the mouse click</span>
+            }
+<span class="nc" id="L139">        }</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (se != null) {</span>
+<span class="nc" id="L141">            return graph.getEdge(se.getId());</span>
+        }
+<span class="nc" id="L143">        return null;</span>
+    }
+    
+    /**
+     * Remove the listener from the view.
+     */
+    @Override
+    public void release() {
+<span class="nc" id="L151">        view.removeListener(MouseEvent.MOUSE_PRESSED, mousePressed);</span>
+<span class="nc" id="L152">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

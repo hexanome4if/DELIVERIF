@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SelectSpriteCommand.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.Command</a> &gt; <span class="el_source">SelectSpriteCommand.java</span></div><h1>SelectSpriteCommand.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.Command;
+
+import deliverif.app.controller.State.SwapRequestState;
+
+/**
+ * Command to select a sprite on the map
+ * @author zakaria
+ */
+public class SelectSpriteCommand implements Command {
+    /**
+     * The current state which must be a SwapRequestState
+     */
+    private final SwapRequestState srs;
+    /**
+     * Whether the selected node is the first or the second
+     */
+    private final boolean isFirst;
+    /**
+     * The selected node id
+     */
+    private final String id;
+
+    /**
+     * Create a select node command
+     *
+     * @param srs the current state
+     * @param isFirst is the selected node first or second
+     * @param id the selected node id
+     */
+<span class="nc" id="L35">    public SelectSpriteCommand(SwapRequestState srs, boolean isFirst, String id) {</span>
+<span class="nc" id="L36">        this.srs = srs;</span>
+<span class="nc" id="L37">        this.isFirst = isFirst;</span>
+<span class="nc" id="L38">        this.id = id;</span>
+<span class="nc" id="L39">    }</span>
+
+    @Override
+    public void doCommand() {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (isFirst) {</span>
+<span class="nc" id="L44">            srs.setFirstId(id);</span>
+        } else {
+<span class="nc" id="L46">            srs.setSecondId(id);</span>
+        }
+<span class="nc" id="L48">    }</span>
+
+    @Override
+    public void undoCommand() {
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (isFirst) {</span>
+<span class="nc" id="L53">            srs.setFirstId(null);</span>
+        } else {
+<span class="nc" id="L55">            srs.setSecondId(null);</span>
+        }
+<span class="nc" id="L57">    }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

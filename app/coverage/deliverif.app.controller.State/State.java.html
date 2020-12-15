@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>State.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.State</a> &gt; <span class="el_source">State.java</span></div><h1>State.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.State;
+
+import deliverif.app.controller.MenuPageController;
+import java.io.IOException;
+
+/**
+ * State abstract class which defines the different user actions
+ * @author zakaria
+ */
+public abstract class State {
+
+    /**
+     * Current view controller
+     */
+    protected MenuPageController mpc;
+
+    /**
+     * Create a new state
+     *
+     * @param mpc the main view controller
+     */
+<span class="nc" id="L27">    public State(MenuPageController mpc) {</span>
+<span class="nc" id="L28">        this.mpc = mpc;</span>
+<span class="nc" id="L29">    }</span>
+
+    /**
+     * Try to load a map if possible
+     *
+     * @throws IOException when an error occured with the selected file
+     */
+    public void loadMap() throws IOException {
+<span class="nc" id="L37">    }</span>
+
+    /**
+     * Try to load a request if possible
+     *
+     * @throws IOException when an error occured with the selected file
+     */
+    public void loadRequest() throws IOException {
+<span class="nc" id="L45">    }</span>
+
+    /**
+     * Try to compute a tour if possible
+     */
+    public void computeTour() {
+<span class="nc" id="L51">    }</span>
+
+    /**
+     * Try to undo the last command if possible
+     */
+    public void undo() {
+<span class="nc" id="L57">    }</span>
+
+    /**
+     * Try to redo the last command if possible
+     */
+    public void redo() {
+<span class="nc" id="L63">    }</span>
+
+    /**
+     * Try to add a request to the current tour if possible
+     */
+    public void addRequest() {
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Try to remove a request from the current tour if possible
+     */
+    public void removeRequest() {
+<span class="nc" id="L75">    }</span>
+    
+    /**
+     * Try to swap a request from the current tour if possible
+     */
+    public void swapRequest() {
+<span class="nc" id="L81">    }</span>
+
+    /**
+     * Start adding a request to the current tour if possible
+     */
+    public void startAddRequest() {
+<span class="nc" id="L87">    }</span>
+    
+    /**
+     * Start swapping a request
+     */
+    public void startSwapRequest() {
+<span class="nc" id="L93">    }</span>
+
+    /**
+     * Select a node
+     *
+     * @param nodeId the node id to select
+     */
+    public void selectNode(String nodeId) {
+<span class="nc" id="L101">        mpc.setSelectedSprite(nodeId);</span>
+<span class="nc" id="L102">    }</span>
+    
+    /**
+     * Select a sprite
+     * @param spriteId the sprite id to select
+     */
+<span class="nc" id="L108">    public void selectSprite(String spriteId) {}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

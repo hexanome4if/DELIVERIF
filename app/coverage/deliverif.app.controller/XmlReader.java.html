@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XmlReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller</a> &gt; <span class="el_source">XmlReader.java</span></div><h1>XmlReader.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller;
+
+
+import deliverif.app.model.map.*;
+import deliverif.app.model.request.*;
+
+import java.io.File;
+import javax.xml.parsers.DocumentBuilderFactory;  
+import javax.xml.parsers.DocumentBuilder;  
+import org.w3c.dom.Document;  
+import org.w3c.dom.NodeList;  
+import org.w3c.dom.Node;  
+import org.w3c.dom.Element;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.text.SimpleDateFormat;  
+import java.util.Date;  
+
+/**
+ *
+ * @author zakaria
+ */
+public class XmlReader {
+    
+    private Map map;
+    
+    /**
+     * XmlReader constructor
+     */
+<span class="fc" id="L36">    public XmlReader(){</span>
+<span class="fc" id="L37">        this.map = null;</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * Getter
+     * @return Map
+     */
+    public Map getMap() {
+<span class="fc" id="L45">        return map;</span>
+    }
+    
+    /**
+     * Read a xml file to create a instance of the Map class
+     * @param filename path of a xml file
+     * @return boolean
+     */
+    public boolean readMap(String filename){
+
+<span class="fc" id="L55">        List&lt;Segment&gt; segments = new ArrayList&lt;&gt;(); </span>
+<span class="fc" id="L56">        HashMap&lt;Long, Intersection&gt; intersections = new HashMap&lt;&gt;();</span>
+       
+        try {  
+            //creating a constructor of file class and parsing an XML file  
+<span class="fc" id="L60">            File file = new File(filename);</span>
+
+            //an instance of factory that gives a document builder  
+<span class="fc" id="L63">            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  </span>
+
+            //an instance of builder to parse the specified xml file  
+<span class="fc" id="L66">            DocumentBuilder db = dbf.newDocumentBuilder();  </span>
+
+<span class="fc" id="L68">            Document doc = db.parse(file);  </span>
+<span class="fc" id="L69">            doc.getDocumentElement().normalize();  </span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">            if(!doc.getDocumentElement().getNodeName().equals(&quot;map&quot;)) return false;</span>
+            
+<span class="fc" id="L72">            NodeList nodeList = doc.getElementsByTagName(&quot;intersection&quot;);</span>
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            for (int itr = 0; itr &lt; nodeList.getLength(); itr++) { </span>
+
+<span class="fc" id="L76">                Node node = nodeList.item(itr);  </span>
+
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                if (node.getNodeType() == Node.ELEMENT_NODE){  </span>
+<span class="fc" id="L79">                    Element eElement = (Element) node;  </span>
+<span class="fc" id="L80">                    Long id = Long.parseLong(eElement.getAttribute(&quot;id&quot;));</span>
+<span class="fc" id="L81">                    float lat = Float.parseFloat(eElement.getAttribute(&quot;latitude&quot;));</span>
+<span class="fc" id="L82">                    float lon = Float.parseFloat(eElement.getAttribute(&quot;longitude&quot;));</span>
+
+<span class="fc" id="L84">                    Intersection inter = new Intersection(id, lat, lon);</span>
+<span class="fc" id="L85">                    intersections.put(id, inter);</span>
+                }
+            }
+
+<span class="fc" id="L89">            nodeList = doc.getElementsByTagName(&quot;segment&quot;);</span>
+
+<span class="fc bfc" id="L91" title="All 2 branches covered.">            for (int itr = 0; itr &lt; nodeList.getLength(); itr++) { </span>
+
+<span class="fc" id="L93">                Node node = nodeList.item(itr);  </span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">                if (node.getNodeType() == Node.ELEMENT_NODE){  </span>
+
+<span class="fc" id="L96">                    Element eElement = (Element) node;</span>
+<span class="fc" id="L97">                    Long origin = Long.parseLong(eElement.getAttribute(&quot;origin&quot;));  </span>
+<span class="fc" id="L98">                    Long dest = Long.parseLong(eElement.getAttribute(&quot;destination&quot;));</span>
+<span class="fc" id="L99">                    float len = Float.parseFloat(eElement.getAttribute(&quot;length&quot;));</span>
+<span class="fc" id="L100">                    String name = eElement.getAttribute(&quot;name&quot;);</span>
+
+<span class="fc" id="L102">                    Segment  seg = new Segment(intersections.get(origin),intersections.get(dest), len, name);</span>
+<span class="fc" id="L103">                    segments.add(seg);</span>
+
+                }
+            }	
+<span class="fc" id="L107">            this.map = new Map(intersections, segments);</span>
+            
+<span class="fc" id="L109">        }catch (Exception e){  </span>
+            //e.printStackTrace(); 
+<span class="fc" id="L111">            System.out.println(&quot;/!\\ Errors on map file&quot;);</span>
+<span class="fc" id="L112">            return false;</span>
+<span class="fc" id="L113">        }</span>
+        
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        return this.map != null;</span>
+   }
+
+    /**
+     * Read a xml file to create an instance of PlanningRequest class
+     * @param filename path of a xml file
+     * @return
+     */
+    public PlanningRequest readRequest(String filename){
+        
+<span class="fc" id="L125">        PlanningRequest pr = null;</span>
+<span class="fc" id="L126">        List&lt;Request&gt; requests = new ArrayList&lt;Request&gt;();</span>
+<span class="fc" id="L127">        Depot depot = null;</span>
+        
+        
+        try {  
+            //creating a constructor of file class and parsing an XML file (attention de le changer //) 
+<span class="fc" id="L132">            File file = new File(filename);  </span>
+
+            //an instance of factory that gives a document builder  
+<span class="fc" id="L135">            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  </span>
+
+            //an instance of builder to parse the specified xml file  
+<span class="fc" id="L138">            DocumentBuilder db = dbf.newDocumentBuilder();  </span>
+
+<span class="fc" id="L140">            Document doc = db.parse(file);  </span>
+<span class="fc" id="L141">            doc.getDocumentElement().normalize();  </span>
+            
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if(!doc.getDocumentElement().getNodeName().equals(&quot;planningRequest&quot;)) return null;</span>
+            
+<span class="fc" id="L145">            NodeList nodeList = doc.getElementsByTagName(&quot;depot&quot;);  </span>
+<span class="fc" id="L146">            SimpleDateFormat hourFormat =new SimpleDateFormat(&quot;HH:mm:ss&quot;); </span>
+            
+            // nodeList is not iterable, so we are using for loop  
+<span class="fc bfc" id="L149" title="All 2 branches covered.">            for (int itr = 0; itr &lt; nodeList.getLength(); itr++) { </span>
+
+<span class="fc" id="L151">                    Node node = nodeList.item(itr);  </span>
+
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">                    if (node.getNodeType() == Node.ELEMENT_NODE){  </span>
+<span class="fc" id="L154">                        Element eElement = (Element) node;  </span>
+<span class="fc" id="L155">                        Long adrId = Long.parseLong(eElement.getAttribute(&quot;address&quot;));</span>
+<span class="fc" id="L156">                        Intersection adr = map.getIntersections().get(adrId);</span>
+                        
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">                        if(adr == null){</span>
+<span class="nc" id="L159">                            break;</span>
+                        }
+<span class="fc" id="L161">                        Date departure = hourFormat.parse(eElement.getAttribute(&quot;departureTime&quot;));</span>
+                        
+<span class="fc" id="L163">                        depot = new Depot (adr, departure); </span>
+                    }  
+            } 
+            
+<span class="fc" id="L167">            nodeList = doc.getElementsByTagName(&quot;request&quot;);  </span>
+            
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            for (int itr = 0; itr &lt; nodeList.getLength(); itr++) { </span>
+
+<span class="fc" id="L171">                Node node = nodeList.item(itr);  </span>
+
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">                if (node.getNodeType() == Node.ELEMENT_NODE){  </span>
+<span class="fc" id="L174">                    Element eElement = (Element) node;  </span>
+<span class="fc" id="L175">                    Long pkId = Long.parseLong(eElement.getAttribute(&quot;pickupAddress&quot;));</span>
+                    Long dlId;
+                    
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">                    if(!&quot;&quot;.equals(eElement.getAttribute(&quot;deliveryAddress&quot;)))</span>
+<span class="fc" id="L179">                        dlId= Long.parseLong(eElement.getAttribute(&quot;deliveryAddress&quot;));</span>
+                    else
+<span class="nc" id="L181">                        dlId= Long.parseLong(eElement.getAttribute(&quot;adresseLivraison&quot;));</span>
+                    
+<span class="fc" id="L183">                    Integer pkD = Integer.parseInt(eElement.getAttribute(&quot;pickupDuration&quot;));</span>
+<span class="fc" id="L184">                    Integer dlD = Integer.parseInt(eElement.getAttribute(&quot;deliveryDuration&quot;));</span>
+                    
+<span class="fc" id="L186">                    Intersection pkAdr = map.getIntersections().get(pkId);</span>
+<span class="fc" id="L187">                    Intersection dlAdr = map.getIntersections().get(dlId);</span>
+                    
+<span class="pc bpc" id="L189" title="2 of 4 branches missed.">                    if(pkAdr == null || dlAdr == null){</span>
+<span class="nc" id="L190">                        requests.clear();</span>
+<span class="nc" id="L191">                        break;</span>
+                    }
+<span class="fc" id="L193">                    Request request = new Request(pkAdr, dlAdr, pkD, dlD);</span>
+<span class="fc" id="L194">                    requests.add(request); </span>
+                
+                }
+            }
+<span class="fc" id="L198">            pr = new PlanningRequest (depot, requests);</span>
+            
+<span class="nc" id="L200">        }catch (Exception e){  </span>
+            //e.printStackTrace();  
+<span class="nc" id="L202">            System.out.println(&quot;/!\\ Errors on request file&quot;);</span>
+<span class="fc" id="L203">        }  </span>
+        
+<span class="fc" id="L205">        return pr;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

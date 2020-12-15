@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlanningRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.request</a> &gt; <span class="el_source">PlanningRequest.java</span></div><h1>PlanningRequest.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.request;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * An object representing a tour information before it's computation
+ * @author zakaria
+ */
+public class PlanningRequest {
+    /**
+     * Deposit point
+     */
+    private Depot depot;
+    /**
+     * Requests of the tour
+     */
+    private List&lt;Request&gt; requests;
+
+    /**
+     * Create an empty planning request
+     */
+<span class="nc" id="L29">    public PlanningRequest() {</span>
+<span class="nc" id="L30">        this.requests = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L31">    }</span>
+
+    /**
+     * Create a new planning request
+     *
+     * @param depot the planning depot
+     * @param requests planning's requests
+     */
+<span class="fc" id="L39">    public PlanningRequest(Depot depot, List&lt;Request&gt; requests) {</span>
+<span class="fc" id="L40">        this.depot = depot;</span>
+<span class="fc" id="L41">        this.requests = requests;</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Get planning depot
+     *
+     * @return planning depot
+     */
+    public Depot getDepot() {
+<span class="fc" id="L50">        return depot;</span>
+    }
+
+    /**
+     * Get the requests composing the planning
+     *
+     * @return planning's requests
+     */
+    public List&lt;Request&gt; getRequests() {
+<span class="fc" id="L59">        return requests;</span>
+    }
+
+    /**
+     * Set the planning depot
+     *
+     * @param depot new planning depot
+     */
+    public void setDepot(Depot depot) {
+<span class="nc" id="L68">        this.depot = depot;</span>
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Set the requests composing the planning
+     *
+     * @param requests planning's requests
+     */
+    public void setRequests(List&lt;Request&gt; requests) {
+<span class="nc" id="L77">        this.requests = requests;</span>
+<span class="nc" id="L78">    }</span>
+
+    /**
+     * Add a request to the planning
+     *
+     * @param r the request to add
+     */
+    public void addRequest(Request r) {
+<span class="nc" id="L86">        this.requests.add(r);</span>
+<span class="nc" id="L87">    }</span>
+
+    /**
+     * Remove a request from the planning
+     *
+     * @param r the request to remove
+     */
+    public void removeRequest(Request r) {
+<span class="nc" id="L95">        this.requests.remove(r);</span>
+<span class="nc" id="L96">    }</span>
+
+    /**
+     * Find out the {@code Request} which contains the intersection 
+     * having the same identity of its parameter
+     *
+     * @param idItsc the identity of the intersection
+     * @return the object Request containing the specific intersection, 
+     * {@code null} if the demanding request wasn't found
+     */
+    public Request findRequestByAddress(Long idItsc){
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        for(Request rq : requests){</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">            if(Objects.equals(rq.getDeliveryAddress().getId(), idItsc) </span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            || Objects.equals(rq.getDeliveryAddress().getId(), idItsc)){</span>
+<span class="nc" id="L110">                return rq;</span>
+            }
+<span class="nc" id="L112">        }</span>
+<span class="nc" id="L113">        return null;</span>
+    }
+    
+    /**
+     * Get the duration corresponding to the request which contains 
+     * the intersection having the same identity of its parameter
+     *
+     * @param idItsc the identity of the intersection
+     * @return the integer time in second, 
+     * {@code -1} if the demanding request wasn't found
+     */
+    public int getDuration(Long idItsc){
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        for(Request rq : requests){</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if(Objects.equals(rq.getPickupAddress().getId(), idItsc)){</span>
+<span class="nc" id="L127">                return rq.getPickupDuration();</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            } else if(Objects.equals(rq.getDeliveryAddress().getId(), idItsc)){</span>
+<span class="nc" id="L129">                return rq.getDeliveryDuration();</span>
+            }
+<span class="nc" id="L131">        }</span>
+<span class="nc" id="L132">        return -1;</span>
+    }
+
+    /**
+     * Get intersection type from requests
+     *
+     * @param id intersection id
+     * @return intersection type can be either &quot;Delivery&quot; or &quot;Pickup&quot;
+     */
+    public String researchTypeIntersection(Long id) {
+        
+<span class="nc" id="L143">        String res = &quot;&quot;;</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        for (Request r : requests) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (Objects.equals(r.getDeliveryAddress().getId(), id)) {</span>
+<span class="nc" id="L146">                res = &quot;Delivery&quot;;</span>
+<span class="nc" id="L147">                break;</span>
+            }
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (Objects.equals(r.getPickupAddress().getId(), id)) {</span>
+<span class="nc" id="L151">                res = &quot;Pickup&quot;;</span>
+<span class="nc" id="L152">                break;</span>
+            }
+<span class="nc" id="L154">        }</span>
+<span class="nc" id="L155">        return res;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L160">        return &quot;PlanningRequest{depot=&quot; + depot + &quot;, requests=&quot; + requests + '}';</span>
+    }
+
+    public boolean isEmpty() {
+<span class="nc bnc" id="L164" title="All 4 branches missed.">        return requests.isEmpty() || depot == null;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

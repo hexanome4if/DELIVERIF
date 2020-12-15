@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TourComputedState.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.State</a> &gt; <span class="el_source">TourComputedState.java</span></div><h1>TourComputedState.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.controller.State;
+
+import deliverif.app.controller.MenuPageController;
+import java.io.IOException;
+
+/**
+ * State when a tour has been computed
+ * @author zakaria
+ */
+public class TourComputedState extends State {
+
+    /**
+     * Start a tour computed state when a tour has been computed
+     *
+     * @param mpc the current view controller
+     */
+    public TourComputedState(MenuPageController mpc) {
+<span class="nc" id="L23">        super(mpc);</span>
+<span class="nc" id="L24">    }</span>
+
+    @Override
+    public void loadMap() throws IOException {
+<span class="nc" id="L28">        mpc.loadMap();</span>
+<span class="nc" id="L29">        mpc.setCurrentState(new MapLoadedState(mpc));</span>
+<span class="nc" id="L30">    }</span>
+
+    @Override
+    public void loadRequest() throws IOException {
+<span class="nc" id="L34">        mpc.loadRequest();</span>
+<span class="nc" id="L35">        mpc.setCurrentState(new RequestLoadedState(mpc));</span>
+<span class="nc" id="L36">    }</span>
+
+    @Override
+    public void computeTour() {
+<span class="nc" id="L40">        mpc.computeTour();</span>
+<span class="nc" id="L41">        mpc.setCurrentState(new TourComputedState(mpc));</span>
+<span class="nc" id="L42">    }</span>
+
+    @Override
+    public void removeRequest() {
+<span class="nc" id="L46">        mpc.removeRequest();</span>
+<span class="nc" id="L47">    }</span>
+
+    @Override
+    public void startAddRequest() {
+<span class="nc" id="L51">        mpc.startAddRequest();</span>
+<span class="nc" id="L52">        mpc.setCurrentState(new AddingRequestState(mpc));</span>
+<span class="nc" id="L53">    }</span>
+    
+    @Override
+    public void startSwapRequest() {
+<span class="nc" id="L57">        mpc.startSwapRequest();</span>
+<span class="nc" id="L58">        mpc.setCurrentState(new SwapRequestState(mpc));</span>
+<span class="nc" id="L59">    }</span>
+
+    @Override
+    public void redo() {
+<span class="nc" id="L63">        mpc.redo();</span>
+<span class="nc" id="L64">    }</span>
+
+    @Override
+    public void undo() {
+<span class="nc" id="L68">        mpc.undo();</span>
+<span class="nc" id="L69">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

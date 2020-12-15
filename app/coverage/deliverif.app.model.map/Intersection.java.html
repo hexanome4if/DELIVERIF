@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Intersection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.map</a> &gt; <span class="el_source">Intersection.java</span></div><h1>Intersection.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.map;
+
+/**
+ * Represents an intersection on the map
+ * @author zakaria
+ */
+public class Intersection {
+    /**
+     * Intersection unique id
+     */
+    private Long id;
+    /**
+     * Latitude position
+     */
+    private float latitude;
+    /**
+     * Longitude position
+     */
+    private float longitude;
+
+    /**
+     * Create an empty intersection
+     */
+<span class="nc" id="L29">    public Intersection() {</span>
+<span class="nc" id="L30">    }</span>
+
+    /**
+     * Create an intersection with only an id
+     *
+     * @param id intersection id
+     */
+<span class="nc" id="L37">    public Intersection(Long id) {</span>
+<span class="nc" id="L38">        this.id = id;</span>
+<span class="nc" id="L39">    }</span>
+
+    /**
+     * Create an intersection
+     *
+     * @param id intersection id
+     * @param latitude intersection latitude
+     * @param longitude intersection longitude
+     */
+<span class="fc" id="L48">    public Intersection(Long id, float latitude, float longitude) {</span>
+<span class="fc" id="L49">        this.id = id;</span>
+<span class="fc" id="L50">        this.latitude = latitude;</span>
+<span class="fc" id="L51">        this.longitude = longitude;</span>
+<span class="fc" id="L52">    }</span>
+
+    /**
+     * Get intersection id
+     *
+     * @return intersection id
+     */
+    public Long getId() {
+<span class="fc" id="L60">        return id;</span>
+    }
+
+    /**
+     * Get intersection latitude
+     *
+     * @return intersection latitude
+     */
+    public float getLatitude() {
+<span class="nc" id="L69">        return latitude;</span>
+    }
+
+    /**
+     * Get intersection longitude
+     *
+     * @return intersection longitude
+     */
+    public float getLongitude() {
+<span class="nc" id="L78">        return longitude;</span>
+    }
+
+    /**
+     * Set intersection id
+     *
+     * @param id new intersection id
+     */
+    public void setId(Long id) {
+<span class="nc" id="L87">        this.id = id;</span>
+<span class="nc" id="L88">    }</span>
+
+    /**
+     * Set intersection latitude
+     *
+     * @param latitude new intersection latitude
+     */
+    public void setLatitude(float latitude) {
+<span class="nc" id="L96">        this.latitude = latitude;</span>
+<span class="nc" id="L97">    }</span>
+
+    /**
+     * Set intersection longitude
+     *
+     * @param longitude new intersection longitude
+     */
+    public void setLongitude(float longitude) {
+<span class="nc" id="L105">        this.longitude = longitude;</span>
+<span class="nc" id="L106">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L110">        return &quot;Intersection{(&quot; + id + &quot;) latitude=&quot; + latitude + &quot;, longitude=&quot; + longitude + &quot;}\n&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

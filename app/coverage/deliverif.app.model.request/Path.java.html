@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Path.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.model.request</a> &gt; <span class="el_source">Path.java</span></div><h1>Path.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package deliverif.app.model.request;
+
+import deliverif.app.model.map.Intersection;
+import deliverif.app.model.map.Segment;
+import java.util.ArrayList;
+import java.util.Date;
+
+/**
+ * Represents a path of segments between two points on the map
+ * @author zakaria
+ */
+public class Path {
+    /**
+     * List of segments to go from departure to arrival
+     */
+    private ArrayList&lt;Segment&gt; segments;
+    /**
+     * Departure point
+     */
+    private Intersection departure;
+    /**
+     * Arrival point
+     */
+    private Intersection arrival;
+    /**
+     * Length of the path
+     */
+    private float length;
+    /**
+     * Departure time from departure point
+     */
+    private Date depatureTime;
+    /**
+     * Arrival time to arrival point
+     */
+    private Date arrivalTime;
+    /**
+     * THe request containing the departure point
+     */
+    private Request request;
+    /**
+     * The type of the path
+     */
+    private Type type;
+
+<span class="nc" id="L51">    public enum Type {</span>
+<span class="nc" id="L52">        PICKUP,</span>
+<span class="nc" id="L53">        DELIVERY,</span>
+<span class="nc" id="L54">        WAREHOUSE</span>
+    }
+
+    /**
+     * Create an empty path
+     */
+<span class="fc" id="L60">    public Path() {</span>
+<span class="fc" id="L61">        this.segments = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L62">        this.length = 0;</span>
+<span class="fc" id="L63">    }</span>
+
+    /**
+     * Create a copy of a path
+     *
+     * @param p the path to copy informations from
+     */
+<span class="fc" id="L70">    public Path(Path p) {</span>
+<span class="fc" id="L71">        this.segments = p.getSegments();</span>
+<span class="fc" id="L72">        this.departure = p.getDeparture();</span>
+<span class="fc" id="L73">        this.arrival = p.getArrival();</span>
+<span class="fc" id="L74">        this.length = p.getLength();</span>
+<span class="fc" id="L75">        this.depatureTime = p.getDepatureTime();</span>
+<span class="fc" id="L76">        this.arrivalTime = p.getArrivalTime();</span>
+<span class="fc" id="L77">        this.request = p.getRequest();</span>
+<span class="fc" id="L78">        this.type = p.getType();</span>
+<span class="fc" id="L79">    }</span>
+   
+
+    
+    /**
+     * Get path's segments
+     *
+     * @return path's segments
+     */
+    public ArrayList&lt;Segment&gt; getSegments() {
+<span class="fc" id="L89">        return segments;</span>
+    }
+
+    /**
+     * Get path departure point
+     *
+     * @return intersection representing departure point
+     */
+    public Intersection getDeparture() {
+<span class="fc" id="L98">        return departure;</span>
+    }
+
+    /**
+     * Get path arrival
+     *
+     * @return intersection representing arrival point
+     */
+    public Intersection getArrival() {
+<span class="fc" id="L107">        return arrival;</span>
+    }
+
+    /**
+     * Get path length
+     *
+     * @return path length
+     */
+    public float getLength() {
+<span class="fc" id="L116">        return length;</span>
+    }
+
+    /**
+     * Get departure time
+     *
+     * @return departure time
+     */
+    public Date getDepatureTime() {
+<span class="fc" id="L125">        return depatureTime;</span>
+    }
+
+    /**
+     * Get arrival time
+     *
+     * @return arrival time
+     */
+    public Date getArrivalTime() {
+<span class="fc" id="L134">        return arrivalTime;</span>
+    }
+
+    /**
+     * Get the request represented by the path
+     *
+     * @return requests of the path
+     */
+    public Request getRequest() {
+<span class="fc" id="L143">        return request;</span>
+    }
+
+    /**
+     * Get path type
+     *
+     * @return path type
+     */
+    public Type getType() {
+<span class="fc" id="L152">        return type;</span>
+    }
+
+    /**
+     * Set path's segments
+     *
+     * @param segments segments representing the path
+     */
+    public void setSegments(ArrayList&lt;Segment&gt; segments) {
+<span class="nc" id="L161">        this.segments = segments;</span>
+<span class="nc" id="L162">    }</span>
+
+    /**
+     * Set path departure
+     *
+     * @param departure intersection representing the departure point
+     */
+    public void setDeparture(Intersection departure) {
+<span class="fc" id="L170">        this.departure = departure;</span>
+<span class="fc" id="L171">    }</span>
+
+    /**
+     * Set path arrival
+     *
+     * @param arrival intersection representing the arrival point
+     */
+    public void setArrival(Intersection arrival) {
+<span class="fc" id="L179">        this.arrival = arrival;</span>
+<span class="fc" id="L180">    }</span>
+
+    /**
+     * Set path length
+     *
+     * @param length path length
+     */
+    public void setLength(float length) {
+<span class="fc" id="L188">        this.length = length;</span>
+<span class="fc" id="L189">    }</span>
+
+    /**
+     * Set departure time
+     *
+     * @param depatureTime departure time as a date object
+     */
+    public void setDepatureTime(Date depatureTime) {
+<span class="fc" id="L197">        this.depatureTime = depatureTime;</span>
+<span class="fc" id="L198">    }</span>
+
+    /**
+     * Set arrival time
+     *
+     * @param arrivalTime arrival time as a date object
+     */
+    public void setArrivalTime(Date arrivalTime) {
+<span class="fc" id="L206">        this.arrivalTime = arrivalTime;</span>
+<span class="fc" id="L207">    }</span>
+
+    /**
+     * Set the request representing the path
+     *
+     * @param request request represented by the path
+     */
+    public void setRequest(Request request) {
+<span class="nc" id="L215">        this.request = request;</span>
+<span class="nc" id="L216">    }</span>
+
+    /**
+     * Add a segment to the path
+     *
+     * @param s the segemnt to add
+     */
+    public void addSegment(Segment s) {
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        if (segments.isEmpty()) {</span>
+<span class="fc" id="L225">            departure = s.getOrigin();</span>
+        }
+<span class="fc" id="L227">        this.segments.add(s);</span>
+<span class="fc" id="L228">        this.arrival = s.getDestination();</span>
+<span class="fc" id="L229">        this.length += s.getLength();</span>
+<span class="fc" id="L230">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L234">        return &quot;Departure: &quot; + departure + &quot;\nArrival: &quot; + arrival + &quot;\nLength: &quot; + length;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

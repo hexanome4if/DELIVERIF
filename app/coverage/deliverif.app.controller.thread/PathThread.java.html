@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PathThread.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app$Whole_project.exec</a> &gt; <a href="index.source.html" class="el_package">deliverif.app.controller.thread</a> &gt; <span class="el_source">PathThread.java</span></div><h1>PathThread.java</h1><pre class="source lang-java linenums">package deliverif.app.controller.thread;
+
+import deliverif.app.controller.MenuPageController;
+import deliverif.app.model.map.Segment;
+import deliverif.app.model.request.Path;
+import java.util.ArrayList;
+import org.graphstream.graph.Edge;
+
+/**
+ * Thread to display the selected path
+ * @author H4314
+ */
+public class PathThread extends Thread {
+
+    /**
+     * MenuPageController instance
+     */
+    private MenuPageController mpc;
+    
+    /**
+     * Position of the path in the tour
+     */
+    private int num;
+    
+    /**
+     * Boolean to check if the thread must continue to run or stop
+     */
+<span class="nc" id="L28">    private volatile boolean continueRun = true;</span>
+    /**
+     * Boolean to check if the thread execution is finished
+     */
+<span class="nc" id="L32">    private volatile boolean isFinished = false;</span>
+
+    /**
+     * Constructor
+     * @param mpc
+     * @param num
+     */
+<span class="nc" id="L39">    public PathThread(MenuPageController mpc, int num) {</span>
+<span class="nc" id="L40">        this.mpc = mpc;</span>
+<span class="nc" id="L41">        this.num = num;</span>
+<span class="nc" id="L42">    }</span>
+
+    /**
+     * Run the thread
+     */
+    @Override
+    public void run() {
+        try {
+<span class="nc" id="L50">            this.isFinished = false;</span>
+<span class="nc" id="L51">            System.out.println(&quot;computePathAction&quot;);</span>
+
+<span class="nc" id="L53">            String color = &quot;fill-color: blue;&quot;;</span>
+<span class="nc" id="L54">            int pathIndex = num - 1;</span>
+
+<span class="nc" id="L56">            Path p = mpc.getTour().getPaths().get(pathIndex);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">            while (this.continueRun) {</span>
+<span class="nc" id="L58">                this.changeColor(p, &quot;marked&quot;);</span>
+<span class="nc" id="L59">                sleep();</span>
+<span class="nc" id="L60">                this.changeColor(p, &quot;unmarked&quot;);</span>
+            }
+<span class="nc" id="L62">            this.isFinished = true;</span>
+<span class="nc" id="L63">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            System.out.println(&quot;Path Thread crash : &quot; + e);</span>
+<span class="nc" id="L65">        }</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * Stop the thread
+     */
+    public void end() {
+<span class="nc" id="L72">        this.continueRun = false;</span>
+<span class="nc" id="L73">    }</span>
+
+    /**
+     * Check if the thread execution is finished
+     * @return true if the thread is finished
+     */
+    public boolean isIsFinished() {
+<span class="nc" id="L80">        return isFinished;</span>
+    }
+
+    /**
+     * Sleep during 200 milliseconds
+     */
+    protected void sleep() {
+        try {
+<span class="nc" id="L88">            Thread.sleep(200);</span>
+<span class="nc" id="L89">        } catch (Exception e) {</span>
+<span class="nc" id="L90">        }</span>
+<span class="nc" id="L91">    }</span>
+
+    /**
+     * Change the color of the path according to it uiClass, display segments on by one in blue
+     * @param p path to change the color
+     * @param uiClass class of the path it can be marked or unmarked
+     */
+    private void changeColor(Path p, String uiClass) {
+        try {
+<span class="nc" id="L100">            ArrayList&lt;Segment&gt; listSegment = p.getSegments();</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            for (int i = listSegment.size() - 1; i &gt;= 0; i--) {</span>
+<span class="nc bnc" id="L102" title="All 4 branches missed.">                if (!this.continueRun &amp;&amp; uiClass.equals(&quot;marked&quot;)) {</span>
+<span class="nc" id="L103">                    break;</span>
+                }
+<span class="nc" id="L105">                Segment s = listSegment.get(i);</span>
+<span class="nc" id="L106">                String originId = s.getOrigin().getId().toString();</span>
+<span class="nc" id="L107">                String destId = s.getDestination().getId().toString();</span>
+
+<span class="nc" id="L109">                Edge edge = mpc.getGraph().getEdge(originId + &quot;|&quot; + destId);</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                if (edge != null) {</span>
+<span class="nc" id="L111">                    edge.setAttribute(&quot;ui.class&quot;, uiClass);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">                    if (uiClass.equals(&quot;marked&quot;)) {</span>
+<span class="nc" id="L113">                        sleep();</span>
+                    }
+                } else {
+<span class="nc" id="L116">                    edge = mpc.getGraph().getEdge(destId + &quot;|&quot; + originId);</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                    if (edge != null) {</span>
+<span class="nc" id="L118">                        edge.setAttribute(&quot;ui.class&quot;, uiClass);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                        if (uiClass.equals(&quot;marked&quot;)) {</span>
+<span class="nc" id="L120">                            sleep();</span>
+                        }
+                    } else {
+<span class="nc" id="L123">                        System.out.println(&quot;Edge not found&quot;);</span>
+                    }
+                }
+            }
+<span class="nc" id="L127">        } catch (Exception e) {</span>
+<span class="nc" id="L128">            System.out.println(&quot;Error in changeColor :&quot; + e);</span>
+<span class="nc" id="L129">        }</span>
+
+<span class="nc" id="L131">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
