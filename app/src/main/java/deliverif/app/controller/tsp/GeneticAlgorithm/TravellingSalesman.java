@@ -17,7 +17,8 @@ import java.util.Random;
 /**
  *
  * @author zakaria
- * Adapted from the implementation provided by Darinka Zobenica: https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
+ * Adapted from the implementation provided by Darinka Zobenica:
+ * https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
 
  */
 public class TravellingSalesman {

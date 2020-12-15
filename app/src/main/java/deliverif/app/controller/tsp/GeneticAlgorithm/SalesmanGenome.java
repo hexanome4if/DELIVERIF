@@ -15,7 +15,8 @@ import java.util.List;
 /**
  *
  * @author zakaria
- * Adapted from the implementation provided by Darinka Zobenica: https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
+ * Adapted from the implementation provided by Darinka Zobenica: 
+ * https://github.com/Mentathiel/StackAbuseGeneticTravelingSalesman
  */
 public class SalesmanGenome implements Comparable {
     // The list of stops in the order in which they should be visited.
